@@ -13,8 +13,9 @@
    * **左侧 AI 访谈助手**：通过结构化对话挖掘用户经历，基于 STAR 原则提炼高量化成果与技术亮点；
    * **右侧 A4 实时画布**：所见即所得实时渲染，同时保留直接点击修改正文的能力，兼顾效率与精细控制。
 
-2. **万物皆 Section 积木模型**
-   * 内容块采用通用积木抽象，不预设死板的模块类型，用户可自由定义经历、作品、技能或自由文本；
+2. **彻底的「万物皆 Section」积木模型**
+   * **完全消灭顶层异构体**：不再设立孤立的 `basics` 或 Header 外挂，个人名片、头像与联系方式同样作为标准的 `profile` Section 存在；
+   * **自由度最大化**：个人信息模块可自由拖拽进 `sidebar` 侧栏或 `main` 主栏，在匿名简历评审或特定作品集场景下亦可直接隐藏或删除；
    * 全面拥抱富文本表现力，支持行内高亮、关键词着色与链接插入。
 
 3. **双槽位自适应布局 (Unified Slot Grid)**
@@ -39,32 +40,35 @@
 
 ## 核心数据结构规范 (Data Schema Specification)
 
-简历采用统一、严谨的 TypeScript / JSON 领域模型定义，兼顾 ATS 机器检索、流式 Tool Calling 与高自由度前端拖拽渲染：
+简历采用高度统一、扁平且类型安全的 TypeScript / JSON 领域模型，所有内容块均为 Section 积木，支持统一的拖拽排序与流式 Tool Calling：
 
 ### 1. TypeScript 接口定义
 
 ```typescript
-/** 个人基础信息（兼顾 PDF 文件名导出、ATS 检索与社交分享） */
-export interface ResumeBasics {
+/** 联系方式项定义 */
+export interface ContactItem {
+  id: string;
+  type: 'phone' | 'email' | 'link' | 'location' | 'github' | 'wechat' | 'linkedin' | 'custom';
+  icon?: string;
+  label: string;
+  value: string;
+  href?: string;
+}
+
+/** 个人名片载荷（当 section.type === 'profile' 时生效） */
+export interface ProfileData {
   name: string;
   headline: string;
   avatar?: {
     url: string;
     shape: 'circle' | 'rounded' | 'square';
-    size: number; // 默认 84px
+    size: number;
     visible: boolean;
   };
-  contacts: Array<{
-    id: string;
-    type: 'phone' | 'email' | 'link' | 'location' | 'github' | 'wechat' | 'linkedin' | 'custom';
-    icon?: string;
-    label: string;
-    value: string;
-    href?: string;
-  }>;
+  contacts: ContactItem[];
 }
 
-/** 经历 / 项目 / 技能等明细项目 */
+/** 经历 / 项目 / 技能等通用明细条目 */
 export interface ResumeItem {
   id: string;
   title: string;              // 职位 / 项目名 / 学位
@@ -76,15 +80,17 @@ export interface ResumeItem {
   visible: boolean;
 }
 
-/** 通用 Section 积木块 */
+/** 通用 Section 积木块（名片、经历、项目、技能均属于此） */
 export interface ResumeSection {
   id: string;
-  title: string;              // 模块标题，如 "工作经历"
+  title: string;              // 模块标题，如 "个人信息"、"工作经历"
+  showHeader: boolean;        // 是否渲染标题栏（个人名片通常为 false，经历为 true）
   icon?: string;              // 图标标识
-  type: 'experience' | 'education' | 'project' | 'skill' | 'richtext' | 'custom';
+  type: 'profile' | 'experience' | 'education' | 'project' | 'skill' | 'richtext' | 'custom';
   slot: 'main' | 'sidebar';   // 渲染槽位：主区域 或 侧边栏
   visible: boolean;
-  items: ResumeItem[];
+  profile?: ProfileData;      // 专属名片数据
+  items: ResumeItem[];        // 细项列表
 }
 
 /** 双槽位网格布局配置 */
@@ -106,19 +112,19 @@ export interface ResumeDesign {
   customCss: string;          // 高级用户自定义 CSS 覆写代码
 }
 
-/** 顶层完整简历实体 */
+/** 顶层完整简历文档（纯扁平积木流） */
 export interface YizhiResume {
   version: '2.0.0';
   metadata: {
-    title: string;
+    id: string;
+    title: string;            // 简历文档名称，如 "前端专家简历"
     createdAt: string;
     updatedAt: string;
     language: 'zh' | 'en';
     paperSize: 'A4' | 'Letter';
   };
-  basics: ResumeBasics;
   layout: ResumeLayout;
-  sections: ResumeSection[];
+  sections: ResumeSection[];  // 所有的内容积木，统一编排与排序
   design: ResumeDesign;
 }
 ```
@@ -129,21 +135,12 @@ export interface YizhiResume {
 {
   "version": "2.0.0",
   "metadata": {
+    "id": "cv_20261110_01",
     "title": "求职简历",
     "createdAt": "2026-11-10T09:00:00.000Z",
     "updatedAt": "2026-11-10T09:00:00.000Z",
     "language": "zh",
     "paperSize": "A4"
-  },
-  "basics": {
-    "name": "求职者",
-    "headline": "资深前端全栈工程师",
-    "avatar": { "url": "", "shape": "circle", "size": 84, "visible": false },
-    "contacts": [
-      { "id": "c1", "type": "phone", "label": "电话", "value": "138-0000-0000", "href": "tel:13800000000" },
-      { "id": "c2", "type": "email", "label": "邮箱", "value": "me@example.com", "href": "mailto:me@example.com" },
-      { "id": "c3", "type": "github", "label": "GitHub", "value": "github.com", "href": "https://github.com" }
-    ]
   },
   "layout": {
     "mode": "single",
@@ -152,8 +149,27 @@ export interface YizhiResume {
   },
   "sections": [
     {
+      "id": "sec_profile",
+      "title": "个人信息",
+      "showHeader": false,
+      "type": "profile",
+      "slot": "main",
+      "visible": true,
+      "profile": {
+        "name": "求职者",
+        "headline": "资深前端全栈工程师",
+        "avatar": { "url": "", "shape": "circle", "size": 84, "visible": false },
+        "contacts": [
+          { "id": "c1", "type": "phone", "label": "电话", "value": "138-0000-0000", "href": "tel:13800000000" },
+          { "id": "c2", "type": "email", "label": "邮箱", "value": "me@example.com", "href": "mailto:me@example.com" }
+        ]
+      },
+      "items": []
+    },
+    {
       "id": "sec_experience",
       "title": "工作经历",
+      "showHeader": true,
       "type": "experience",
       "slot": "main",
       "visible": true,

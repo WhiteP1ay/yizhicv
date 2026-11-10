@@ -23,9 +23,9 @@ export const contactItemSchema = z.object({
 export type ContactItem = z.infer<typeof contactItemSchema>;
 
 /**
- * 个人基础信息（兼顾 PDF 文件名、ATS 检索与卡片展示）
+ * 个人信息配置（作为 Profile 类型 Section 的数据载荷）
  */
-export const resumeBasicsSchema = z.object({
+export const profileDataSchema = z.object({
   name: z.string().default(""),
   headline: z.string().default(""),
   avatar: z
@@ -38,7 +38,7 @@ export const resumeBasicsSchema = z.object({
     .optional(),
   contacts: z.array(contactItemSchema).default([]),
 });
-export type ResumeBasics = z.infer<typeof resumeBasicsSchema>;
+export type ProfileData = z.infer<typeof profileDataSchema>;
 
 /**
  * 经历/项目/技能细项
@@ -56,17 +56,27 @@ export const resumeItemSchema = z.object({
 export type ResumeItem = z.infer<typeof resumeItemSchema>;
 
 /**
- * 通用 Section 积木块
+ * 通用 Section 积木块（彻底的万物皆 Section：包括个人信息 Profile 也作为普通积木流转）
  */
 export const resumeSectionSchema = z.object({
   id: z.string(),
   title: z.string(),
+  showHeader: z.boolean().default(true),
   icon: z.string().optional(),
   type: z
-    .enum(["experience", "education", "project", "skill", "richtext", "custom"])
+    .enum([
+      "profile",
+      "experience",
+      "education",
+      "project",
+      "skill",
+      "richtext",
+      "custom",
+    ])
     .default("custom"),
   slot: z.enum(["main", "sidebar"]).default("main"),
   visible: z.boolean().default(true),
+  profile: profileDataSchema.optional(),
   items: z.array(resumeItemSchema).default([]),
 });
 export type ResumeSection = z.infer<typeof resumeSectionSchema>;
@@ -98,17 +108,18 @@ export type ResumeDesign = z.infer<typeof resumeDesignSchema>;
 
 /**
  * 顶层简历完整文档结构
+ * 彻底消除顶层基础信息异构体，所有内容完全由 sections 统一编排
  */
 export const yizhiResumeSchema = z.object({
   version: z.literal("2.0.0"),
   metadata: z.object({
+    id: z.string(),
     title: z.string().default("未命名简历"),
     createdAt: z.string(),
     updatedAt: z.string(),
     language: z.enum(["zh", "en"]).default("zh"),
     paperSize: z.enum(["A4", "Letter"]).default("A4"),
   }),
-  basics: resumeBasicsSchema,
   layout: resumeLayoutSchema,
   sections: z.array(resumeSectionSchema).default([]),
   design: resumeDesignSchema,
@@ -116,59 +127,34 @@ export const yizhiResumeSchema = z.object({
 export type YizhiResume = z.infer<typeof yizhiResumeSchema>;
 
 /**
+ * 根据简历提取导出文件名（优先标题，次选姓名+职位，保底时间戳）
+ */
+export function getResumeExportName(resume: YizhiResume): string {
+  if (resume.metadata.title && resume.metadata.title !== "未命名简历") {
+    return resume.metadata.title;
+  }
+  const profileSection = resume.sections.find((s) => s.type === "profile");
+  const name = profileSection?.profile?.name?.trim();
+  const headline = profileSection?.profile?.headline?.trim();
+  if (name) {
+    return headline ? `${name}_${headline}` : `${name}_简历`;
+  }
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  return `简历_${dateStr}`;
+}
+
+/**
  * 默认初始简历模板数据
  */
 export const defaultResume: YizhiResume = {
   version: "2.0.0",
   metadata: {
+    id: "cv_default",
     title: "求职简历",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     language: "zh",
     paperSize: "A4",
-  },
-  basics: {
-    name: "求职者",
-    headline: "资深前端全栈工程师",
-    avatar: {
-      url: "",
-      shape: "circle",
-      size: 84,
-      visible: false,
-    },
-    contacts: [
-      {
-        id: "c_phone",
-        type: "phone",
-        icon: "phone",
-        label: "电话",
-        value: "138-0000-0000",
-        href: "tel:13800000000",
-      },
-      {
-        id: "c_email",
-        type: "email",
-        icon: "mail",
-        label: "邮箱",
-        value: "example@gmail.com",
-        href: "mailto:example@gmail.com",
-      },
-      {
-        id: "c_location",
-        type: "location",
-        icon: "map-pin",
-        label: "城市",
-        value: "北京",
-      },
-      {
-        id: "c_github",
-        type: "github",
-        icon: "github",
-        label: "GitHub",
-        value: "github.com",
-        href: "https://github.com",
-      },
-    ],
   },
   layout: {
     mode: "single",
@@ -177,8 +163,61 @@ export const defaultResume: YizhiResume = {
   },
   sections: [
     {
+      id: "sec_profile",
+      title: "个人信息",
+      showHeader: false,
+      type: "profile",
+      slot: "main",
+      visible: true,
+      profile: {
+        name: "求职者",
+        headline: "资深前端全栈工程师",
+        avatar: {
+          url: "",
+          shape: "circle",
+          size: 84,
+          visible: false,
+        },
+        contacts: [
+          {
+            id: "c_phone",
+            type: "phone",
+            icon: "phone",
+            label: "电话",
+            value: "138-0000-0000",
+            href: "tel:13800000000",
+          },
+          {
+            id: "c_email",
+            type: "email",
+            icon: "mail",
+            label: "邮箱",
+            value: "example@gmail.com",
+            href: "mailto:example@gmail.com",
+          },
+          {
+            id: "c_location",
+            type: "location",
+            icon: "map-pin",
+            label: "城市",
+            value: "北京",
+          },
+          {
+            id: "c_github",
+            type: "github",
+            icon: "github",
+            label: "GitHub",
+            value: "github.com",
+            href: "https://github.com",
+          },
+        ],
+      },
+      items: [],
+    },
+    {
       id: "sec_experience",
       title: "工作经历",
+      showHeader: true,
       type: "experience",
       slot: "main",
       visible: true,
@@ -198,6 +237,7 @@ export const defaultResume: YizhiResume = {
     {
       id: "sec_project",
       title: "项目经历",
+      showHeader: true,
       type: "project",
       slot: "main",
       visible: true,
@@ -217,6 +257,7 @@ export const defaultResume: YizhiResume = {
     {
       id: "sec_education",
       title: "教育背景",
+      showHeader: true,
       type: "education",
       slot: "main",
       visible: true,
@@ -235,6 +276,7 @@ export const defaultResume: YizhiResume = {
     {
       id: "sec_skills",
       title: "专业技能",
+      showHeader: true,
       type: "skill",
       slot: "sidebar",
       visible: true,
