@@ -37,6 +37,154 @@
 
 ---
 
+## 核心数据结构规范 (Data Schema Specification)
+
+简历采用统一、严谨的 TypeScript / JSON 领域模型定义，兼顾 ATS 机器检索、流式 Tool Calling 与高自由度前端拖拽渲染：
+
+### 1. TypeScript 接口定义
+
+```typescript
+/** 个人基础信息（兼顾 PDF 文件名导出、ATS 检索与社交分享） */
+export interface ResumeBasics {
+  name: string;
+  headline: string;
+  avatar?: {
+    url: string;
+    shape: 'circle' | 'rounded' | 'square';
+    size: number; // 默认 84px
+    visible: boolean;
+  };
+  contacts: Array<{
+    id: string;
+    type: 'phone' | 'email' | 'link' | 'location' | 'github' | 'wechat' | 'linkedin' | 'custom';
+    icon?: string;
+    label: string;
+    value: string;
+    href?: string;
+  }>;
+}
+
+/** 经历 / 项目 / 技能等明细项目 */
+export interface ResumeItem {
+  id: string;
+  title: string;              // 职位 / 项目名 / 学位
+  subtitle?: string;          // 公司名 / 院校名 / 角色
+  dateRange?: string;         // "2023.03 - 至今"
+  location?: string;          // 城市 / 工作地
+  description: string;        // Tiptap 富文本 HTML (支持高亮与脱敏 mark)
+  tags?: string[];            // 技术栈或标签词
+  visible: boolean;
+}
+
+/** 通用 Section 积木块 */
+export interface ResumeSection {
+  id: string;
+  title: string;              // 模块标题，如 "工作经历"
+  icon?: string;              // 图标标识
+  type: 'experience' | 'education' | 'project' | 'skill' | 'richtext' | 'custom';
+  slot: 'main' | 'sidebar';   // 渲染槽位：主区域 或 侧边栏
+  visible: boolean;
+  items: ResumeItem[];
+}
+
+/** 双槽位网格布局配置 */
+export interface ResumeLayout {
+  mode: 'single' | 'split';
+  sidebarWidth: number;       // 侧栏宽度 (px，默认 260px，支持 180~360px 拖拽调节)
+  sidebarPosition: 'left' | 'right';
+}
+
+/** 设计规范与排版弹性 Tokens */
+export interface ResumeDesign {
+  themeColor: string;         // 主题强调色 (Hex)
+  fontFamily: 'sans' | 'serif' | 'mono';
+  fontSize: number;           // 基准字号 (pt，默认 10.5pt，9~12pt 弹性伸缩)
+  lineHeight: number;         // 基准行高 (默认 1.45，1.2~1.8 弹性伸缩)
+  sectionGap: number;         // 模块垂直间距 (px，默认 16px)
+  itemGap: number;            // 经历条目间距 (px，默认 12px)
+  pagePadding: number;        // A4 画布内边距 (mm，默认 16mm)
+  customCss: string;          // 高级用户自定义 CSS 覆写代码
+}
+
+/** 顶层完整简历实体 */
+export interface YizhiResume {
+  version: '2.0.0';
+  metadata: {
+    title: string;
+    createdAt: string;
+    updatedAt: string;
+    language: 'zh' | 'en';
+    paperSize: 'A4' | 'Letter';
+  };
+  basics: ResumeBasics;
+  layout: ResumeLayout;
+  sections: ResumeSection[];
+  design: ResumeDesign;
+}
+```
+
+### 2. 标准 JSON 载荷示例
+
+```json
+{
+  "version": "2.0.0",
+  "metadata": {
+    "title": "求职简历",
+    "createdAt": "2026-11-10T09:00:00.000Z",
+    "updatedAt": "2026-11-10T09:00:00.000Z",
+    "language": "zh",
+    "paperSize": "A4"
+  },
+  "basics": {
+    "name": "求职者",
+    "headline": "资深前端全栈工程师",
+    "avatar": { "url": "", "shape": "circle", "size": 84, "visible": false },
+    "contacts": [
+      { "id": "c1", "type": "phone", "label": "电话", "value": "138-0000-0000", "href": "tel:13800000000" },
+      { "id": "c2", "type": "email", "label": "邮箱", "value": "me@example.com", "href": "mailto:me@example.com" },
+      { "id": "c3", "type": "github", "label": "GitHub", "value": "github.com", "href": "https://github.com" }
+    ]
+  },
+  "layout": {
+    "mode": "single",
+    "sidebarWidth": 260,
+    "sidebarPosition": "left"
+  },
+  "sections": [
+    {
+      "id": "sec_experience",
+      "title": "工作经历",
+      "type": "experience",
+      "slot": "main",
+      "visible": true,
+      "items": [
+        {
+          "id": "item_exp_1",
+          "title": "高级全栈工程师",
+          "subtitle": "某知名互联网科技公司",
+          "dateRange": "2023.03 - 至今",
+          "location": "北京",
+          "description": "<p>负责核心平台架构演进，重构组件库与富文本编辑器，首屏 LCP 优化 45%。</p>",
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "design": {
+    "themeColor": "#0f172a",
+    "fontFamily": "sans",
+    "fontSize": 10.5,
+    "lineHeight": 1.45,
+    "sectionGap": 16,
+    "itemGap": 12,
+    "pagePadding": 16,
+    "customCss": ""
+  }
+}
+```
+
+---
+
 ## 为什么手写一个工具而不是xxx？
 
 这是该项目被问到最多的问题。
@@ -59,10 +207,17 @@ A：注册登录、看广告、有收费功能、收集个人信息、样式过�
 
 ## 技术栈
 
-* **核心框架**：[Next.js](https://nextjs.org/) (App Router) + [React 19](https://react.dev/)
-* **语言标准**：[TypeScript](https://www.typescriptlang.org/)
-* **样式系统**：[Tailwind CSS v4](https://tailwindcss.com/)
-* **代码规范**：[Biome](https://biomejs.dev/)
+* **核心框架**：[Next.js](https://nextjs.org/) (App Router, Turbopack) + [React 19](https://react.dev/)
+* **语言与类型**：[TypeScript](https://www.typescriptlang.org/) + [Zod](https://zod.dev/) (运行时类型校验与 Schema 推导)
+* **样式系统**：[Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) (Radix / Base UI)
+* **状态管理**：[Zustand](https://github.com/pmndrs/zustand) (轻量响应式与 LocalStorage 持久化)
+* **富文本引擎**：[Tiptap 全家桶](https://tiptap.dev/) (`@tiptap/react`, `@tiptap/pm`, StarterKit, 链接/下划线/颜色/脱敏扩展)
+* **拖拽编排**：[@dnd-kit](https://dndkit.com/) (`@dnd-kit/core`, `@dnd-kit/sortable`, 现代化 React 19 弹性拖拽排序)
+* **代码编辑器**：[CodeMirror 6](https://codemirror.net/) (`@uiw/react-codemirror` + `@codemirror/lang-css`, 轻量无 WebWorker 负担)
+* **图标系统**：[Lucide React](https://lucide.dev/) + [@icons-pack/react-simple-icons](https://simpleicons.org/) (技术品牌与社交全量 SVG 图标)
+* **图片裁剪**：[react-image-crop](https://github.com/DominicTobias/react-image-crop) (轻量无头头像裁剪器)
+* **通知与工具**：[Sonner](https://sonner.emilkowal.ski/) (现代化 Toast 通知) + [nanoid](https://github.com/ai/nanoid) (紧凑安全唯一 ID)
+* **代码质量**：[Biome](https://biomejs.dev/) (极速格式化与代码规范检查)
 * **包管理器**：[pnpm](https://pnpm.io/)
 
 ---
@@ -81,6 +236,10 @@ pnpm install
 
 # 启动开发服务器
 pnpm dev
+
+# 代码质量检查与格式化
+pnpm lint
+pnpm format
 
 # 构建生产产物
 pnpm build
