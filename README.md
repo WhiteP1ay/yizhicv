@@ -1,6 +1,9 @@
-# 📝 Resumaker - 简历编辑器
+# 📝 一纸简历 (YizhiCV) - 原 Resumaker
 
-一个基于 React + TypeScript 构建的简历编辑器。
+> 📢 **重大更新公告**：本项目由原 `Resumaker` 全新升级为 **「一纸简历 (YizhiCV)」**！
+> 经典 v1.x 版本完整代码已归档至 [`v1-legacy`](https://github.com/WhiteP1ay/yizhicv/tree/v1-legacy) 分支与 [`v1.0.0`](https://github.com/WhiteP1ay/yizhicv/releases/tag/v1.0.0) Release 标签，历史 Star 与功能不受任何影响。
+
+一个基于 React + TypeScript 构建的高自由度简历编辑器。
 
 纯前端项目，没有登录注册、信息收集，也没有收费项目。
 
