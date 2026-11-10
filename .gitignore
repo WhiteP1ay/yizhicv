@@ -24,6 +24,12 @@
 .DS_Store
 *.pem
 
+# ide & agent leftovers
+.vscode/
+.idea/
+.claude/
+*.local
+
 # debug
 npm-debug.log*
 yarn-debug.log*
