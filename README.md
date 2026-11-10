@@ -13,19 +13,19 @@
    * **左侧 AI 访谈助手**：通过结构化对话挖掘用户经历，基于 STAR 原则提炼高量化成果与技术亮点；
    * **右侧 A4 实时画布**：所见即所得实时渲染，全量拥抱 Tiptap 富文本内联输入，像在 Notion 一样点击即编辑。
 
-2. **纯粹的「无类型 Section 积木流」**
-   * **彻底干掉 `type` 限制**：不再强行区隔“这是经历”、“那是教育”，每个模块都是纯粹的富文本容器；
-   * **系统预设（Presets）**：内置名片、工作经历、项目经历、技能矩阵等开箱即用的 HTML 模板，用户一键插入后可随心所欲微调；
+2. **极致纯粹的「无类型 Section 积木流」**
+   * **彻底消灭数据冗余**：彻底干掉 `type`、`title`、`showHeader` 等外挂字段，标题与正文完全内联于富文本 HTML 中；
+   * **系统开箱预设（Presets）**：内置名片、工作经历、项目经历、技能矩阵等开箱即用的 HTML 模板，用户一键插入后可随心所欲微调；
    * **极致自由度**：个人信息模块可自由拖入 `sidebar` 侧栏或 `main` 主栏，在匿名简历评审或特定作品集场景下亦可直接隐藏或删除。
 
 3. **双槽位自适应布局 (Unified Slot Grid)**
    * 画布底层统一采用 `main` 与 `sidebar` 双槽位网格；
-   * **侧栏宽度支持拖拽微调**，用户可根据文字体量自由分配左右留白；
-   * **单栏布局为侧栏宽度归零时的自然折叠退化**，无需维护两套割裂的模板组件。
+   * **侧栏宽度支持拖拽微调**：`sidebarWidth === 0` 即为极简单栏上下流，`sidebarWidth > 0` 即为黄金比例双栏网格，无需冗余维护 `mode` 字段；
+   * **纸张规格锁死工业级 A4 (210mm × 297mm)**：摒弃无用纸张下拉配置，保障打印与导出绝对一致。
 
 4. **语义化 DOM 与稳定 Style Hooks**
    * 摒弃无序嵌套的 Div 结构，输出扁平语义化标签（`<section>`、`<article>`、`<time>`）；
-   * 暴露稳定、层级浅的样式钩子（如 `.cv-section`、`.cv-title`、`.cv-entry`），由全局 CSS 变量驱动；
+   * 暴露稳定、层级浅的样式钩子（如 `.cv-section`、`.cv-entry`），由全局 CSS 变量驱动；
    * 既保证开箱即用的高审美排版，又赋予高级用户通过全局 CSS 窗口进行像素级定制的自由，确保打印与机筛稳定性。
 
 5. **本地优先与 BYOK (Bring Your Own Key)**
@@ -40,52 +40,48 @@
 
 ## 核心数据结构规范 (Data Schema Specification)
 
-简历采用高度统一、扁平且类型安全的 TypeScript / JSON 领域模型，彻底消除了复杂嵌套与类型分支：
+简历采用高度统一、扁平且类型安全的 TypeScript / JSON 领域模型，消灭了所有冗余状态分支：
 
 ### 1. TypeScript 接口定义
 
 ```typescript
-/** 通用 Section 积木块（彻底消灭 type 字段，内容完全由 Tiptap 富文本驱动） */
+/** 通用 Section 积木块（无冗余字段，内容完全由 Tiptap 富文本内联驱动） */
 export interface ResumeSection {
-  id: string;
-  title: string;              // 模块标题，如 "个人信息"、"工作经历"、"专业技能"
-  showHeader: boolean;        // 是否在画布上渲染该模块的标题栏 (个人名片默认 false，经历类默认 true)
-  slot: 'main' | 'sidebar';   // 物理槽位：主区域 或 侧边栏
-  visible: boolean;
-  content: string;            // Tiptap 富文本 HTML (或 ProseMirror JSON 字符串)
+  id: string;               // 唯一标识 (nanoid)
+  slot: 'main' | 'sidebar'; // 物理槽位：主栏 或 侧栏
+  visible: boolean;         // 可见性开关
+  content: string;          // Tiptap 富文本 HTML (标题、正文全部包含其中)
 }
 
 /** 双槽位自适应布局配置 (Unified Slot Grid) */
 export interface ResumeLayout {
-  mode: 'single' | 'split';
-  sidebarWidth: number;       // 侧栏宽度 (px，默认 260px，支持 180~360px 拖拽调节)
+  sidebarWidth: number;     // 侧栏宽度 (px，0 = 纯单栏上下流；>0 = 双栏网格，默认 260px)
   sidebarPosition: 'left' | 'right';
 }
 
 /** 设计规范与排版弹性 Tokens */
 export interface ResumeDesign {
-  themeColor: string;         // 主题强调色 (Hex)
+  themeColor: string;       // 主题强调色 (Hex)
   fontFamily: 'sans' | 'serif' | 'mono';
-  fontSize: number;           // 基准字号 (pt，默认 10.5pt，9~12pt 弹性伸缩)
-  lineHeight: number;         // 基准行高 (默认 1.45，1.2~1.8 弹性伸缩)
-  sectionGap: number;         // 模块垂直间距 (px，默认 16px)
-  pagePadding: number;        // A4 画布内边距 (mm，默认 16mm)
-  customCss: string;          // 高级用户自定义 CSS 覆写代码
+  fontSize: number;         // 基准字号 (pt，默认 10.5pt，9~12pt 弹性伸缩)
+  lineHeight: number;       // 基准行高 (默认 1.45，1.2~1.8 弹性伸缩)
+  sectionGap: number;       // 模块垂直间距 (px，默认 16px)
+  pagePadding: number;      // A4 画布内边距 (mm，默认 16mm)
+  customCss: string;        // 高级用户自定义 CSS 覆写代码
 }
 
-/** 顶层完整简历文档（纯扁平积木流） */
+/** 顶层完整简历文档（极致扁平的积木流模型） */
 export interface YizhiResume {
   version: '2.0.0';
   metadata: {
     id: string;
-    title: string;            // 简历文档名称，如 "前端专家简历"
+    title: string;          // 简历文档名称，如 "前端专家简历"
     createdAt: string;
     updatedAt: string;
     language: 'zh' | 'en';
-    paperSize: 'A4' | 'Letter';
   };
   layout: ResumeLayout;
-  sections: ResumeSection[];  // 所有的内容积木，统一编排与排序
+  sections: ResumeSection[]; // 所有的内容积木，统一编排与排序
   design: ResumeDesign;
 }
 ```
@@ -100,30 +96,24 @@ export interface YizhiResume {
     "title": "求职简历",
     "createdAt": "2026-11-10T09:00:00.000Z",
     "updatedAt": "2026-11-10T09:00:00.000Z",
-    "language": "zh",
-    "paperSize": "A4"
+    "language": "zh"
   },
   "layout": {
-    "mode": "single",
     "sidebarWidth": 260,
     "sidebarPosition": "left"
   },
   "sections": [
     {
       "id": "sec_profile",
-      "title": "个人信息",
-      "showHeader": false,
       "slot": "main",
       "visible": true,
       "content": "<div class=\"cv-profile-card text-center pb-2\"><h1 class=\"text-3xl font-bold tracking-tight text-slate-900\">求职者</h1><p class=\"text-base font-medium text-slate-600 mt-1\">资深前端全栈工程师</p><div class=\"cv-contacts-wrap flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-2 text-sm text-slate-600\"><span>📱 138-0000-0000</span><span>✉️ <a href=\"mailto:me@example.com\">me@example.com</a></span><span>📍 北京</span><span>🌐 <a href=\"https://github.com\" target=\"_blank\">github.com</a></span></div></div>"
     },
     {
       "id": "sec_experience",
-      "title": "工作经历",
-      "showHeader": true,
       "slot": "main",
       "visible": true,
-      "content": "<div class=\"cv-entry mb-4\"><div class=\"flex justify-between items-baseline font-semibold text-slate-900\"><span class=\"text-base\">高级全栈工程师 · 某知名互联网科技公司</span><span class=\"text-sm font-normal text-slate-500\">2023.03 - 至今</span></div><div class=\"text-sm text-slate-500 mb-1\">北京 · 核心平台研发部</div><ul class=\"list-disc list-outside pl-4 space-y-1 text-sm text-slate-700\"><li>主导核心业务系统重构，全面采用 Next.js App Router 与 Tailwind CSS 体系，提升首屏加载性能 45%。</li><li>设计并落地微前端与无头组件库方案，支撑公司 10+ 业务线独立交付。</li></ul></div>"
+      "content": "<div class=\"cv-section-block mb-4\"><h2 class=\"text-lg font-bold text-slate-900 border-b border-slate-200 pb-1 mb-3\">工作经历</h2><div class=\"cv-entry mb-4\"><div class=\"flex justify-between items-baseline font-semibold text-slate-900\"><span class=\"text-base\">高级全栈工程师 · 某知名互联网科技公司</span><span class=\"text-sm font-normal text-slate-500\">2023.03 - 至今</span></div><div class=\"text-sm text-slate-500 mb-1\">北京 · 核心平台研发部</div><ul class=\"list-disc list-outside pl-4 space-y-1 text-sm text-slate-700\"><li>主导核心业务系统重构，全面采用 Next.js App Router 与 Tailwind CSS 体系，提升首屏加载性能 45%。</li><li>设计并落地微前端与无头组件库方案，支撑公司 10+ 业务线独立交付。</li></ul></div></div>"
     }
   ],
   "design": {
