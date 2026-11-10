@@ -11,12 +11,12 @@
 
 1. **双轨画布架构 (Artifacts Mode)**
    * **左侧 AI 访谈助手**：通过结构化对话挖掘用户经历，基于 STAR 原则提炼高量化成果与技术亮点；
-   * **右侧 A4 实时画布**：所见即所得实时渲染，同时保留直接点击修改正文的能力，兼顾效率与精细控制。
+   * **右侧 A4 实时画布**：所见即所得实时渲染，全量拥抱 Tiptap 富文本内联输入，像在 Notion 一样点击即编辑。
 
-2. **彻底的「万物皆 Section」积木模型**
-   * **完全消灭顶层异构体**：不再设立孤立的 `basics` 或 Header 外挂，个人名片、头像与联系方式同样作为标准的 `profile` Section 存在；
-   * **自由度最大化**：个人信息模块可自由拖拽进 `sidebar` 侧栏或 `main` 主栏，在匿名简历评审或特定作品集场景下亦可直接隐藏或删除；
-   * 全面拥抱富文本表现力，支持行内高亮、关键词着色与链接插入。
+2. **纯粹的「无类型 Section 积木流」**
+   * **彻底干掉 `type` 限制**：不再强行区隔“这是经历”、“那是教育”，每个模块都是纯粹的富文本容器；
+   * **系统预设（Presets）**：内置名片、工作经历、项目经历、技能矩阵等开箱即用的 HTML 模板，用户一键插入后可随心所欲微调；
+   * **极致自由度**：个人信息模块可自由拖入 `sidebar` 侧栏或 `main` 主栏，在匿名简历评审或特定作品集场景下亦可直接隐藏或删除。
 
 3. **双槽位自适应布局 (Unified Slot Grid)**
    * 画布底层统一采用 `main` 与 `sidebar` 双槽位网格；
@@ -25,7 +25,7 @@
 
 4. **语义化 DOM 与稳定 Style Hooks**
    * 摒弃无序嵌套的 Div 结构，输出扁平语义化标签（`<section>`、`<article>`、`<time>`）；
-   * 暴露稳定、层级浅的样式钩子（如 `.cv-section`、`.cv-title`、`.cv-item`），由全局 CSS 变量驱动；
+   * 暴露稳定、层级浅的样式钩子（如 `.cv-section`、`.cv-title`、`.cv-entry`），由全局 CSS 变量驱动；
    * 既保证开箱即用的高审美排版，又赋予高级用户通过全局 CSS 窗口进行像素级定制的自由，确保打印与机筛稳定性。
 
 5. **本地优先与 BYOK (Bring Your Own Key)**
@@ -40,60 +40,22 @@
 
 ## 核心数据结构规范 (Data Schema Specification)
 
-简历采用高度统一、扁平且类型安全的 TypeScript / JSON 领域模型，所有内容块均为 Section 积木，支持统一的拖拽排序与流式 Tool Calling：
+简历采用高度统一、扁平且类型安全的 TypeScript / JSON 领域模型，彻底消除了复杂嵌套与类型分支：
 
 ### 1. TypeScript 接口定义
 
 ```typescript
-/** 联系方式项定义 */
-export interface ContactItem {
-  id: string;
-  type: 'phone' | 'email' | 'link' | 'location' | 'github' | 'wechat' | 'linkedin' | 'custom';
-  icon?: string;
-  label: string;
-  value: string;
-  href?: string;
-}
-
-/** 个人名片载荷（当 section.type === 'profile' 时生效） */
-export interface ProfileData {
-  name: string;
-  headline: string;
-  avatar?: {
-    url: string;
-    shape: 'circle' | 'rounded' | 'square';
-    size: number;
-    visible: boolean;
-  };
-  contacts: ContactItem[];
-}
-
-/** 经历 / 项目 / 技能等通用明细条目 */
-export interface ResumeItem {
-  id: string;
-  title: string;              // 职位 / 项目名 / 学位
-  subtitle?: string;          // 公司名 / 院校名 / 角色
-  dateRange?: string;         // "2023.03 - 至今"
-  location?: string;          // 城市 / 工作地
-  description: string;        // Tiptap 富文本 HTML (支持高亮与脱敏 mark)
-  tags?: string[];            // 技术栈或标签词
-  visible: boolean;
-}
-
-/** 通用 Section 积木块（名片、经历、项目、技能均属于此） */
+/** 通用 Section 积木块（彻底消灭 type 字段，内容完全由 Tiptap 富文本驱动） */
 export interface ResumeSection {
   id: string;
-  title: string;              // 模块标题，如 "个人信息"、"工作经历"
-  showHeader: boolean;        // 是否渲染标题栏（个人名片通常为 false，经历为 true）
-  icon?: string;              // 图标标识
-  type: 'profile' | 'experience' | 'education' | 'project' | 'skill' | 'richtext' | 'custom';
-  slot: 'main' | 'sidebar';   // 渲染槽位：主区域 或 侧边栏
+  title: string;              // 模块标题，如 "个人信息"、"工作经历"、"专业技能"
+  showHeader: boolean;        // 是否在画布上渲染该模块的标题栏 (个人名片默认 false，经历类默认 true)
+  slot: 'main' | 'sidebar';   // 物理槽位：主区域 或 侧边栏
   visible: boolean;
-  profile?: ProfileData;      // 专属名片数据
-  items: ResumeItem[];        // 细项列表
+  content: string;            // Tiptap 富文本 HTML (或 ProseMirror JSON 字符串)
 }
 
-/** 双槽位网格布局配置 */
+/** 双槽位自适应布局配置 (Unified Slot Grid) */
 export interface ResumeLayout {
   mode: 'single' | 'split';
   sidebarWidth: number;       // 侧栏宽度 (px，默认 260px，支持 180~360px 拖拽调节)
@@ -107,7 +69,6 @@ export interface ResumeDesign {
   fontSize: number;           // 基准字号 (pt，默认 10.5pt，9~12pt 弹性伸缩)
   lineHeight: number;         // 基准行高 (默认 1.45，1.2~1.8 弹性伸缩)
   sectionGap: number;         // 模块垂直间距 (px，默认 16px)
-  itemGap: number;            // 经历条目间距 (px，默认 12px)
   pagePadding: number;        // A4 画布内边距 (mm，默认 16mm)
   customCss: string;          // 高级用户自定义 CSS 覆写代码
 }
@@ -152,38 +113,17 @@ export interface YizhiResume {
       "id": "sec_profile",
       "title": "个人信息",
       "showHeader": false,
-      "type": "profile",
       "slot": "main",
       "visible": true,
-      "profile": {
-        "name": "求职者",
-        "headline": "资深前端全栈工程师",
-        "avatar": { "url": "", "shape": "circle", "size": 84, "visible": false },
-        "contacts": [
-          { "id": "c1", "type": "phone", "label": "电话", "value": "138-0000-0000", "href": "tel:13800000000" },
-          { "id": "c2", "type": "email", "label": "邮箱", "value": "me@example.com", "href": "mailto:me@example.com" }
-        ]
-      },
-      "items": []
+      "content": "<div class=\"cv-profile-card text-center pb-2\"><h1 class=\"text-3xl font-bold tracking-tight text-slate-900\">求职者</h1><p class=\"text-base font-medium text-slate-600 mt-1\">资深前端全栈工程师</p><div class=\"cv-contacts-wrap flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-2 text-sm text-slate-600\"><span>📱 138-0000-0000</span><span>✉️ <a href=\"mailto:me@example.com\">me@example.com</a></span><span>📍 北京</span><span>🌐 <a href=\"https://github.com\" target=\"_blank\">github.com</a></span></div></div>"
     },
     {
       "id": "sec_experience",
       "title": "工作经历",
       "showHeader": true,
-      "type": "experience",
       "slot": "main",
       "visible": true,
-      "items": [
-        {
-          "id": "item_exp_1",
-          "title": "高级全栈工程师",
-          "subtitle": "某知名互联网科技公司",
-          "dateRange": "2023.03 - 至今",
-          "location": "北京",
-          "description": "<p>负责核心平台架构演进，重构组件库与富文本编辑器，首屏 LCP 优化 45%。</p>",
-          "visible": true
-        }
-      ]
+      "content": "<div class=\"cv-entry mb-4\"><div class=\"flex justify-between items-baseline font-semibold text-slate-900\"><span class=\"text-base\">高级全栈工程师 · 某知名互联网科技公司</span><span class=\"text-sm font-normal text-slate-500\">2023.03 - 至今</span></div><div class=\"text-sm text-slate-500 mb-1\">北京 · 核心平台研发部</div><ul class=\"list-disc list-outside pl-4 space-y-1 text-sm text-slate-700\"><li>主导核心业务系统重构，全面采用 Next.js App Router 与 Tailwind CSS 体系，提升首屏加载性能 45%。</li><li>设计并落地微前端与无头组件库方案，支撑公司 10+ 业务线独立交付。</li></ul></div>"
     }
   ],
   "design": {
@@ -192,7 +132,6 @@ export interface YizhiResume {
     "fontSize": 10.5,
     "lineHeight": 1.45,
     "sectionGap": 16,
-    "itemGap": 12,
     "pagePadding": 16,
     "customCss": ""
   }
