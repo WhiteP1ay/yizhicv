@@ -20,13 +20,13 @@ export const TextInspector: React.FC = () => {
 
   if (!editor) {
     return (
-      <div className="p-3 bg-slate-50 border border-dashed border-slate-200 rounded-lg text-center text-xs text-slate-500 space-y-1">
-        <div className="flex items-center justify-center gap-1.5 font-medium text-slate-600">
-          <Type className="size-3.5 text-slate-400" />
-          <span>选中文本与排版控制</span>
+      <div className="p-3 bg-slate-50/70 border border-dashed border-slate-200 rounded-xl text-center text-xs text-slate-500 space-y-1">
+        <div className="flex items-center justify-center gap-1.5 font-medium text-slate-700">
+          <Type className="size-3.5 text-blue-600" />
+          <span>文本</span>
         </div>
         <p className="text-[11px] text-slate-400">
-          在左侧画布点击或选中任意文字，即可在此调整颜色、层级与字号
+          在画布中点击或选中任意文字，即可在此调整层级、色彩与字号
         </p>
       </div>
     );
@@ -123,16 +123,10 @@ export const TextInspector: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
           <Type className="size-3.5 text-blue-600" />
-          <span>选中文本排版</span>
+          <span>文本</span>
         </div>
         <span className="text-[10px] text-slate-400 font-mono">
-          {isH1
-            ? "一级标题 (H1)"
-            : isH2
-              ? "二级标题 (H2)"
-              : isH3
-                ? "三级标题 (H3)"
-                : "正文段落 (P)"}
+          {isH1 ? "H1" : isH2 ? "H2" : isH3 ? "H3" : "正文"}
         </span>
       </div>
 

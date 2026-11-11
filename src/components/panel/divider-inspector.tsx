@@ -122,7 +122,7 @@ export const DividerInspector: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
           <Minus className="size-3.5 text-blue-600 stroke-[2.5]" />
-          <span>{isDividerSelected ? "二次编辑分割线" : "插入分割线"}</span>
+          <span>分割线</span>
           {isDividerSelected && (
             <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700 animate-in fade-in">
               <span className="size-1.5 rounded-full bg-blue-600 animate-pulse" />

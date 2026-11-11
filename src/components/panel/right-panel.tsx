@@ -1,15 +1,23 @@
 "use client";
 
-import { ChevronRight, FileCode, Layers, Palette } from "lucide-react";
+import {
+  ChevronRight,
+  FileCode,
+  Layers,
+  Palette,
+  PlusCircle,
+} from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRightPanelResize } from "@/hooks/use-right-panel-resize";
+import { useActiveEditorStore } from "@/store/active-editor";
 import { useResumeStore } from "@/store/resume";
 import { DesignTokenPanel } from "./design-token-panel";
+import { InsertPanel } from "./insert-panel";
 import { JsonEditorPanel } from "./json-editor-panel";
 
-type PanelTab = "design" | "sections" | "json";
+type PanelTab = "design" | "insert" | "sections" | "json";
 
 interface TabItem {
   id: PanelTab;
@@ -20,18 +28,24 @@ interface TabItem {
 const BASE_TABS: TabItem[] = [
   {
     id: "design",
-    title: "设计与排版 Token",
+    title: "设计",
     icon: Palette,
   },
   {
+    id: "insert",
+    title: "插入",
+    icon: PlusCircle,
+  },
+  {
     id: "sections",
-    title: "模块结构管理",
+    title: "模块",
     icon: Layers,
   },
 ];
 
 export const RightPanel: React.FC = () => {
   const { isJsonEditorEnabled } = useResumeStore();
+  const { getEffectiveEditor, selectionTick } = useActiveEditorStore();
   const [activeTab, setActiveTab] = useState<PanelTab | null>("design");
 
   const {
@@ -42,6 +56,16 @@ export const RightPanel: React.FC = () => {
     handlePointerDownResize,
     handleDoubleClickResize,
   } = useRightPanelResize();
+
+  // 当在画布中选中分割线时，自动切换至「插入」tab 便于即时二次编辑
+  useEffect(() => {
+    void selectionTick;
+    const editor = getEffectiveEditor();
+    if (editor?.isActive("horizontalRule")) {
+      setActiveTab("insert");
+      setIsCollapsed(false);
+    }
+  }, [selectionTick, getEffectiveEditor, setIsCollapsed]);
 
   // 当开启 JSON 编辑器时，若当前收起则自动展开并切换到 json tab；关闭时回退到 design
   useEffect(() => {
@@ -59,7 +83,7 @@ export const RightPanel: React.FC = () => {
       ? [
           {
             id: "json" as const,
-            title: "JSON 数据结构编辑",
+            title: "JSON",
             icon: FileCode,
           },
         ]
@@ -124,7 +148,7 @@ export const RightPanel: React.FC = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => handleTabClick(tab.id)}
-                  className={`size-8 rounded-full transition-all duration-150 relative ${
+                  className={`size-8 rounded-full transition-all duration-150 relative cursor-pointer ${
                     isActive
                       ? "bg-slate-900 text-white shadow-xs hover:bg-slate-800 hover:text-white"
                       : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
@@ -144,7 +168,7 @@ export const RightPanel: React.FC = () => {
           variant="ghost"
           size="icon-xs"
           onClick={() => setIsCollapsed((prev) => !prev)}
-          className="size-7 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors flex-shrink-0"
+          className="size-7 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors flex-shrink-0 cursor-pointer"
           title={isCollapsed ? "展开右侧面板" : "收起面板"}
         >
           <ChevronRight
@@ -169,7 +193,7 @@ export const RightPanel: React.FC = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => handleTabClick(tab.id)}
-                className={`size-8 rounded-full transition-all duration-150 ${
+                className={`size-8 rounded-full transition-all duration-150 cursor-pointer ${
                   isActive
                     ? "bg-slate-900 text-white shadow-xs hover:bg-slate-800 hover:text-white"
                     : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
@@ -187,6 +211,7 @@ export const RightPanel: React.FC = () => {
       {!isCollapsed && (
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {activeTab === "design" && <DesignTokenPanel />}
+          {activeTab === "insert" && <InsertPanel />}
           {activeTab === "sections" && (
             <div className="flex-1 p-6 flex flex-col items-center justify-center text-center text-slate-400 text-xs">
               <Layers className="size-8 text-slate-300 mb-2 stroke-[1.5]" />

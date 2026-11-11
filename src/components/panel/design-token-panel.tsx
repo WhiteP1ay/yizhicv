@@ -4,7 +4,6 @@ import { Minus, Plus, RotateCcw, Sliders, Type } from "lucide-react";
 import type React from "react";
 import { Button } from "@/components/ui/button";
 import { useResumeStore } from "@/store/resume";
-import { DividerInspector } from "./divider-inspector";
 import { TextInspector } from "./text-inspector";
 
 const FONT_OPTIONS: Array<{
@@ -33,18 +32,20 @@ export const DesignTokenPanel: React.FC = () => {
   const { design } = resume;
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5 text-xs text-slate-700 select-none">
-      {/* 1. 选中文本与排版控制 (实时响应光标选区) */}
+    <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 text-xs text-slate-700 select-none">
+      {/* 1. 文本区块 (淡灰底圆角，实时响应光标选区) */}
       <TextInspector />
 
-      {/* 2. 插入分割线 (独立 div 容器，支持调节高度与颜色) */}
-      <DividerInspector />
-
-      {/* 3. 页面与排版全局版面设置 */}
-      <div className="pt-1 border-t border-slate-200/80 space-y-4">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-800">
-          <Sliders className="size-3.5 text-slate-500" />
-          <span>版面与基准设置</span>
+      {/* 2. 版面区块 (淡灰底圆角，统一样式规范) */}
+      <div
+        data-testid="layout-inspector"
+        className="space-y-4 p-3 bg-slate-50/70 border border-slate-200/80 rounded-xl"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-800">
+            <Sliders className="size-3.5 text-blue-600" />
+            <span>版面</span>
+          </div>
         </div>
 
         {/* 字体族群 */}
@@ -87,8 +88,8 @@ export const DesignTokenPanel: React.FC = () => {
           </div>
         </section>
 
-        {/* 3. 设计排版数值 Token */}
-        <section className="space-y-4 pt-1 border-t border-slate-100">
+        {/* 设计排版数值 Token */}
+        <section className="space-y-4 pt-2 border-t border-slate-200/60">
           {/* 字号大小 */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
@@ -316,12 +317,12 @@ export const DesignTokenPanel: React.FC = () => {
       </div>
 
       {/* 3. 底部重置操作 */}
-      <div className="pt-2">
+      <div className="pt-1">
         <Button
           type="button"
           variant="outline"
           onClick={resetDesign}
-          className="w-full h-8 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 gap-1.5 rounded-lg border-slate-200"
+          className="w-full h-8 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 gap-1.5 rounded-lg border-slate-200 cursor-pointer"
         >
           <RotateCcw className="size-3 text-slate-400" />
           <span>恢复默认样式规范</span>
