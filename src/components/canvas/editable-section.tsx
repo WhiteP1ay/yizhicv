@@ -14,8 +14,8 @@ import type React from "react";
 import { useEffect } from "react";
 import { CanvasBubbleMenu } from "@/components/editor/bubble-menu";
 import { BlurMark } from "@/components/editor/extensions/blur-mark";
+import { SectionToolbar } from "@/components/editor/section-toolbar";
 import { Button } from "@/components/ui/button";
-import { useActiveEditorStore } from "@/store/active-editor";
 import { useResumeStore } from "@/store/resume";
 import type { ResumeSection } from "@/types/resume";
 
@@ -33,13 +33,6 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
     activeSectionId,
     resume,
   } = useResumeStore();
-
-  const {
-    registerEditor,
-    unregisterEditor,
-    setActiveEditor,
-    syncHeadingState,
-  } = useActiveEditorStore();
 
   // dnd-kit 拖拽排序集成
   const {
@@ -86,38 +79,13 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
           "cv-inline-editor focus:outline-none min-h-[30px] prose prose-slate max-w-none text-slate-800 leading-normal",
       },
     },
-    onFocus: ({ editor }) => {
+    onFocus: () => {
       setActiveSectionId(section.id);
-      setActiveEditor(editor, section.id);
-      syncHeadingState(editor);
-    },
-    onSelectionUpdate: ({ editor }) => {
-      syncHeadingState(editor);
-    },
-    onTransaction: ({ editor }) => {
-      syncHeadingState(editor);
     },
     onUpdate: ({ editor }) => {
       updateSectionContent(section.id, editor.getHTML());
     },
   });
-
-  // 注册并维护全局活跃编辑器映射
-  useEffect(() => {
-    if (editor) {
-      registerEditor(section.id, editor);
-    }
-    return () => {
-      unregisterEditor(section.id);
-    };
-  }, [editor, section.id, registerEditor, unregisterEditor]);
-
-  // 当外部选中的模块变化时，同步活跃编辑器
-  useEffect(() => {
-    if (editor && activeSectionId === section.id) {
-      setActiveEditor(editor, section.id);
-    }
-  }, [editor, activeSectionId, section.id, setActiveEditor]);
 
   // 外部 content 变化时同步内容
   useEffect(() => {
@@ -138,8 +106,23 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
           : "hover:ring-1 hover:ring-slate-300/80"
       }`}
     >
-      {/* 悬停把手控制栏 (仅拖拽把手与删除，打印时隐藏) */}
-      <div className="no-print absolute -top-3.5 right-1 z-30 hidden group-hover:flex items-center gap-1 bg-slate-900/90 text-white px-1.5 py-0.5 rounded-full text-[10px] shadow-lg backdrop-blur-sm animate-in fade-in zoom-in-95 duration-100">
+      {/* 模块顶部工具栏：标题插入与格式切换 (仅在当前模块活跃或悬停时显示，打印时隐藏) */}
+      {editor && (
+        <div
+          className={`no-print absolute -top-9 left-1 z-30 ${
+            isActive ? "flex" : "hidden group-hover:flex"
+          }`}
+        >
+          <SectionToolbar editor={editor} />
+        </div>
+      )}
+
+      {/* 悬停与激活把手控制栏 (仅拖拽把手与删除，打印时隐藏) */}
+      <div
+        className={`no-print absolute -top-9 right-1 z-30 ${
+          isActive ? "flex" : "hidden group-hover:flex"
+        } items-center gap-0.5 p-1 bg-slate-900/95 backdrop-blur-md text-white rounded-lg shadow-xl border border-slate-700/60 animate-in fade-in zoom-in-95 duration-100`}
+      >
         {/* 拖拽把手 */}
         <Button
           type="button"
@@ -147,10 +130,10 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
           size="icon-xs"
           {...attributes}
           {...listeners}
-          className="h-5 w-5 p-0 hover:bg-slate-700/80 rounded cursor-grab active:cursor-grabbing text-slate-300 hover:text-white transition-colors"
+          className="h-7 w-7 p-0 hover:bg-slate-700/80 rounded cursor-grab active:cursor-grabbing text-slate-300 hover:text-white transition-colors"
           title="按住拖拽调整模块顺序或跨栏移动"
         >
-          <GripVertical className="w-3.5 h-3.5" />
+          <GripVertical className="size-3.5" />
         </Button>
 
         {/* 删除模块 */}
@@ -164,10 +147,10 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
                 removeSection(section.id);
               }
             }}
-            className="h-5 w-5 p-0 hover:bg-rose-600/80 text-rose-300 hover:text-white rounded transition-colors"
+            className="h-7 w-7 p-0 hover:bg-rose-600/80 text-rose-300 hover:text-white rounded transition-colors"
             title="删除此模块"
           >
-            <Trash2 className="w-3 h-3" />
+            <Trash2 className="size-3.5" />
           </Button>
         )}
       </div>
