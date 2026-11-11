@@ -16,6 +16,7 @@ import {
 import { Plus } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { useSidebarResize } from "@/hooks/use-sidebar-resize";
 import { useResumeStore } from "@/store/resume";
 import { SECTION_PRESETS } from "@/types/resume";
@@ -143,14 +144,15 @@ export const A4PaperCanvas: React.FC = () => {
 
                 {/* 侧栏底部添加按钮 */}
                 <div className="no-print mt-2 relative">
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
                     onClick={() => setActiveAddSlot("sidebar")}
-                    className="w-full py-2 border border-dashed border-slate-300 hover:border-slate-400 hover:bg-slate-50/50 rounded text-[11px] text-slate-400 hover:text-slate-600 flex items-center justify-center gap-1 transition-all"
+                    className="w-full h-auto py-2 border-dashed border-slate-300 text-slate-400 hover:border-slate-400 hover:bg-slate-50/50 hover:text-slate-600 text-[11px] gap-1 shadow-none transition-all"
                   >
                     <Plus className="w-3 h-3" />
                     <span>添加侧栏模块</span>
-                  </button>
+                  </Button>
 
                   {activeAddSlot === "sidebar" && (
                     <>
@@ -230,14 +232,15 @@ export const A4PaperCanvas: React.FC = () => {
 
                 {/* 主栏底部添加按钮 */}
                 <div className="no-print mt-4 relative">
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
                     onClick={() => setActiveAddSlot("main")}
-                    className="w-full py-2.5 border border-dashed border-slate-300 hover:border-slate-500 hover:bg-slate-50/60 rounded-md text-xs text-slate-400 hover:text-slate-700 flex items-center justify-center gap-1.5 transition-all"
+                    className="w-full h-auto py-2.5 border-dashed border-slate-300 text-slate-400 hover:border-slate-500 hover:bg-slate-50/60 hover:text-slate-700 text-xs gap-1.5 shadow-none transition-all"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>在此处添加新模块 (经历 / 作品 / 技能)</span>
-                  </button>
+                  </Button>
 
                   {activeAddSlot === "main" && (
                     <>
@@ -308,14 +311,15 @@ export const A4PaperCanvas: React.FC = () => {
 
                 {/* 底部添加按钮 */}
                 <div className="no-print mt-4 relative">
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
                     onClick={() => setActiveAddSlot("main")}
-                    className="w-full py-2.5 border border-dashed border-slate-300 hover:border-slate-500 hover:bg-slate-50/60 rounded-md text-xs text-slate-400 hover:text-slate-700 flex items-center justify-center gap-1.5 transition-all"
+                    className="w-full h-auto py-2.5 border-dashed border-slate-300 text-slate-400 hover:border-slate-500 hover:bg-slate-50/60 hover:text-slate-700 text-xs gap-1.5 shadow-none transition-all"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>在此处添加新模块</span>
-                  </button>
+                  </Button>
 
                   {activeAddSlot === "main" && (
                     <>
