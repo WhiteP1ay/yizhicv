@@ -2,7 +2,7 @@
 
 import { json } from "@codemirror/lang-json";
 import CodeMirror, { keymap } from "@uiw/react-codemirror";
-import { ArrowDownToLine, Check, Copy, RefreshCw, Wand2 } from "lucide-react";
+import { Check, Copy, RefreshCw, Wand2 } from "lucide-react";
 import { nanoid } from "nanoid";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -291,7 +291,7 @@ export const JsonEditorPanel: React.FC = () => {
             size="xs"
             onClick={handleSync}
             disabled={!hasUnsyncedChanges && !justSynced}
-            className={`h-6 px-2 text-[11px] font-medium gap-1 transition-all ${
+            className={`h-6 px-2.5 text-[11px] font-medium transition-all ${
               justSynced
                 ? "bg-emerald-600 hover:bg-emerald-600 text-white border-transparent"
                 : hasUnsyncedChanges
@@ -300,25 +300,11 @@ export const JsonEditorPanel: React.FC = () => {
             }`}
             title={
               hasUnsyncedChanges
-                ? "将 JSON 修改同步应用至画布 (⌘S)"
-                : "当前编辑器内容已与画布完全一致"
+                ? "将 JSON 修改同步应用至简历 (⌘S)"
+                : "当前编辑器内容已与简历完全一致"
             }
           >
-            {justSynced ? (
-              <>
-                <Check className="size-3 stroke-[2.5]" />
-                <span>已同步</span>
-              </>
-            ) : (
-              <>
-                <ArrowDownToLine
-                  className={`size-3 ${
-                    hasUnsyncedChanges ? "stroke-[2]" : "text-slate-400"
-                  }`}
-                />
-                <span>同步</span>
-              </>
-            )}
+            {justSynced ? "已同步到简历" : "同步到简历"}
           </Button>
         </div>
       </div>
