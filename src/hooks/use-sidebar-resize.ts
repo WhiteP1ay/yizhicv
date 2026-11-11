@@ -23,7 +23,7 @@ interface UseSidebarResizeOptions {
 export function useSidebarResize(options: UseSidebarResizeOptions = {}) {
   const {
     minWidth = 120,
-    maxWidth = 380,
+    maxWidth = 580,
     snapThreshold = 70,
     defaultExpandWidth = 180,
   } = options;

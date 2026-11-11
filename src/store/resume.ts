@@ -80,7 +80,7 @@ export const useResumeStore = create<ResumeState>()(
             ...state.resume,
             layout: {
               ...state.resume.layout,
-              sidebarWidth: Math.max(0, Math.min(400, sidebarWidth)),
+              sidebarWidth: Math.max(0, Math.min(580, sidebarWidth)),
             },
             metadata: {
               ...state.resume.metadata,
