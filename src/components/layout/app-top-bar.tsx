@@ -168,33 +168,39 @@ export const AppTopBar: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* 菜单与简历标题分隔线 */}
+        <div className="h-3.5 w-px bg-slate-200 mx-0.5" />
+
+        {/* 简历标题微调 (左侧紧随文件菜单：点击改名，默认未命名，后带铅笔 icon) */}
+        <div className="flex items-center">
+          {isEditingTitle ? (
+            <input
+              type="text"
+              value={titleInput}
+              onChange={(e) => setTitleInput(e.target.value)}
+              onBlur={handleTitleSubmit}
+              onKeyDown={handleTitleKeyDown}
+              className="h-7 text-xs font-medium text-slate-800 bg-slate-100 px-2.5 rounded border border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-900 w-44"
+              autoFocus
+            />
+          ) : (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={startEditingTitle}
+              className="group h-7 flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 px-2.5 rounded-md transition-colors"
+              title="点击重命名简历"
+            >
+              <span>{title}</span>
+              <Pencil className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition-colors" />
+            </Button>
+          )}
+        </div>
       </div>
 
-      {/* 2. 中间：简历标题微调 (点击改名，默认未命名，后带铅笔 icon) */}
-      <div className="flex items-center">
-        {isEditingTitle ? (
-          <input
-            type="text"
-            value={titleInput}
-            onChange={(e) => setTitleInput(e.target.value)}
-            onBlur={handleTitleSubmit}
-            onKeyDown={handleTitleKeyDown}
-            className="h-7 text-xs font-medium text-slate-800 bg-slate-100 px-2.5 rounded border border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-900 w-44 text-center"
-            autoFocus
-          />
-        ) : (
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={startEditingTitle}
-            className="group h-7 flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 px-2.5 rounded-md transition-colors"
-            title="点击重命名简历"
-          >
-            <span>{title}</span>
-            <Pencil className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition-colors" />
-          </Button>
-        )}
-      </div>
+      {/* 2. 中间：纯净留白，不再居中堆放文件名 */}
+      <div />
 
       {/* 3. 右侧：GitHub */}
       <div className="flex items-center gap-1.5">

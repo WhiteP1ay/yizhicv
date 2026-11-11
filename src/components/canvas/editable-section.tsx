@@ -9,7 +9,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { GripVertical, Trash2 } from "lucide-react";
 import type React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CanvasBubbleMenu } from "@/components/editor/bubble-menu";
 import { BlurMark } from "@/components/editor/extensions/blur-mark";
 import { SectionToolbar } from "@/components/editor/section-toolbar";
@@ -24,13 +24,8 @@ interface EditableSectionProps {
 export const EditableSection: React.FC<EditableSectionProps> = ({
   section,
 }) => {
-  const {
-    updateSectionContent,
-    removeSection,
-    setActiveSectionId,
-    activeSectionId,
-    resume,
-  } = useResumeStore();
+  const { updateSectionContent, removeSection, setActiveSectionId, resume } =
+    useResumeStore();
 
   // dnd-kit 拖拽排序集成
   const {
@@ -47,6 +42,8 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
     transition,
     opacity: isDragging ? 0.35 : 1,
   };
+
+  const [isFocused, setIsFocused] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -72,7 +69,12 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
       },
     },
     onFocus: () => {
+      setIsFocused(true);
       setActiveSectionId(section.id);
+    },
+    onBlur: () => {
+      setIsFocused(false);
+      setActiveSectionId(null);
     },
     onUpdate: ({ editor }) => {
       updateSectionContent(section.id, editor.getHTML());
@@ -86,7 +88,8 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
     }
   }, [section.content, editor]);
 
-  const isActive = activeSectionId === section.id;
+  // 仅在当前编辑器处于聚焦状态时，才显示高亮边框和顶部格式工具栏；失焦立即隐藏
+  const isActive = isFocused;
 
   return (
     <div
@@ -95,16 +98,12 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
       className={`cv-section-container relative group rounded transition-all duration-150 ${
         isActive
           ? "ring-1 ring-blue-500/40 bg-blue-50/10"
-          : "hover:ring-1 hover:ring-slate-300/80"
+          : "hover:ring-1 hover:ring-slate-300/60"
       }`}
     >
-      {/* 模块顶部工具栏：标题插入与格式切换 (仅在当前模块活跃或悬停时显示，打印时隐藏) */}
-      {editor && (
-        <div
-          className={`no-print absolute -top-9 left-1 z-30 ${
-            isActive ? "flex" : "hidden group-hover:flex"
-          }`}
-        >
+      {/* 模块顶部工具栏：仅在当前模块处于聚焦编辑时显示，失焦完全隐藏，打印隐藏 */}
+      {editor && isActive && (
+        <div className="no-print absolute -top-9 left-1 z-30 flex">
           <SectionToolbar editor={editor} />
         </div>
       )}

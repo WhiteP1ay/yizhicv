@@ -142,15 +142,15 @@ export const A4PaperCanvas: React.FC = () => {
                   ))}
                 </SortableContext>
 
-                {/* 侧栏底部添加按钮 */}
-                <div className="no-print mt-2 relative">
+                {/* 侧栏底部添加按钮 (永远保持水平居中) */}
+                <div className="no-print mt-3 flex justify-center items-center w-full relative">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setActiveAddSlot("sidebar")}
-                    className="w-full h-auto py-2 border-dashed border-slate-300 text-slate-400 hover:border-slate-400 hover:bg-slate-50/50 hover:text-slate-600 text-[11px] gap-1 shadow-none transition-all"
+                    className="w-full h-auto py-2 border-dashed border-slate-300 text-slate-400 hover:border-slate-400 hover:bg-slate-50/50 hover:text-slate-600 text-[11px] gap-1.5 shadow-none transition-all flex items-center justify-center text-center"
                   >
-                    <Plus className="w-3 h-3" />
+                    <Plus className="size-3" />
                     <span>添加侧栏模块</span>
                   </Button>
 
@@ -161,7 +161,7 @@ export const A4PaperCanvas: React.FC = () => {
                         className="fixed inset-0 z-40 cursor-default"
                         onClick={() => setActiveAddSlot(null)}
                       />
-                      <div className="absolute left-0 bottom-full mb-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 text-left">
+                      <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 w-48 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 text-left">
                         <div className="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100">
                           添加预设至侧栏
                         </div>
@@ -191,29 +191,29 @@ export const A4PaperCanvas: React.FC = () => {
                 className="no-print relative flex items-center justify-center cursor-col-resize group z-30 select-none -mx-2.5 px-2.5"
                 title="按住左右拖拽调节侧栏宽度（拉到最左侧自动吸附为单栏）"
               >
-                {/* 垂直分界线 */}
+                {/* 垂直分界线：显眼且清晰的高对比度中线 */}
                 <div
                   className={`h-full transition-all ${
                     isResizing
                       ? "w-[2px] bg-blue-600 shadow-xs"
-                      : "w-[1px] bg-slate-200 group-hover:bg-blue-500 group-active:bg-blue-600 group-hover:w-[2px]"
+                      : "w-[1.5px] bg-slate-300 group-hover:bg-blue-500 group-active:bg-blue-600 group-hover:w-[2px]"
                   }`}
                 />
 
-                {/* 悬停时的双点把手指示 */}
+                {/* 常驻微显的手势中线把手指示（即便不悬停也清晰可见） */}
                 <div
                   className={`absolute top-1/2 -translate-y-1/2 w-3.5 h-6 bg-white border rounded shadow-xs flex items-center justify-center transition-all ${
                     isResizing
                       ? "opacity-100 border-blue-500 shadow-md scale-105"
-                      : "opacity-0 group-hover:opacity-100 border-slate-300"
+                      : "opacity-60 group-hover:opacity-100 group-hover:border-blue-400 group-hover:scale-105 border-slate-300"
                   }`}
                 >
                   <div className="flex gap-0.5">
                     <span
-                      className={`w-0.5 h-2.5 rounded-full ${isResizing ? "bg-blue-500" : "bg-slate-400"}`}
+                      className={`w-0.5 h-2.5 rounded-full ${isResizing ? "bg-blue-500" : "bg-slate-400 group-hover:bg-blue-500"}`}
                     />
                     <span
-                      className={`w-0.5 h-2.5 rounded-full ${isResizing ? "bg-blue-500" : "bg-slate-400"}`}
+                      className={`w-0.5 h-2.5 rounded-full ${isResizing ? "bg-blue-500" : "bg-slate-400 group-hover:bg-blue-500"}`}
                     />
                   </div>
                 </div>
@@ -281,19 +281,38 @@ export const A4PaperCanvas: React.FC = () => {
           ) : (
             /* =================== 单栏模式 (sidebarWidth === 0) =================== */
             <div className="relative w-full min-h-full">
-              {/* 单栏模式下：左侧边缘隐藏一条轻巧的拉出把手 */}
+              {/* 单栏模式下：左侧边缘显眼的分界中线与把手指示（即便不是双栏也清晰可见，便于随时拉出侧栏） */}
               <div
                 onPointerDown={handlePointerDownResize}
-                className="no-print absolute top-0 bottom-0 -left-3 w-5 cursor-col-resize group z-30 flex items-center justify-center select-none"
-                title="向右拖拽拉出侧边栏"
+                className="no-print absolute top-0 bottom-0 -left-2.5 w-5 cursor-col-resize group z-30 flex items-center justify-center select-none"
+                title="向右拖拽开启双栏侧边栏"
               >
+                {/* 显眼清晰的左边缘参考线 */}
                 <div
-                  className={`h-full transition-colors ${
+                  className={`h-full transition-all ${
                     isResizing
-                      ? "w-[2px] bg-blue-600"
-                      : "w-[2px] bg-transparent group-hover:bg-blue-500/80"
+                      ? "w-[2px] bg-blue-600 shadow-xs"
+                      : "w-[1.5px] bg-slate-300/80 group-hover:bg-blue-500 group-hover:w-[2px]"
                   }`}
                 />
+
+                {/* 显眼把手指示 */}
+                <div
+                  className={`absolute top-1/2 -translate-y-1/2 w-3.5 h-6 bg-white border rounded shadow-xs flex items-center justify-center transition-all ${
+                    isResizing
+                      ? "opacity-100 border-blue-500 shadow-md scale-105"
+                      : "opacity-60 group-hover:opacity-100 group-hover:border-blue-400 group-hover:scale-105 border-slate-300"
+                  }`}
+                >
+                  <div className="flex gap-0.5">
+                    <span
+                      className={`w-0.5 h-2.5 rounded-full ${isResizing ? "bg-blue-500" : "bg-slate-400 group-hover:bg-blue-500"}`}
+                    />
+                    <span
+                      className={`w-0.5 h-2.5 rounded-full ${isResizing ? "bg-blue-500" : "bg-slate-400 group-hover:bg-blue-500"}`}
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* 单栏文档流 */}
