@@ -12,10 +12,10 @@ import StarterKit from "@tiptap/starter-kit";
 import { GripVertical, Trash2 } from "lucide-react";
 import type React from "react";
 import { useEffect } from "react";
+import { CanvasBubbleMenu } from "@/components/editor/bubble-menu";
 import { BlurMark } from "@/components/editor/extensions/blur-mark";
 import { useResumeStore } from "@/store/resume";
 import type { ResumeSection } from "@/types/resume";
-import { CanvasBubbleMenu } from "./bubble-menu";
 
 interface EditableSectionProps {
   section: ResumeSection;
