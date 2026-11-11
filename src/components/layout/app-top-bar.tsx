@@ -9,7 +9,9 @@ import {
   FileCode,
   FilePlus,
   Printer,
+  Redo2,
   Terminal,
+  Undo2,
   Upload,
 } from "lucide-react";
 import Link from "next/link";
@@ -18,9 +20,11 @@ import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { useResumeFileActions } from "@/hooks/use-resume-file-actions";
+import { useResumeHistory } from "@/hooks/use-resume-history";
 import { useResumeStore } from "@/store/resume";
 
 export const AppTopBar: React.FC = () => {
+  const { canUndo, canRedo, undo, redo } = useResumeHistory();
   const [isFileMenuOpen, setIsFileMenuOpen] = useState(false);
   const [isExportSubmenuOpen, setIsExportSubmenuOpen] = useState(false);
   const menuContainerRef = useRef<HTMLDivElement>(null);
@@ -249,6 +253,33 @@ export const AppTopBar: React.FC = () => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* 历史记录时间机器：撤销与重做 */}
+        <div className="h-3.5 w-px bg-slate-200 mx-1" />
+        <div className="flex items-center gap-0.5">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            onClick={undo}
+            disabled={!canUndo}
+            className="size-7 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-25 disabled:pointer-events-none transition-opacity"
+            title="撤销 / 上一步 (⌘Z)"
+          >
+            <Undo2 className="size-3.5" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            onClick={redo}
+            disabled={!canRedo}
+            className="size-7 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-25 disabled:pointer-events-none transition-opacity"
+            title="重做 / 下一步 (⌘⇧Z)"
+          >
+            <Redo2 className="size-3.5" />
+          </Button>
         </div>
       </div>
 
