@@ -1,6 +1,6 @@
 "use client";
 
-import { Minus, Plus, RotateCcw } from "lucide-react";
+import { Check, Info, Minus, Plus, RotateCcw, Trash2 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -14,14 +14,19 @@ export const DividerInspector: React.FC = () => {
   const [height, setHeight] = useState<number>(1);
   const [color, setColor] = useState<string>("#e2e8f0");
 
-  // 监听编辑器选区：若当前选区正好落在分割线上，自动回填其高度与颜色
+  const editor = getEffectiveEditor();
+  // 依赖 selectionTick 触发重算选区状态
+  void selectionTick;
+  const isDividerSelected = Boolean(editor?.isActive("horizontalRule"));
+
+  // 监听选区变化：若当前光标/NodeSelection 落在已有分割线上，回填其属性
   useEffect(() => {
     void selectionTick;
-    const editor = getEffectiveEditor();
-    if (!editor) return;
+    const currentEditor = getEffectiveEditor();
+    if (!currentEditor) return;
 
-    if (editor.isActive("horizontalRule")) {
-      const attrs = editor.getAttributes("horizontalRule");
+    if (currentEditor.isActive("horizontalRule")) {
+      const attrs = currentEditor.getAttributes("horizontalRule");
       if (attrs.height) {
         setHeight(Number(attrs.height) || 1);
       }
@@ -31,45 +36,67 @@ export const DividerInspector: React.FC = () => {
     }
   }, [selectionTick, getEffectiveEditor]);
 
-  // 修改高度：若当前正选中分割线，实时联动更新已有分割线
+  // 修改高度：若当前处于二次编辑选中态，实时联动更新已有分割线
   const handleHeightChange = (newHeight: number) => {
     const clamped = Math.max(1, Math.min(8, newHeight));
     setHeight(clamped);
 
-    const editor = getEffectiveEditor();
-    if (editor?.isActive("horizontalRule")) {
-      editor.commands.updateAttributes("horizontalRule", {
+    const currentEditor = getEffectiveEditor();
+    if (currentEditor?.isActive("horizontalRule")) {
+      currentEditor.commands.updateAttributes("horizontalRule", {
         height: clamped,
         color,
       });
     }
   };
 
-  // 修改颜色：若当前正选中分割线，实时联动更新已有分割线
+  // 修改颜色：若当前处于二次编辑选中态，实时联动更新已有分割线
   const handleColorChange = (newColor: string) => {
     setColor(newColor);
 
-    const editor = getEffectiveEditor();
-    if (editor?.isActive("horizontalRule")) {
-      editor.commands.updateAttributes("horizontalRule", {
+    const currentEditor = getEffectiveEditor();
+    if (currentEditor?.isActive("horizontalRule")) {
+      currentEditor.commands.updateAttributes("horizontalRule", {
         height,
         color: newColor,
       });
     }
   };
 
-  // 重置回默认浅灰 1px
+  // 重置为默认浅灰 1px (若正选中分割线，同步重置其样式)
   const handleReset = () => {
     handleHeightChange(1);
     handleColorChange("#e2e8f0");
   };
 
-  // 点击插入分割线
-  const handleInsert = () => {
-    const editor = getEffectiveEditor();
-    if (!editor) return;
+  // 删除当前选中的分割线
+  const handleDeleteSelected = () => {
+    const currentEditor = getEffectiveEditor();
+    if (currentEditor?.isActive("horizontalRule")) {
+      currentEditor.chain().focus().deleteSelection().run();
+    }
+  };
 
-    editor
+  // 点击插入新分割线
+  const handleInsert = () => {
+    const currentEditor = getEffectiveEditor();
+    if (!currentEditor) return;
+
+    // 若当前恰好正选中某条已有分割线，将光标平移至其后方再插入，避免意外覆盖
+    if (currentEditor.isActive("horizontalRule")) {
+      const { to } = currentEditor.state.selection;
+      currentEditor
+        .chain()
+        .setTextSelection(to)
+        .insertContent({
+          type: "horizontalRule",
+          attrs: { height, color },
+        })
+        .run();
+      return;
+    }
+
+    currentEditor
       .chain()
       .focus()
       .insertContent({
@@ -83,12 +110,25 @@ export const DividerInspector: React.FC = () => {
   };
 
   return (
-    <div className="space-y-3.5 p-3 bg-slate-50/70 border border-slate-200/80 rounded-xl select-none">
-      {/* 头部标题与当前参数展示 */}
+    <div
+      data-testid="divider-inspector"
+      className={`space-y-3.5 p-3 rounded-xl select-none transition-all duration-200 ${
+        isDividerSelected
+          ? "bg-blue-50/40 border border-blue-200/80 shadow-xs ring-1 ring-blue-500/20"
+          : "bg-slate-50/70 border border-slate-200/80"
+      }`}
+    >
+      {/* 头部标题与二次编辑状态指示 */}
       <div className="flex items-center justify-between">
         <div className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
           <Minus className="size-3.5 text-blue-600 stroke-[2.5]" />
-          <span>插入分割线</span>
+          <span>{isDividerSelected ? "二次编辑分割线" : "插入分割线"}</span>
+          {isDividerSelected && (
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700 animate-in fade-in">
+              <span className="size-1.5 rounded-full bg-blue-600 animate-pulse" />
+              <span>已选中</span>
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] text-slate-400 font-mono">
@@ -110,8 +150,14 @@ export const DividerInspector: React.FC = () => {
 
       {/* 实时视觉预览窗 */}
       <div className="px-3 py-2.5 bg-white rounded-lg border border-slate-200 shadow-2xs flex flex-col justify-center">
-        <div className="text-[10px] text-slate-400 mb-1.5 font-medium">
-          实时效果预览
+        <div className="flex items-center justify-between text-[10px] text-slate-400 mb-1.5 font-medium">
+          <span>{isDividerSelected ? "当前选中效果" : "效果预览"}</span>
+          {isDividerSelected && (
+            <span className="text-blue-600 font-normal flex items-center gap-0.5">
+              <Check className="size-2.5" />
+              <span>实时联动中</span>
+            </span>
+          )}
         </div>
         <div className="w-full py-1">
           <div
@@ -198,17 +244,56 @@ export const DividerInspector: React.FC = () => {
         defaultLabel="浅灰 (默认)"
       />
 
-      {/* 3. 插入分割线主动作按钮 */}
-      <div className="pt-1">
-        <Button
-          type="button"
-          onPointerDown={(e) => e.preventDefault()}
-          onClick={handleInsert}
-          className="w-full h-8 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 gap-1.5 rounded-lg shadow-2xs transition-all cursor-pointer"
-        >
-          <Minus className="size-3.5 stroke-[2.5]" />
-          <span>插入分割线</span>
-        </Button>
+      {/* 3. 动作区：区分常规插入态 vs 二次编辑态 */}
+      <div className="pt-1 space-y-2">
+        {isDividerSelected ? (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                onPointerDown={(e) => e.preventDefault()}
+                onClick={handleInsert}
+                variant="outline"
+                className="flex-1 h-8 text-xs font-medium text-slate-700 bg-white hover:bg-slate-100 gap-1 rounded-lg border-slate-200 cursor-pointer"
+                title="在选中分割线下方插入一条新的分割线"
+              >
+                <Plus className="size-3" />
+                <span>插入新线</span>
+              </Button>
+
+              <Button
+                type="button"
+                onPointerDown={(e) => e.preventDefault()}
+                onClick={handleDeleteSelected}
+                variant="outline"
+                className="h-8 px-2.5 text-xs font-medium text-red-600 bg-red-50/50 hover:bg-red-100 border-red-200 rounded-lg cursor-pointer transition-colors"
+                title="删除当前选中的分割线 (或按 Delete / Backspace 键)"
+              >
+                <Trash2 className="size-3 text-red-600" />
+                <span>删除此线</span>
+              </Button>
+            </div>
+            <div className="flex items-center gap-1 text-[11px] text-blue-700 bg-blue-100/60 px-2 py-1 rounded-md">
+              <Info className="size-3 flex-shrink-0" />
+              <span>调节上方参数将即时生效，也可按 Backspace 删除</span>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-1.5">
+            <Button
+              type="button"
+              onPointerDown={(e) => e.preventDefault()}
+              onClick={handleInsert}
+              className="w-full h-8 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 gap-1.5 rounded-lg shadow-2xs transition-all cursor-pointer"
+            >
+              <Minus className="size-3.5 stroke-[2.5]" />
+              <span>插入分割线</span>
+            </Button>
+            <p className="text-[10px] text-slate-400 text-center">
+              在画布中单击已有分割线，即可直接在此二次编辑
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

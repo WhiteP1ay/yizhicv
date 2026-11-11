@@ -115,7 +115,10 @@ export const TextInspector: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 p-3 bg-slate-50/70 border border-slate-200/80 rounded-xl">
+    <div
+      data-testid="text-inspector"
+      className="space-y-4 p-3 bg-slate-50/70 border border-slate-200/80 rounded-xl"
+    >
       {/* 标题栏 */}
       <div className="flex items-center justify-between">
         <div className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">

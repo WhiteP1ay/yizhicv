@@ -1,5 +1,7 @@
 import { mergeAttributes } from "@tiptap/core";
 import { HorizontalRule } from "@tiptap/extension-horizontal-rule";
+import { ReactNodeViewRenderer } from "@tiptap/react";
+import { DividerNodeView } from "@/components/editor/node-views/divider-node-view";
 
 export interface CustomDividerOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -21,10 +23,18 @@ declare module "@tiptap/core" {
 }
 
 /**
- * 支持高度（粗细）与颜色自定义的简历水平分割线扩展
+ * 支持高度（粗细）与颜色自定义、可视化选中与二次编辑的简历水平分割线扩展
  */
 export const CustomDivider = HorizontalRule.extend<CustomDividerOptions>({
   name: "horizontalRule",
+
+  selectable: true,
+  draggable: true,
+  atom: true,
+
+  addNodeView() {
+    return ReactNodeViewRenderer(DividerNodeView);
+  },
 
   addAttributes() {
     return {
