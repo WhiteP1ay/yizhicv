@@ -68,12 +68,12 @@ export const useResumeStore = create<ResumeState>()(
     (set) => ({
       resume: defaultResume,
       activeSectionId: defaultResume.sections[0]?.id || null,
-      isBlurMode: defaultResume.setting.isBlurMode,
+      isBlurMode: defaultResume.settings.isBlurMode,
       isPaddingHighlight: false,
-      isJsonEditorEnabled: defaultResume.setting.isJsonEditorEnabled,
-      previewScale: defaultResume.setting.previewScale,
-      rightPanelWidth: defaultResume.setting.rightPanelWidth,
-      isRightPanelCollapsed: defaultResume.setting.isRightPanelCollapsed,
+      isJsonEditorEnabled: defaultResume.settings.isJsonEditorEnabled,
+      previewScale: defaultResume.settings.previewScale,
+      rightPanelWidth: defaultResume.settings.rightPanelWidth,
+      isRightPanelCollapsed: defaultResume.settings.isRightPanelCollapsed,
 
       setActiveSectionId: (id) => set({ activeSectionId: id }),
       toggleBlurMode: () =>
@@ -83,8 +83,8 @@ export const useResumeStore = create<ResumeState>()(
             isBlurMode: next,
             resume: {
               ...state.resume,
-              setting: {
-                ...state.resume.setting,
+              settings: {
+                ...state.resume.settings,
                 isBlurMode: next,
               },
             },
@@ -97,8 +97,8 @@ export const useResumeStore = create<ResumeState>()(
             isJsonEditorEnabled: next,
             resume: {
               ...state.resume,
-              setting: {
-                ...state.resume.setting,
+              settings: {
+                ...state.resume.settings,
                 isJsonEditorEnabled: next,
               },
             },
@@ -109,8 +109,8 @@ export const useResumeStore = create<ResumeState>()(
           isJsonEditorEnabled: enabled,
           resume: {
             ...state.resume,
-            setting: {
-              ...state.resume.setting,
+            settings: {
+              ...state.resume.settings,
               isJsonEditorEnabled: enabled,
             },
           },
@@ -124,8 +124,8 @@ export const useResumeStore = create<ResumeState>()(
             previewScale: clamped,
             resume: {
               ...state.resume,
-              setting: {
-                ...state.resume.setting,
+              settings: {
+                ...state.resume.settings,
                 previewScale: clamped,
               },
             },
@@ -138,8 +138,8 @@ export const useResumeStore = create<ResumeState>()(
             rightPanelWidth: clamped,
             resume: {
               ...state.resume,
-              setting: {
-                ...state.resume.setting,
+              settings: {
+                ...state.resume.settings,
                 rightPanelWidth: clamped,
               },
             },
@@ -155,8 +155,8 @@ export const useResumeStore = create<ResumeState>()(
             isRightPanelCollapsed: next,
             resume: {
               ...state.resume,
-              setting: {
-                ...state.resume.setting,
+              settings: {
+                ...state.resume.settings,
                 isRightPanelCollapsed: next,
               },
             },
@@ -466,22 +466,22 @@ export const useResumeStore = create<ResumeState>()(
         set({
           resume: defaultResume,
           activeSectionId: defaultResume.sections[0]?.id || null,
-          rightPanelWidth: defaultResume.setting.rightPanelWidth,
-          isRightPanelCollapsed: defaultResume.setting.isRightPanelCollapsed,
-          isBlurMode: defaultResume.setting.isBlurMode,
-          isJsonEditorEnabled: defaultResume.setting.isJsonEditorEnabled,
-          previewScale: defaultResume.setting.previewScale,
+          rightPanelWidth: defaultResume.settings.rightPanelWidth,
+          isRightPanelCollapsed: defaultResume.settings.isRightPanelCollapsed,
+          isBlurMode: defaultResume.settings.isBlurMode,
+          isJsonEditorEnabled: defaultResume.settings.isJsonEditorEnabled,
+          previewScale: defaultResume.settings.previewScale,
         }),
 
       importResume: (newResume) =>
         set({
           resume: newResume,
           activeSectionId: newResume.sections[0]?.id || null,
-          rightPanelWidth: newResume.setting.rightPanelWidth,
-          isRightPanelCollapsed: newResume.setting.isRightPanelCollapsed,
-          isBlurMode: newResume.setting.isBlurMode,
-          isJsonEditorEnabled: newResume.setting.isJsonEditorEnabled,
-          previewScale: newResume.setting.previewScale,
+          rightPanelWidth: newResume.settings.rightPanelWidth,
+          isRightPanelCollapsed: newResume.settings.isRightPanelCollapsed,
+          isBlurMode: newResume.settings.isBlurMode,
+          isJsonEditorEnabled: newResume.settings.isJsonEditorEnabled,
+          previewScale: newResume.settings.previewScale,
         }),
 
       createNewResume: () =>
@@ -495,8 +495,8 @@ export const useResumeStore = create<ResumeState>()(
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
             },
-            setting: {
-              ...state.resume.setting,
+            settings: {
+              ...state.resume.settings,
             },
           },
           activeSectionId: defaultResume.sections[0]?.id || null,
@@ -514,20 +514,8 @@ export const useResumeStore = create<ResumeState>()(
           isJsonEditorEnabled?: boolean;
         };
         const rawResume = persisted.resume || {};
-        const rawSetting =
-          (
-            rawResume as {
-              setting?: Partial<YizhiResume["setting"]>;
-              settings?: Partial<YizhiResume["setting"]>;
-            }
-          ).setting ||
-          (
-            rawResume as {
-              setting?: Partial<YizhiResume["setting"]>;
-              settings?: Partial<YizhiResume["setting"]>;
-            }
-          ).settings ||
-          {};
+        const rawSettings: Partial<YizhiResume["settings"]> =
+          rawResume.settings || {};
 
         const mergedResume: YizhiResume = {
           ...currentState.resume,
@@ -537,13 +525,13 @@ export const useResumeStore = create<ResumeState>()(
               rawResume.layout?.sidebarWidth ??
               currentState.resume.layout.sidebarWidth,
           },
-          setting: {
-            ...currentState.resume.setting,
-            ...rawSetting,
+          settings: {
+            ...currentState.resume.settings,
+            ...rawSettings,
             isJsonEditorEnabled:
               persisted.isJsonEditorEnabled ??
-              rawSetting.isJsonEditorEnabled ??
-              currentState.resume.setting.isJsonEditorEnabled,
+              rawSettings.isJsonEditorEnabled ??
+              currentState.resume.settings.isJsonEditorEnabled,
           },
         };
 
@@ -554,11 +542,11 @@ export const useResumeStore = create<ResumeState>()(
         return {
           ...currentState,
           resume: mergedResume,
-          isBlurMode: mergedResume.setting.isBlurMode,
-          isJsonEditorEnabled: mergedResume.setting.isJsonEditorEnabled,
-          previewScale: mergedResume.setting.previewScale,
-          rightPanelWidth: mergedResume.setting.rightPanelWidth,
-          isRightPanelCollapsed: mergedResume.setting.isRightPanelCollapsed,
+          isBlurMode: mergedResume.settings.isBlurMode,
+          isJsonEditorEnabled: mergedResume.settings.isJsonEditorEnabled,
+          previewScale: mergedResume.settings.previewScale,
+          rightPanelWidth: mergedResume.settings.rightPanelWidth,
+          isRightPanelCollapsed: mergedResume.settings.isRightPanelCollapsed,
         };
       },
     },

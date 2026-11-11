@@ -72,21 +72,10 @@ export const JsonEditorPanel: React.FC = () => {
         return;
       }
 
-      // 4. 组装具备完备保底的 YizhiResume 对象，确保系统鲁棒性
-      const rawSetting =
-        (
-          parsed as {
-            setting?: Partial<YizhiResume["setting"]>;
-            settings?: Partial<YizhiResume["setting"]>;
-          }
-        ).setting ||
-        (
-          parsed as {
-            setting?: Partial<YizhiResume["setting"]>;
-            settings?: Partial<YizhiResume["setting"]>;
-          }
-        ).settings ||
-        {};
+      // 4. 组装具备完备保底的 YizhiResume 对象，确保系统鲁棒性（严格使用 settings 与 isRightPanelCollapsed）
+      const rawSettings = (parsed.settings || {}) as Partial<
+        YizhiResume["settings"]
+      >;
 
       const fullResume: YizhiResume = {
         version: "2.0.0",
@@ -105,26 +94,29 @@ export const JsonEditorPanel: React.FC = () => {
               ? parsed.layout.sidebarWidth
               : defaultResume.layout.sidebarWidth,
         },
-        setting: {
-          ...defaultResume.setting,
-          ...rawSetting,
+        settings: {
+          ...defaultResume.settings,
+          ...rawSettings,
           rightPanelWidth:
-            typeof rawSetting.rightPanelWidth === "number"
-              ? rawSetting.rightPanelWidth
-              : defaultResume.setting.rightPanelWidth,
+            typeof rawSettings.rightPanelWidth === "number"
+              ? rawSettings.rightPanelWidth
+              : defaultResume.settings.rightPanelWidth,
           isRightPanelCollapsed:
-            rawSetting.isRightPanelCollapsed ??
-            (rawSetting as { rightPanelCollapsed?: boolean })
-              .rightPanelCollapsed ??
-            defaultResume.setting.isRightPanelCollapsed,
+            typeof rawSettings.isRightPanelCollapsed === "boolean"
+              ? rawSettings.isRightPanelCollapsed
+              : defaultResume.settings.isRightPanelCollapsed,
           previewScale:
-            typeof rawSetting.previewScale === "number"
-              ? rawSetting.previewScale
-              : defaultResume.setting.previewScale,
-          isBlurMode: rawSetting.isBlurMode ?? defaultResume.setting.isBlurMode,
+            typeof rawSettings.previewScale === "number"
+              ? rawSettings.previewScale
+              : defaultResume.settings.previewScale,
+          isBlurMode:
+            typeof rawSettings.isBlurMode === "boolean"
+              ? rawSettings.isBlurMode
+              : defaultResume.settings.isBlurMode,
           isJsonEditorEnabled:
-            rawSetting.isJsonEditorEnabled ??
-            defaultResume.setting.isJsonEditorEnabled,
+            typeof rawSettings.isJsonEditorEnabled === "boolean"
+              ? rawSettings.isJsonEditorEnabled
+              : defaultResume.settings.isJsonEditorEnabled,
         },
         design: {
           ...defaultResume.design,

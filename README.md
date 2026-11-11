@@ -59,7 +59,7 @@ export interface ResumeLayout {
 }
 
 /** 工作台偏好设置 (Workspace Settings) */
-export interface ResumeSetting {
+export interface ResumeSettings {
   rightPanelWidth: number; // 右侧面板展开宽度 (px, 默认 336px)
   isRightPanelCollapsed: boolean; // 右侧面板是否折叠 (默认 false)
   previewScale: number; // 画布缩放比例 (默认 0.88)
@@ -89,7 +89,7 @@ export interface YizhiResume {
     language: "zh" | "en";
   };
   layout: ResumeLayout;
-  setting: ResumeSetting; // 工作台与编辑器设置项
+  settings: ResumeSettings; // 工作台与编辑器设置项
   sections: ResumeSection[]; // 所有的内容积木，统一编排与排序
   design: ResumeDesign;
 }
@@ -110,7 +110,7 @@ export interface YizhiResume {
   "layout": {
     "sidebarWidth": 260
   },
-  "setting": {
+  "settings": {
     "rightPanelWidth": 336,
     "isRightPanelCollapsed": false,
     "previewScale": 0.88,

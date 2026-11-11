@@ -16,7 +16,7 @@ interface UseRightPanelResizeOptions {
  * 右侧面板拖拽调节宽度 Hook
  *
  * 核心特性：
- * 1. 同步简历设置项：宽度与折叠状态直接与 resume.setting 联动，支持 JSON 导入导出与持久化；
+ * 1. 同步简历设置项：宽度与折叠状态直接与 resume.settings 联动，支持 JSON 导入导出与持久化；
  * 2. 边缘拖拽反馈：支持从面板左边缘向左拖动拉宽、向右拖动收窄；
  * 3. 磁吸阈值判定：向右拖拽低于 snapCollapseThreshold 时自动吸附折叠（56px）；折叠状态向左拖动自动展开；
  * 4. 展开记忆恢复：折叠后再展开时精准记忆恢复至折叠前用户的首选宽度；
