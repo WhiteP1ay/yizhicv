@@ -27,7 +27,8 @@
         "noImportantStyles": "off"
       },
       "a11y": {
-        "noAutofocus": "off"
+        "noAutofocus": "off",
+        "noStaticElementInteractions": "off"
       },
       "security": {
         "noDangerouslySetInnerHtml": "off"

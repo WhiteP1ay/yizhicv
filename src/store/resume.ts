@@ -45,6 +45,8 @@ interface ResumeState {
   ) => string;
   reorderSections: (newSections: ResumeSection[]) => void;
   resetResume: () => void;
+  importResume: (newResume: YizhiResume) => void;
+  createNewResume: () => void;
 }
 
 export const useResumeStore = create<ResumeState>()(
@@ -320,6 +322,27 @@ export const useResumeStore = create<ResumeState>()(
       resetResume: () =>
         set({
           resume: defaultResume,
+          activeSectionId: defaultResume.sections[0]?.id || null,
+        }),
+
+      importResume: (newResume) =>
+        set({
+          resume: newResume,
+          activeSectionId: newResume.sections[0]?.id || null,
+        }),
+
+      createNewResume: () =>
+        set({
+          resume: {
+            ...defaultResume,
+            metadata: {
+              ...defaultResume.metadata,
+              id: `cv_${nanoid(8)}`,
+              title: "新建简历",
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            },
+          },
           activeSectionId: defaultResume.sections[0]?.id || null,
         }),
     }),
