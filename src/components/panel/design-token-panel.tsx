@@ -4,6 +4,7 @@ import { Minus, Plus, RotateCcw, Sliders, Type } from "lucide-react";
 import type React from "react";
 import { Button } from "@/components/ui/button";
 import { useResumeStore } from "@/store/resume";
+import { DividerInspector } from "./divider-inspector";
 import { TextInspector } from "./text-inspector";
 
 const FONT_OPTIONS: Array<{
@@ -36,7 +37,10 @@ export const DesignTokenPanel: React.FC = () => {
       {/* 1. 选中文本与排版控制 (实时响应光标选区) */}
       <TextInspector />
 
-      {/* 2. 页面与排版全局版面设置 */}
+      {/* 2. 插入分割线 (独立 div 容器，支持调节高度与颜色) */}
+      <DividerInspector />
+
+      {/* 3. 页面与排版全局版面设置 */}
       <div className="pt-1 border-t border-slate-200/80 space-y-4">
         <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-800">
           <Sliders className="size-3.5 text-slate-500" />

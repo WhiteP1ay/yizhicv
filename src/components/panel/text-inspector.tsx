@@ -10,7 +10,6 @@ import {
   Pipette,
   Plus,
   RotateCcw,
-  Split,
   Type,
 } from "lucide-react";
 import type React from "react";
@@ -51,7 +50,7 @@ export const TextInspector: React.FC = () => {
           <span>选中文本与排版控制</span>
         </div>
         <p className="text-[11px] text-slate-400">
-          在左侧画布点击或选中任意文字，即可在此调整颜色、层级、字号及插入分割线
+          在左侧画布点击或选中任意文字，即可在此调整颜色、层级与字号
         </p>
       </div>
     );
@@ -372,20 +371,6 @@ export const TextInspector: React.FC = () => {
             </Button>
           </div>
         </div>
-      </div>
-
-      {/* 4. 插入水平分割线 */}
-      <div className="pt-1">
-        <Button
-          type="button"
-          variant="outline"
-          onPointerDown={(e) => e.preventDefault()}
-          onClick={() => editor.chain().focus().setHorizontalRule().run()}
-          className="w-full h-7 text-xs text-slate-700 bg-white hover:bg-slate-100 hover:text-slate-900 gap-1.5 rounded-lg border-slate-200 shadow-2xs font-normal"
-        >
-          <Split className="size-3 text-slate-500" />
-          <span>在当前光标处插入分割线</span>
-        </Button>
       </div>
     </div>
   );

@@ -64,7 +64,7 @@ export const A4PaperCanvas: React.FC = () => {
         } ${paperFontClass}`}
         style={paperStyle}
       >
-        {/* 画布基础排版与分割线规则 (不锁死颜色与边框，由右侧面板自由排版) */}
+        {/* 画布基础排版与分割线规则 (标题绝不自带分割线，分割线支持自由高度与色彩) */}
         <style>{`
           #cv-print-target h1,
           #cv-print-target .cv-inline-editor h1 {
@@ -74,6 +74,9 @@ export const A4PaperCanvas: React.FC = () => {
             letter-spacing: -0.02em;
             margin-top: 0.35em;
             margin-bottom: 0.25em;
+            border: none !important;
+            border-bottom: none !important;
+            padding-bottom: 0 !important;
           }
 
           #cv-print-target h2,
@@ -84,6 +87,9 @@ export const A4PaperCanvas: React.FC = () => {
             letter-spacing: -0.01em;
             margin-top: 0.45em;
             margin-bottom: 0.3em;
+            border: none !important;
+            border-bottom: none !important;
+            padding-bottom: 0 !important;
           }
 
           #cv-print-target h3,
@@ -93,6 +99,9 @@ export const A4PaperCanvas: React.FC = () => {
             line-height: 1.4;
             margin-top: 0.35em;
             margin-bottom: 0.2em;
+            border: none !important;
+            border-bottom: none !important;
+            padding-bottom: 0 !important;
           }
 
           #cv-print-target .cv-entry .flex h1,
@@ -103,6 +112,8 @@ export const A4PaperCanvas: React.FC = () => {
           #cv-print-target .justify-between h3 {
             margin-top: 0 !important;
             margin-bottom: 0 !important;
+            border: none !important;
+            border-bottom: none !important;
           }
 
           #cv-print-target p,
@@ -113,9 +124,9 @@ export const A4PaperCanvas: React.FC = () => {
           }
 
           #cv-print-target hr {
-            border: none !important;
-            border-top: 1px solid #e2e8f0 !important;
-            margin: 0.6em 0 !important;
+            border: none;
+            border-top-style: solid;
+            margin: 0.6em 0;
           }
         `}</style>
 

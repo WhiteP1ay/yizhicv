@@ -14,6 +14,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { CanvasBubbleMenu } from "@/components/editor/bubble-menu";
 import { BlurMark } from "@/components/editor/extensions/blur-mark";
+import { CustomDivider } from "@/components/editor/extensions/custom-divider";
 import { Button } from "@/components/ui/button";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { useResumeStore } from "@/store/resume";
@@ -33,7 +34,12 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
     activeSectionId,
     resume,
   } = useResumeStore();
-  const { setActiveEditor, notifySelectionUpdate } = useActiveEditorStore();
+  const {
+    setActiveEditor,
+    notifySelectionUpdate,
+    registerEditor,
+    unregisterEditor,
+  } = useActiveEditorStore();
 
   // dnd-kit 拖拽排序集成
   const {
@@ -59,8 +65,10 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
         heading: {
           levels: [1, 2, 3],
         },
+        horizontalRule: false, // 禁用默认 hr，使用支持高度与颜色的 CustomDivider
         link: false, // 纸质简历排版不需要超链接扩展，消除重名警告与非预期样式
       }),
+      CustomDivider,
       TextStyle,
       Color,
       FontSize,
@@ -104,6 +112,16 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
       editor.commands.setContent(section.content, { emitUpdate: false });
     }
   }, [section.content, editor]);
+
+  // 注册全局编辑器映射，便于面板跨模块触发插入
+  useEffect(() => {
+    if (editor) {
+      registerEditor(section.id, editor);
+      return () => {
+        unregisterEditor(section.id);
+      };
+    }
+  }, [editor, section.id, registerEditor, unregisterEditor]);
 
   // 当当前模块被置为活跃模块时，更新全局 activeEditor
   useEffect(() => {
