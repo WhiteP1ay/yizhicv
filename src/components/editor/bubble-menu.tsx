@@ -9,9 +9,7 @@ import {
   Heading3,
   Highlighter,
   Italic,
-  Link as LinkIcon,
   Underline,
-  Unlink,
 } from "lucide-react";
 import type React from "react";
 import { Button } from "@/components/ui/button";
@@ -24,22 +22,6 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
   editor,
 }) => {
   if (!editor) return null;
-
-  const setLink = () => {
-    const previousUrl = editor.getAttributes("link").href;
-    const url = window.prompt("输入链接地址 (URL):", previousUrl);
-    if (url === null) return;
-    if (url === "") {
-      editor.chain().focus().extendMarkRange("link").unsetLink().run();
-      return;
-    }
-    editor
-      .chain()
-      .focus()
-      .extendMarkRange("link")
-      .setLink({ href: url, target: "_blank" })
-      .run();
-  };
 
   return (
     <TiptapBubbleMenu
@@ -145,36 +127,6 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
       </Button>
 
       <span className="w-px h-4 bg-slate-700 my-auto mx-0.5" />
-
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-xs"
-        onPointerDown={(e) => e.preventDefault()}
-        onClick={setLink}
-        className={`h-7 w-7 rounded transition-colors ${
-          editor.isActive("link")
-            ? "bg-blue-600 text-white hover:bg-blue-600 hover:text-white"
-            : "text-slate-300 hover:bg-slate-700/80 hover:text-white"
-        }`}
-        title="插入超链接"
-      >
-        <LinkIcon className="w-3.5 h-3.5" />
-      </Button>
-
-      {editor.isActive("link") && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-xs"
-          onPointerDown={(e) => e.preventDefault()}
-          onClick={() => editor.chain().focus().unsetLink().run()}
-          className="h-7 w-7 rounded hover:bg-slate-700/80 text-rose-400 hover:text-rose-300 transition-colors"
-          title="移除链接"
-        >
-          <Unlink className="w-3.5 h-3.5" />
-        </Button>
-      )}
 
       {/* 王牌特色：脱敏 */}
       <Button

@@ -4,9 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import BubbleMenuExtension from "@tiptap/extension-bubble-menu";
 import Highlight from "@tiptap/extension-highlight";
-import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
-import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { GripVertical, Trash2 } from "lucide-react";
@@ -56,15 +54,9 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
         heading: {
           levels: [1, 2, 3],
         },
+        link: false, // 纸质简历排版不需要超链接扩展，消除重名警告与非预期样式
       }),
-      Underline,
       Highlight.configure({ multicolor: true }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: "cv-link text-blue-600 underline hover:text-blue-800",
-        },
-      }),
       Placeholder.configure({
         placeholder: "点击输入模块标题或正文...",
       }),

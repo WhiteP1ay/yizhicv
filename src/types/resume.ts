@@ -82,9 +82,9 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
   <p class="text-base font-medium text-slate-600 mt-1">资深前端全栈工程师</p>
   <div class="cv-contacts-wrap flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-2 text-sm text-slate-600">
     <span>📱 138-0000-0000</span>
-    <span>✉️ <a href="mailto:me@example.com">me@example.com</a></span>
+    <span>✉️ me@example.com</span>
     <span>📍 北京</span>
-    <span>🌐 <a href="https://github.com" target="_blank">github.com</a></span>
+    <span>🌐 github.com</span>
   </div>
 </div>
 `.trim(),
