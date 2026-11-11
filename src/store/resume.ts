@@ -145,7 +145,10 @@ export const useResumeStore = create<ResumeState>()(
         set((state) => ({
           resume: {
             ...state.resume,
-            design: { ...state.resume.design, sectionGap },
+            design: {
+              ...state.resume.design,
+              sectionGap: Math.max(0, sectionGap),
+            },
           },
         })),
 
@@ -160,7 +163,10 @@ export const useResumeStore = create<ResumeState>()(
         set((state) => ({
           resume: {
             ...state.resume,
-            design: { ...state.resume.design, pagePadding },
+            design: {
+              ...state.resume.design,
+              pagePadding: Math.max(0, pagePadding),
+            },
           },
           isPaddingHighlight: true,
         }));

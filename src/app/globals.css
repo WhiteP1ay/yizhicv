@@ -237,6 +237,32 @@
   );
 }
 
+/* 行高变量穿透与强制继承：击碎 prose 默认行高与硬编码 leading */
+#cv-print-target {
+  line-height: var(--cv-line-height, 1.45);
+}
+
+#cv-print-target .cv-inline-editor,
+#cv-print-target .cv-inline-editor *,
+#cv-print-target .prose,
+#cv-print-target .prose p,
+#cv-print-target .prose li,
+#cv-print-target .prose ul,
+#cv-print-target .prose ol,
+#cv-print-target .prose div,
+#cv-print-target .prose span,
+#cv-print-target p,
+#cv-print-target li,
+#cv-print-target div,
+#cv-print-target span {
+  line-height: var(--cv-line-height, 1.45) !important;
+}
+
+/* 模块间隙完全由父级 --cv-gap 驱动，消除模板内写死的 mb-4 外边距干扰，确保间隙可真正降至 0 */
+#cv-print-target .cv-section-block {
+  margin-bottom: 0 !important;
+}
+
 /* 打印时彻底隐藏辅助控制线与按钮 */
 @media print {
   .cv-section-container {

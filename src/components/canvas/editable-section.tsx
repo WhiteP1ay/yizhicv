@@ -65,7 +65,7 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
     editorProps: {
       attributes: {
         class:
-          "cv-inline-editor focus:outline-none min-h-[30px] prose prose-slate max-w-none text-slate-800 leading-normal",
+          "cv-inline-editor focus:outline-none min-h-[30px] prose prose-slate max-w-none text-slate-800",
       },
     },
     onFocus: () => {

@@ -187,6 +187,7 @@ export const A4PaperCanvas: React.FC = () => {
             lineHeight: design.lineHeight,
             color: "#1e293b",
             "--cv-theme": design.themeColor,
+            "--cv-line-height": design.lineHeight,
             "--cv-gap": `${design.sectionGap}px`,
           } as React.CSSProperties
         }

@@ -175,6 +175,9 @@ export const DesignTokenPanel: React.FC = () => {
               step="0.5"
               value={design.fontSize}
               onChange={(e) => setFontSize(Number.parseFloat(e.target.value))}
+              onInput={(e) =>
+                setFontSize(Number.parseFloat(e.currentTarget.value))
+              }
               className="flex-1 accent-slate-900 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
             />
             <Button
@@ -209,7 +212,7 @@ export const DesignTokenPanel: React.FC = () => {
               size="icon-xs"
               onClick={() =>
                 setLineHeight(
-                  Math.max(1.2, Number((design.lineHeight - 0.05).toFixed(2))),
+                  Math.max(1.0, Number((design.lineHeight - 0.05).toFixed(2))),
                 )
               }
               className="size-6 rounded text-slate-500 hover:text-slate-800"
@@ -219,11 +222,14 @@ export const DesignTokenPanel: React.FC = () => {
             </Button>
             <input
               type="range"
-              min="1.2"
-              max="1.8"
+              min="1.0"
+              max="2.2"
               step="0.05"
               value={design.lineHeight}
               onChange={(e) => setLineHeight(Number.parseFloat(e.target.value))}
+              onInput={(e) =>
+                setLineHeight(Number.parseFloat(e.currentTarget.value))
+              }
               className="flex-1 accent-slate-900 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
             />
             <Button
@@ -232,7 +238,7 @@ export const DesignTokenPanel: React.FC = () => {
               size="icon-xs"
               onClick={() =>
                 setLineHeight(
-                  Math.min(1.8, Number((design.lineHeight + 0.05).toFixed(2))),
+                  Math.min(2.2, Number((design.lineHeight + 0.05).toFixed(2))),
                 )
               }
               className="size-6 rounded text-slate-500 hover:text-slate-800"
@@ -256,7 +262,7 @@ export const DesignTokenPanel: React.FC = () => {
               type="button"
               variant="outline"
               size="icon-xs"
-              onClick={() => setSectionGap(Math.max(8, design.sectionGap - 2))}
+              onClick={() => setSectionGap(Math.max(0, design.sectionGap - 2))}
               className="size-6 rounded text-slate-500 hover:text-slate-800"
               title="紧凑模块"
             >
@@ -264,12 +270,15 @@ export const DesignTokenPanel: React.FC = () => {
             </Button>
             <input
               type="range"
-              min="8"
+              min="0"
               max="32"
               step="2"
               value={design.sectionGap}
               onChange={(e) =>
                 setSectionGap(Number.parseInt(e.target.value, 10))
+              }
+              onInput={(e) =>
+                setSectionGap(Number.parseInt(e.currentTarget.value, 10))
               }
               className="flex-1 accent-slate-900 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
             />
@@ -304,7 +313,7 @@ export const DesignTokenPanel: React.FC = () => {
               variant="outline"
               size="icon-xs"
               onClick={() =>
-                setPagePadding(Math.max(10, design.pagePadding - 1))
+                setPagePadding(Math.max(0, design.pagePadding - 1))
               }
               onMouseEnter={() => setIsPaddingHighlight(true)}
               className="size-6 rounded text-slate-500 hover:text-slate-800"
@@ -314,12 +323,15 @@ export const DesignTokenPanel: React.FC = () => {
             </Button>
             <input
               type="range"
-              min="10"
+              min="0"
               max="24"
               step="1"
               value={design.pagePadding}
               onChange={(e) =>
                 setPagePadding(Number.parseInt(e.target.value, 10))
+              }
+              onInput={(e) =>
+                setPagePadding(Number.parseInt(e.currentTarget.value, 10))
               }
               onPointerDown={() => setIsPaddingHighlight(true)}
               onPointerUp={() => setIsPaddingHighlight(false)}
