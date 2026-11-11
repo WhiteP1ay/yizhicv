@@ -16,6 +16,7 @@ import {
 import { Plus } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
+import { useSidebarResize } from "@/hooks/use-sidebar-resize";
 import { useResumeStore } from "@/store/resume";
 import { SECTION_PRESETS } from "@/types/resume";
 import { EditableSection } from "./editable-section";
@@ -25,10 +26,11 @@ export const A4PaperCanvas: React.FC = () => {
     resume,
     isBlurMode,
     previewScale,
-    setSidebarWidth,
     addSectionFromPreset,
     reorderSections,
   } = useResumeStore();
+
+  const { isResizing, handlePointerDownResize } = useSidebarResize();
 
   const { layout, sections, design } = resume;
   const [activeAddSlot, setActiveAddSlot] = useState<"main" | "sidebar" | null>(
@@ -76,38 +78,6 @@ export const A4PaperCanvas: React.FC = () => {
       updated = arrayMove(updated, oldIndex, newIndex);
       reorderSections(updated);
     }
-  };
-
-  // 核心功能：直接按住中线左右拖拽改变侧栏宽度
-  const handlePointerDownResize = (e: React.PointerEvent) => {
-    e.preventDefault();
-    const startX = e.clientX;
-    const startWidth = layout.sidebarWidth || 180; // 若原本为 0 则基准按 180 开始拉
-
-    const onPointerMove = (moveEvent: PointerEvent) => {
-      const deltaX = (moveEvent.clientX - startX) / previewScale;
-      const nextWidth = startWidth + deltaX;
-
-      // 磁吸阈值：拉到 70px 以内自动吸附为 0（纯单栏）
-      if (nextWidth < 70) {
-        setSidebarWidth(0);
-      } else {
-        const clamped = Math.min(380, Math.max(120, Math.round(nextWidth)));
-        setSidebarWidth(clamped);
-      }
-    };
-
-    const onPointerUp = () => {
-      document.removeEventListener("pointermove", onPointerMove);
-      document.removeEventListener("pointerup", onPointerUp);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
-
-    document.addEventListener("pointermove", onPointerMove);
-    document.addEventListener("pointerup", onPointerUp);
-    document.body.style.cursor = "col-resize";
-    document.body.style.userSelect = "none";
   };
 
   return (
@@ -220,13 +190,29 @@ export const A4PaperCanvas: React.FC = () => {
                 title="按住左右拖拽调节侧栏宽度（拉到最左侧自动吸附为单栏）"
               >
                 {/* 垂直分界线 */}
-                <div className="w-[1px] h-full bg-slate-200 group-hover:bg-blue-500 group-active:bg-blue-600 group-hover:w-[2px] transition-all" />
+                <div
+                  className={`h-full transition-all ${
+                    isResizing
+                      ? "w-[2px] bg-blue-600 shadow-xs"
+                      : "w-[1px] bg-slate-200 group-hover:bg-blue-500 group-active:bg-blue-600 group-hover:w-[2px]"
+                  }`}
+                />
 
                 {/* 悬停时的双点把手指示 */}
-                <div className="absolute top-1/2 -translate-y-1/2 w-3.5 h-6 bg-white border border-slate-300 rounded shadow-xs flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity">
+                <div
+                  className={`absolute top-1/2 -translate-y-1/2 w-3.5 h-6 bg-white border rounded shadow-xs flex items-center justify-center transition-all ${
+                    isResizing
+                      ? "opacity-100 border-blue-500 shadow-md scale-105"
+                      : "opacity-0 group-hover:opacity-100 border-slate-300"
+                  }`}
+                >
                   <div className="flex gap-0.5">
-                    <span className="w-0.5 h-2.5 bg-slate-400 rounded-full" />
-                    <span className="w-0.5 h-2.5 bg-slate-400 rounded-full" />
+                    <span
+                      className={`w-0.5 h-2.5 rounded-full ${isResizing ? "bg-blue-500" : "bg-slate-400"}`}
+                    />
+                    <span
+                      className={`w-0.5 h-2.5 rounded-full ${isResizing ? "bg-blue-500" : "bg-slate-400"}`}
+                    />
                   </div>
                 </div>
               </div>
@@ -298,7 +284,13 @@ export const A4PaperCanvas: React.FC = () => {
                 className="no-print absolute top-0 bottom-0 -left-3 w-5 cursor-col-resize group z-30 flex items-center justify-center select-none"
                 title="向右拖拽拉出侧边栏"
               >
-                <div className="w-[2px] h-full bg-transparent group-hover:bg-blue-500/80 transition-colors" />
+                <div
+                  className={`h-full transition-colors ${
+                    isResizing
+                      ? "w-[2px] bg-blue-600"
+                      : "w-[2px] bg-transparent group-hover:bg-blue-500/80"
+                  }`}
+                />
               </div>
 
               {/* 单栏文档流 */}
