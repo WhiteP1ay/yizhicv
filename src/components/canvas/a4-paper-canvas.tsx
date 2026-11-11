@@ -25,6 +25,7 @@ export const A4PaperCanvas: React.FC = () => {
   const {
     resume,
     isBlurMode,
+    isPaddingHighlight,
     previewScale,
     setSidebarWidth,
     addDefaultSection,
@@ -192,6 +193,26 @@ export const A4PaperCanvas: React.FC = () => {
       >
         {/* 用户自定 CSS 钩子 */}
         {design.customCss && <style>{design.customCss}</style>}
+
+        {/* 页面外边距动态辅助参考高亮层 (调节页面外间距时浮现，带半透明色彩与实时尺寸指示) */}
+        <div
+          className={`no-print absolute inset-0 pointer-events-none transition-opacity duration-200 z-30 ${
+            isPaddingHighlight ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            borderWidth: `${design.pagePadding}mm`,
+            borderStyle: "solid",
+            borderColor: "rgba(99, 102, 241, 0.22)",
+          }}
+        >
+          {/* 内沿参考虚线与尺寸角标 */}
+          <div className="w-full h-full border-2 border-dashed border-indigo-500/70 relative">
+            <div className="absolute top-1.5 left-2 px-2 py-0.5 bg-indigo-600 text-white rounded text-[11px] font-mono shadow-md backdrop-blur-xs flex items-center gap-1.5 select-none">
+              <span className="text-[10px] opacity-80">页面外边距</span>
+              <span className="font-bold">{design.pagePadding}mm</span>
+            </div>
+          </div>
+        </div>
 
         {/* DndContext 拖拽提供者 */}
         <DndContext

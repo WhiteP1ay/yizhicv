@@ -36,6 +36,7 @@ export const DesignTokenPanel: React.FC = () => {
     setLineHeight,
     setSectionGap,
     setPagePadding,
+    setIsPaddingHighlight,
     resetDesign,
   } = useResumeStore();
 
@@ -285,8 +286,12 @@ export const DesignTokenPanel: React.FC = () => {
           </div>
         </div>
 
-        {/* 页面边距 */}
-        <div className="space-y-1.5">
+        {/* 页面边距 (调节或悬停时画布高亮外间距范围) */}
+        <div
+          onMouseEnter={() => setIsPaddingHighlight(true)}
+          onMouseLeave={() => setIsPaddingHighlight(false)}
+          className="space-y-1.5 p-1.5 -mx-1.5 rounded-lg transition-colors hover:bg-slate-50"
+        >
           <div className="flex items-center justify-between text-xs">
             <span className="text-slate-700 font-medium">页面外边距</span>
             <span className="font-mono text-slate-500 text-[11px]">
@@ -301,6 +306,7 @@ export const DesignTokenPanel: React.FC = () => {
               onClick={() =>
                 setPagePadding(Math.max(10, design.pagePadding - 1))
               }
+              onMouseEnter={() => setIsPaddingHighlight(true)}
               className="size-6 rounded text-slate-500 hover:text-slate-800"
               title="减小边距"
             >
@@ -315,7 +321,13 @@ export const DesignTokenPanel: React.FC = () => {
               onChange={(e) =>
                 setPagePadding(Number.parseInt(e.target.value, 10))
               }
-              className="flex-1 accent-slate-900 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+              onPointerDown={() => setIsPaddingHighlight(true)}
+              onPointerUp={() => setIsPaddingHighlight(false)}
+              onFocus={() => setIsPaddingHighlight(true)}
+              onBlur={() => setIsPaddingHighlight(false)}
+              onTouchStart={() => setIsPaddingHighlight(true)}
+              onTouchEnd={() => setIsPaddingHighlight(false)}
+              className="flex-1 accent-indigo-600 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
             />
             <Button
               type="button"
@@ -324,6 +336,7 @@ export const DesignTokenPanel: React.FC = () => {
               onClick={() =>
                 setPagePadding(Math.min(24, design.pagePadding + 1))
               }
+              onMouseEnter={() => setIsPaddingHighlight(true)}
               className="size-6 rounded text-slate-500 hover:text-slate-800"
               title="增大边距"
             >

@@ -12,11 +12,13 @@ interface ResumeState {
   resume: YizhiResume;
   activeSectionId: string | null;
   isBlurMode: boolean; // 是否开启全局脱敏预览（模糊遮盖）
+  isPaddingHighlight: boolean; // 是否高亮显示页面边距辅助参考框
   previewScale: number; // 画布缩放比例 (0.5 ~ 1.3)
 
   // Actions
   setActiveSectionId: (id: string | null) => void;
   toggleBlurMode: () => void;
+  setIsPaddingHighlight: (highlight: boolean) => void;
   setPreviewScale: (scale: number) => void;
   setTitle: (title: string) => void;
 
@@ -51,16 +53,21 @@ interface ResumeState {
   createNewResume: () => void;
 }
 
+let paddingHighlightTimer: ReturnType<typeof setTimeout> | null = null;
+
 export const useResumeStore = create<ResumeState>()(
   persist(
     (set) => ({
       resume: defaultResume,
       activeSectionId: defaultResume.sections[0]?.id || null,
       isBlurMode: false,
+      isPaddingHighlight: false,
       previewScale: 0.88,
 
       setActiveSectionId: (id) => set({ activeSectionId: id }),
       toggleBlurMode: () => set((state) => ({ isBlurMode: !state.isBlurMode })),
+      setIsPaddingHighlight: (isPaddingHighlight) =>
+        set({ isPaddingHighlight }),
       setPreviewScale: (scale) =>
         set({ previewScale: Math.max(0.4, Math.min(1.4, scale)) }),
 
@@ -142,13 +149,22 @@ export const useResumeStore = create<ResumeState>()(
           },
         })),
 
-      setPagePadding: (pagePadding) =>
+      setPagePadding: (pagePadding) => {
+        if (paddingHighlightTimer) {
+          clearTimeout(paddingHighlightTimer);
+        }
+        paddingHighlightTimer = setTimeout(() => {
+          set({ isPaddingHighlight: false });
+        }, 1200);
+
         set((state) => ({
           resume: {
             ...state.resume,
             design: { ...state.resume.design, pagePadding },
           },
-        })),
+          isPaddingHighlight: true,
+        }));
+      },
 
       setCustomCss: (customCss) =>
         set((state) => ({
