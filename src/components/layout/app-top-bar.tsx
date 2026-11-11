@@ -6,7 +6,7 @@ import {
   Download,
   FileCode,
   FilePlus,
-  FileText,
+  Pencil,
   Printer,
   Upload,
 } from "lucide-react";
@@ -21,7 +21,9 @@ export const AppTopBar: React.FC = () => {
   const [isFileMenuOpen, setIsFileMenuOpen] = useState(false);
   const [isExportSubmenuOpen, setIsExportSubmenuOpen] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [titleInput, setTitleInput] = useState(resume.metadata.title);
+  const [titleInput, setTitleInput] = useState(
+    resume.metadata.title || "未命名",
+  );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const menuContainerRef = useRef<HTMLDivElement>(null);
@@ -137,11 +139,10 @@ export const AppTopBar: React.FC = () => {
   };
 
   const handleTitleSubmit = () => {
-    if (titleInput.trim()) {
-      setTitle(titleInput.trim());
-    } else {
-      setTitleInput(resume.metadata.title);
-    }
+    const trimmed = titleInput.trim();
+    const finalTitle = trimmed || "未命名";
+    setTitle(finalTitle);
+    setTitleInput(finalTitle);
     setIsEditingTitle(false);
   };
 
@@ -156,12 +157,14 @@ export const AppTopBar: React.FC = () => {
         onChange={handleFileChange}
       />
 
-      {/* 1. 左侧：品牌微标与文件菜单 */}
+      {/* 1. 左侧：品牌与文件菜单 */}
       <div className="flex items-center gap-1">
-        <div className="flex items-center gap-1.5 px-2 py-1 text-slate-900 font-bold text-xs tracking-tight">
-          <FileText className="w-3.5 h-3.5" />
-          <span>一纸简历</span>
-        </div>
+        <span className="text-xs font-bold text-slate-900 tracking-tight px-2 py-1 select-none">
+          一纸简历
+        </span>
+
+        {/* 品牌与菜单分隔线 */}
+        <div className="h-3.5 w-px bg-slate-200 mx-0.5" />
 
         {/* 核心文件菜单 (支持新建、导入、导出 -> 导出PDF/JSON) */}
         <div className="relative" ref={menuContainerRef}>
@@ -171,7 +174,7 @@ export const AppTopBar: React.FC = () => {
               setIsFileMenuOpen((prev) => !prev);
               setIsExportSubmenuOpen(false);
             }}
-            className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
+            className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
               isFileMenuOpen
                 ? "bg-slate-200 text-slate-900"
                 : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
@@ -251,7 +254,7 @@ export const AppTopBar: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. 中间：简历标题微调 (点击改名) */}
+      {/* 2. 中间：简历标题微调 (点击改名，默认未命名，后带铅笔 icon) */}
       <div className="flex items-center">
         {isEditingTitle ? (
           <input
@@ -262,23 +265,25 @@ export const AppTopBar: React.FC = () => {
             onKeyDown={(e) => {
               if (e.key === "Enter") handleTitleSubmit();
               if (e.key === "Escape") {
-                setTitleInput(resume.metadata.title);
+                setTitleInput(resume.metadata.title || "未命名");
                 setIsEditingTitle(false);
               }
             }}
-            className="text-xs font-medium text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-900 w-44 text-center"
+            className="text-xs font-medium text-slate-800 bg-slate-100 px-2.5 py-1 rounded border border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-900 w-44 text-center"
+            autoFocus
           />
         ) : (
           <button
             type="button"
             onClick={() => {
-              setTitleInput(resume.metadata.title);
+              setTitleInput(resume.metadata.title || "未命名");
               setIsEditingTitle(true);
             }}
-            className="text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 px-2 py-0.5 rounded transition-colors"
+            className="group flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
             title="点击重命名简历"
           >
-            <span>{resume.metadata.title}</span>
+            <span>{resume.metadata.title || "未命名"}</span>
+            <Pencil className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition-colors" />
           </button>
         )}
       </div>

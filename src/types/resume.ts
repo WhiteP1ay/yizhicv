@@ -47,7 +47,7 @@ export const yizhiResumeSchema = z.object({
   version: z.literal("2.0.0"),
   metadata: z.object({
     id: z.string(),
-    title: z.string().default("未命名简历"),
+    title: z.string().default("未命名"),
     createdAt: z.string(),
     updatedAt: z.string(),
     language: z.enum(["zh", "en"]).default("zh"),
@@ -204,7 +204,7 @@ export function getSectionLabel(content: string): string {
  * 提取简历智能导出文件名（优先级：用户自定义标题 > 网页内第一条姓名 > 保底时间戳）
  */
 export function getResumeExportName(resume: YizhiResume): string {
-  if (resume.metadata.title && resume.metadata.title !== "未命名简历") {
+  if (resume.metadata.title && resume.metadata.title !== "未命名") {
     return resume.metadata.title;
   }
   const firstContent = resume.sections[0]?.content || "";
@@ -226,7 +226,7 @@ export const defaultResume: YizhiResume = {
   version: "2.0.0",
   metadata: {
     id: "cv_default",
-    title: "求职简历",
+    title: "未命名",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     language: "zh",

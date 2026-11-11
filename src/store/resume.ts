@@ -338,7 +338,7 @@ export const useResumeStore = create<ResumeState>()(
             metadata: {
               ...defaultResume.metadata,
               id: `cv_${nanoid(8)}`,
-              title: "新建简历",
+              title: "未命名",
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
             },
