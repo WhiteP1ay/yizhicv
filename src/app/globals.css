@@ -225,6 +225,18 @@
   margin-bottom: 0 !important;
 }
 
+/* 主题色变量响应：大标题文字与主题下划线 */
+#cv-print-target h2 {
+  color: var(--cv-theme, #0f172a);
+}
+#cv-print-target h2.border-b {
+  border-bottom-color: color-mix(
+    in srgb,
+    var(--cv-theme, #0f172a) 25%,
+    #e2e8f0
+  );
+}
+
 /* 打印时彻底隐藏辅助控制线与按钮 */
 @media print {
   .cv-section-container {

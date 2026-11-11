@@ -30,6 +30,7 @@ interface ResumeState {
   setSectionGap: (gap: number) => void;
   setPagePadding: (padding: number) => void;
   setCustomCss: (css: string) => void;
+  resetDesign: () => void;
 
   // Sections
   updateSectionContent: (id: string, content: string) => void;
@@ -154,6 +155,14 @@ export const useResumeStore = create<ResumeState>()(
           resume: {
             ...state.resume,
             design: { ...state.resume.design, customCss },
+          },
+        })),
+
+      resetDesign: () =>
+        set((state) => ({
+          resume: {
+            ...state.resume,
+            design: { ...defaultResume.design },
           },
         })),
 
