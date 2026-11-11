@@ -10,6 +10,7 @@ import {
   Printer,
   Upload,
 } from "lucide-react";
+import Link from "next/link";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useResumeStore } from "@/store/resume";
@@ -159,9 +160,13 @@ export const AppTopBar: React.FC = () => {
 
       {/* 1. 左侧：品牌与文件菜单 */}
       <div className="flex items-center gap-1">
-        <div className="h-7 px-2 flex items-center text-xs font-bold text-slate-900 tracking-tight select-none">
+        <Link
+          href="/"
+          title="返回官网首页"
+          className="h-7 px-2 flex items-center text-xs font-bold text-slate-900 tracking-tight hover:opacity-75 transition-opacity select-none"
+        >
           一纸简历
-        </div>
+        </Link>
 
         {/* 品牌与菜单分隔线 */}
         <div className="h-3.5 w-px bg-slate-200 mx-0.5" />
