@@ -32,10 +32,10 @@ export type ResumeLayout = z.infer<typeof resumeLayoutSchema>;
 export const resumeDesignSchema = z.object({
   themeColor: z.string().default("#0f172a"),
   fontFamily: z.enum(["sans", "serif", "mono"]).default("sans"),
-  fontSize: z.number().min(8).max(14).default(10.5),
-  lineHeight: z.number().min(1.2).max(2.0).default(1.45),
-  sectionGap: z.number().min(4).max(36).default(16),
-  pagePadding: z.number().min(8).max(30).default(16),
+  fontSize: z.number().min(6).max(20).default(10.5),
+  lineHeight: z.number().min(0.8).max(3.0).default(1.45),
+  sectionGap: z.number().min(0).max(48).default(16),
+  pagePadding: z.number().min(0).max(48).default(16),
   customCss: z.string().default(""),
 });
 export type ResumeDesign = z.infer<typeof resumeDesignSchema>;

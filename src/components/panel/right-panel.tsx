@@ -196,7 +196,15 @@ export const RightPanel: React.FC = () => {
               </p>
             </div>
           )}
-          {activeTab === "json" && isJsonEditorEnabled && <JsonEditorPanel />}
+          {isJsonEditorEnabled && (
+            <div
+              className={`flex-1 flex-col min-h-0 overflow-hidden ${
+                activeTab === "json" ? "flex" : "hidden"
+              }`}
+            >
+              <JsonEditorPanel />
+            </div>
+          )}
         </div>
       )}
     </aside>
