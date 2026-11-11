@@ -34,6 +34,10 @@ export const resumeSettingsSchema = z.object({
   previewScale: z.number().min(0.4).max(1.4).default(0.88),
   isBlurMode: z.boolean().default(false),
   isJsonEditorEnabled: z.boolean().default(false),
+  customTextColors: z
+    .array(z.string().nullable())
+    .max(5)
+    .default([null, null, null, null, null]),
 });
 export type ResumeSettings = z.infer<typeof resumeSettingsSchema>;
 
@@ -71,6 +75,7 @@ export const yizhiResumeSchema = z.object({
     previewScale: 0.88,
     isBlurMode: false,
     isJsonEditorEnabled: false,
+    customTextColors: [null, null, null, null, null],
   }),
   sections: z.array(resumeSectionSchema).default([]),
   design: resumeDesignSchema,
@@ -259,6 +264,7 @@ export const defaultResume: YizhiResume = {
     previewScale: 0.88,
     isBlurMode: false,
     isJsonEditorEnabled: false,
+    customTextColors: [null, null, null, null, null],
   },
   sections: [
     {

@@ -31,6 +31,7 @@ interface ResumeState {
   setIsRightPanelCollapsed: (
     collapsed: boolean | ((prev: boolean) => boolean),
   ) => void;
+  setCustomTextColorSlot: (index: number, color: string | null) => void;
   setTitle: (title: string) => void;
 
   // Layout & Design
@@ -161,6 +162,43 @@ export const useResumeStore = create<ResumeState>()(
                 settings: {
                   ...state.resume.settings,
                   isRightPanelCollapsed: next,
+                },
+              },
+            };
+          }),
+
+        setCustomTextColorSlot: (index, color) =>
+          set((state) => {
+            const currentSlots = [
+              ...(state.resume.settings.customTextColors || [
+                null,
+                null,
+                null,
+                null,
+                null,
+              ]),
+            ];
+            while (currentSlots.length < 5) currentSlots.push(null);
+            currentSlots[index] = color;
+            const nextSlots = currentSlots.slice(0, 5);
+
+            if (typeof window !== "undefined") {
+              try {
+                localStorage.setItem(
+                  "yizhicv_custom_text_colors",
+                  JSON.stringify(nextSlots),
+                );
+              } catch {
+                // ignore local storage errors
+              }
+            }
+
+            return {
+              resume: {
+                ...state.resume,
+                settings: {
+                  ...state.resume.settings,
+                  customTextColors: nextSlots,
                 },
               },
             };
