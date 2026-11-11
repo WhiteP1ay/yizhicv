@@ -67,6 +67,19 @@ interface ResumeState {
 
 let paddingHighlightTimer: ReturnType<typeof setTimeout> | null = null;
 
+const stripBlurMarks = (html: string): string =>
+  html
+    .replace(/<span[^>]*data-blur[^>]*>(.*?)<\/span>/gi, "$1")
+    .replace(/<mark[^>]*data-blur[^>]*>(.*?)<\/mark>/gi, "$1")
+    .replace(
+      /<span[^>]*class="[^"]*cv-blur-mark[^"]*"[^>]*>(.*?)<\/span>/gi,
+      "$1",
+    )
+    .replace(
+      /<mark[^>]*class="[^"]*cv-blur-mark[^"]*"[^>]*>(.*?)<\/mark>/gi,
+      "$1",
+    );
+
 export const useResumeStore = create<ResumeState>()(
   temporal(
     persist(
@@ -508,11 +521,21 @@ export const useResumeStore = create<ResumeState>()(
 
         resetResume: () =>
           set({
-            resume: defaultResume,
+            resume: {
+              ...defaultResume,
+              settings: {
+                ...defaultResume.settings,
+                isBlurMode: false,
+              },
+              sections: defaultResume.sections.map((s) => ({
+                ...s,
+                content: stripBlurMarks(s.content),
+              })),
+            },
             activeSectionId: defaultResume.sections[0]?.id || null,
             rightPanelWidth: defaultResume.settings.rightPanelWidth,
             isRightPanelCollapsed: defaultResume.settings.isRightPanelCollapsed,
-            isBlurMode: defaultResume.settings.isBlurMode,
+            isBlurMode: false,
             isJsonEditorEnabled: defaultResume.settings.isJsonEditorEnabled,
             previewScale: defaultResume.settings.previewScale,
           }),
@@ -530,12 +553,17 @@ export const useResumeStore = create<ResumeState>()(
               },
               settings: {
                 ...defaultResume.settings,
+                isBlurMode: false,
               },
+              sections: defaultResume.sections.map((s) => ({
+                ...s,
+                content: stripBlurMarks(s.content),
+              })),
             },
             activeSectionId: defaultResume.sections[0]?.id || null,
             rightPanelWidth: defaultResume.settings.rightPanelWidth,
             isRightPanelCollapsed: defaultResume.settings.isRightPanelCollapsed,
-            isBlurMode: defaultResume.settings.isBlurMode,
+            isBlurMode: false,
             isJsonEditorEnabled: defaultResume.settings.isJsonEditorEnabled,
             previewScale: defaultResume.settings.previewScale,
           }),
@@ -552,7 +580,7 @@ export const useResumeStore = create<ResumeState>()(
           }),
 
         createNewResume: () =>
-          set((state) => ({
+          set({
             resume: {
               ...defaultResume,
               metadata: {
@@ -563,11 +591,17 @@ export const useResumeStore = create<ResumeState>()(
                 updatedAt: new Date().toISOString(),
               },
               settings: {
-                ...state.resume.settings,
+                ...defaultResume.settings,
+                isBlurMode: false,
               },
+              sections: defaultResume.sections.map((s) => ({
+                ...s,
+                content: stripBlurMarks(s.content),
+              })),
             },
             activeSectionId: defaultResume.sections[0]?.id || null,
-          })),
+            isBlurMode: false,
+          }),
       }),
       {
         name: "yizhicv_resume_v2",
