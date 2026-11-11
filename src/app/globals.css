@@ -174,7 +174,7 @@
   }
 }
 
-/* 画布预览脱敏：开启「隐藏敏感内容」时的五彩云朵遮盖效果 */
+/* 画布预览脱敏：开启「隐藏敏感内容」时的五彩云朵遮盖效果（透出朦胧暗色字迹） */
 .cv-preview-blur .cv-blur-mark {
   position: relative;
   display: inline-flex;
@@ -185,29 +185,33 @@
   margin: 0 4px;
   padding: 1px 10px;
   border-radius: 9999px;
-  color: transparent !important;
+  /* 稍微透出朦胧的黑色字迹感，保证知晓有字但无法轻易辨识具体隐私细节 */
+  color: rgba(15, 23, 42, 0.72) !important;
+  text-shadow: 0 0 3px rgba(15, 23, 42, 0.35);
+  filter: blur(0.75px);
   user-select: none;
   pointer-events: none;
   border: none !important;
-  text-shadow: none !important;
-  /* 五彩梦幻马卡龙彩虹渐变：浅粉 -> 暖杏 -> 奶油黄 -> 薄荷绿 -> 晴空蓝 -> 薰衣草紫 */
+  /* 半透梦幻马卡龙五彩云朵渐变 + 毛玻璃质感 */
   background: linear-gradient(
     135deg,
-    #ffb6c1 0%,
-    #ffd1a4 18%,
-    #fff2a8 36%,
-    #a8f0d5 54%,
-    #a3d8f4 72%,
-    #d8bbf4 90%,
-    #ffb6c1 100%
+    rgba(255, 182, 193, 0.58) 0%,
+    rgba(255, 209, 164, 0.58) 18%,
+    rgba(255, 242, 168, 0.58) 36%,
+    rgba(168, 240, 213, 0.58) 54%,
+    rgba(163, 216, 244, 0.58) 72%,
+    rgba(216, 187, 244, 0.58) 90%,
+    rgba(255, 182, 193, 0.58) 100%
   );
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   background-size: 200% 200%;
   animation: cvCloudFloat 5s ease-in-out infinite;
   box-shadow:
-    0 2px 6px -1px rgba(255, 182, 193, 0.5),
-    0 1px 4px rgba(163, 216, 244, 0.4),
+    0 2px 6px -1px rgba(255, 182, 193, 0.45),
+    0 1px 4px rgba(163, 216, 244, 0.35),
     inset 0 1.5px 2px rgba(255, 255, 255, 0.95),
-    inset 0 -1.5px 2px rgba(216, 187, 244, 0.4);
+    inset 0 -1.5px 2px rgba(216, 187, 244, 0.35);
 }
 
 .cv-preview-blur .cv-blur-mark::before {

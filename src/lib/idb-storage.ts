@@ -1,5 +1,50 @@
-import { del, get, set } from "idb-keyval";
+import { clear, del, get, set } from "idb-keyval";
 import type { StateStorage } from "zustand/middleware";
+
+/**
+ * 彻底清除所有客户端持久化数据（localStorage、sessionStorage 与 IndexedDB）
+ */
+export async function clearAllClientStorage(): Promise<void> {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  // 1. 清空 localStorage 与 sessionStorage
+  try {
+    localStorage.clear();
+  } catch {
+    // ignore
+  }
+  try {
+    sessionStorage.clear();
+  } catch {
+    // ignore
+  }
+
+  // 2. 清空 idb-keyval 默认数据库键值对
+  try {
+    await clear();
+  } catch {
+    // ignore
+  }
+
+  // 3. 递归删除所有 IndexedDB 数据库
+  if (
+    typeof indexedDB !== "undefined" &&
+    typeof indexedDB.databases === "function"
+  ) {
+    try {
+      const databases = await indexedDB.databases();
+      for (const db of databases) {
+        if (db.name) {
+          indexedDB.deleteDatabase(db.name);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+}
 
 /**
  * 基于 IndexedDB (idb-keyval) 的异步安全存储适配器

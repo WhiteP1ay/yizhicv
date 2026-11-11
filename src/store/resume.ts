@@ -60,6 +60,7 @@ interface ResumeState {
   addDefaultSection: (slot: "main" | "sidebar") => string;
   reorderSections: (newSections: ResumeSection[]) => void;
   resetResume: () => void;
+  clearResume: () => void;
   importResume: (newResume: YizhiResume) => void;
   createNewResume: () => void;
 }
@@ -508,6 +509,29 @@ export const useResumeStore = create<ResumeState>()(
         resetResume: () =>
           set({
             resume: defaultResume,
+            activeSectionId: defaultResume.sections[0]?.id || null,
+            rightPanelWidth: defaultResume.settings.rightPanelWidth,
+            isRightPanelCollapsed: defaultResume.settings.isRightPanelCollapsed,
+            isBlurMode: defaultResume.settings.isBlurMode,
+            isJsonEditorEnabled: defaultResume.settings.isJsonEditorEnabled,
+            previewScale: defaultResume.settings.previewScale,
+          }),
+
+        clearResume: () =>
+          set({
+            resume: {
+              ...defaultResume,
+              metadata: {
+                ...defaultResume.metadata,
+                id: `cv_${nanoid(8)}`,
+                title: "未命名",
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              },
+              settings: {
+                ...defaultResume.settings,
+              },
+            },
             activeSectionId: defaultResume.sections[0]?.id || null,
             rightPanelWidth: defaultResume.settings.rightPanelWidth,
             isRightPanelCollapsed: defaultResume.settings.isRightPanelCollapsed,

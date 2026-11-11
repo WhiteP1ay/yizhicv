@@ -12,6 +12,7 @@ import {
   Printer,
   Redo2,
   Terminal,
+  Trash2,
   Undo2,
   Upload,
 } from "lucide-react";
@@ -70,10 +71,11 @@ export const AppTopBar: React.FC = () => {
     }
   };
 
-  // 4. 文件操作生命周期 (新建文档、导入校验、PDF/JSON导出)
+  // 4. 文件操作生命周期 (新建文档、清空缓存、导入校验、PDF/JSON导出)
   const {
     fileInputRef,
     handleNew,
+    handleClear,
     triggerImport,
     handleFileChange,
     exportPdf,
@@ -139,7 +141,18 @@ export const AppTopBar: React.FC = () => {
                   <span>新建</span>
                 </Button>
 
-                {/* 导入 JSON */}
+                {/* 清空（新建下增加清空功能，彻底清除本地缓存与当前内容） */}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleClear}
+                  className="w-full h-8 px-3 justify-start text-xs font-normal text-slate-700 hover:bg-red-50 hover:text-red-600 gap-2 rounded-md cursor-pointer group"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-slate-400 group-hover:text-red-500" />
+                  <span>清空</span>
+                </Button>
+
+                <div className="h-px bg-slate-100 my-1" />
                 <Button
                   type="button"
                   variant="ghost"
