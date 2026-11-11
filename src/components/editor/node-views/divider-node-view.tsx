@@ -1,14 +1,11 @@
 "use client";
 
 import { type NodeViewProps, NodeViewWrapper } from "@tiptap/react";
-import { Trash2 } from "lucide-react";
 import type React from "react";
-import { Button } from "@/components/ui/button";
 
 export const DividerNodeView: React.FC<NodeViewProps> = ({
   node,
   selected,
-  deleteNode,
   editor,
   getPos,
 }) => {
@@ -57,34 +54,6 @@ export const DividerNodeView: React.FC<NodeViewProps> = ({
           className="w-full block transition-all duration-150 pointer-events-none"
         />
       </button>
-
-      {/* 选中态悬浮状态指示栏与快速删除手柄 (打印时隐藏) */}
-      {selected && (
-        <div className="no-print absolute -top-7 right-1 z-30 flex items-center gap-1.5 px-2 py-0.5 bg-slate-900/95 backdrop-blur-md text-white rounded-md shadow-lg text-[10px] animate-in fade-in duration-100">
-          <span className="font-mono text-slate-300">
-            {height}px · {color.toUpperCase()}
-          </span>
-          <div className="h-2.5 w-px bg-slate-700" />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-xs"
-            onPointerDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              deleteNode();
-            }}
-            className="size-4 p-0 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
-            title="删除分割线 (或按 Delete / Backspace 键)"
-          >
-            <Trash2 className="size-2.5" />
-          </Button>
-        </div>
-      )}
     </NodeViewWrapper>
   );
 };

@@ -92,9 +92,6 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
     onSelectionUpdate: () => {
       notifySelectionUpdate();
     },
-    onTransaction: () => {
-      notifySelectionUpdate();
-    },
     onUpdate: ({ editor }) => {
       updateSectionContent(section.id, editor.getHTML());
     },

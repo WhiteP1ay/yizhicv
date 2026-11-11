@@ -19,6 +19,53 @@ interface CanvasBubbleMenuProps {
   editor: Editor | null;
 }
 
+/**
+ * 严格控制气泡菜单显示时机（顶层静态函数，保持引用恒定，防止 Tiptap BubbleMenu 内部 useEffect 循环触发）
+ * 1. 选中分割线 (horizontalRule) 或节点选区时坚决不弹出
+ * 2. 选区必须是非空文本选区
+ */
+const shouldShowBubbleMenu = ({
+  editor: currentEditor,
+  state,
+  from,
+  to,
+}: {
+  editor: Editor;
+  state: Editor["state"];
+  from: number;
+  to: number;
+}): boolean => {
+  // 1. 若当前处于非可编辑状态，不展示
+  if (!currentEditor.isEditable) {
+    return false;
+  }
+
+  // 2. 若当前选中或落在分割线上，坚决不弹出气泡菜单
+  if (currentEditor.isActive("horizontalRule")) {
+    return false;
+  }
+
+  // 3. 选区必须是非空选区 (未选中文本时不弹出)
+  const { selection } = state;
+  if (selection.empty) {
+    return false;
+  }
+
+  // 4. 若为节点选区（例如 atom 节点分割线），不弹出文本格式化气泡
+  const sel = selection as { node?: { type: { name: string } } };
+  if (sel.node) {
+    return false;
+  }
+
+  // 5. 必须有实际的选中文本内容（去除空白后大于 0）
+  const text = state.doc.textBetween(from, to);
+  if (!text || text.trim().length === 0) {
+    return false;
+  }
+
+  return true;
+};
+
 export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
   editor,
 }) => {
@@ -27,6 +74,7 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
   return (
     <TiptapBubbleMenu
       editor={editor}
+      shouldShow={shouldShowBubbleMenu}
       className="flex items-center gap-0.5 p-1 bg-slate-900/95 backdrop-blur-md text-white rounded-lg shadow-2xl border border-slate-700/60 z-50 animate-in fade-in zoom-in-95 duration-100"
     >
       <Button
