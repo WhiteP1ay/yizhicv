@@ -127,3 +127,89 @@
     @apply font-sans;
   }
 }
+
+/* ==========================================================================
+   一纸简历 (YizhiCV) 核心排版引擎与打印样式
+   ========================================================================== */
+
+/* 隐藏横向滚动条 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Tiptap 编辑器与画布内排版基础 */
+.tiptap p.is-editor-empty:first-child::before {
+  color: #94a3b8;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* 脱敏标记：编辑器内的视觉提示 */
+.cv-blur-mark {
+  background-color: #f3e8ff;
+  color: #6b21a8;
+  border-radius: 3px;
+  padding: 1px 4px;
+  border-bottom: 1.5px dashed #a855f7;
+}
+
+/* 画布预览脱敏：开启脱敏时的高阶毛玻璃模糊 */
+.cv-preview-blur .cv-blur-mark {
+  filter: blur(4px);
+  user-select: none;
+  background-color: #e2e8f0;
+  color: transparent !important;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 0 4px;
+  pointer-events: none;
+}
+
+/* 打印与导出 PDF 专属媒体查询 */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  header,
+  nav,
+  .md\:hidden,
+  .SectionEditorPane,
+  aside:not(.cv-slot-sidebar),
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  #cv-print-target {
+    transform: none !important;
+    box-shadow: none !important;
+    margin: 0 auto !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    padding: var(--cv-page-padding, 16mm) !important;
+    page-break-after: always;
+  }
+
+  /* 打印时避免断行截断 */
+  .cv-section-block,
+  .cv-entry {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

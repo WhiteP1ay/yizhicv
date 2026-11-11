@@ -10,31 +10,31 @@
 本项目旨在解决传统简历工具“格式死板”、“排版溢出难调”以及“空白画布创作焦虑”的核心痛点，基于现代化 Web 与 AI 智能体技术构建：
 
 1. **双轨画布架构 (Artifacts Mode)**
-   * **左侧 AI 访谈助手**：通过结构化对话挖掘用户经历，基于 STAR 原则提炼高量化成果与技术亮点；
-   * **右侧 A4 实时画布**：所见即所得实时渲染，全量拥抱 Tiptap 富文本内联输入，像在 Notion 一样点击即编辑。
+   - **左侧 AI 访谈助手**：通过结构化对话挖掘用户经历，基于 STAR 原则提炼高量化成果与技术亮点；
+   - **右侧 A4 实时画布**：所见即所得实时渲染，全量拥抱 Tiptap 富文本内联输入，像在 Notion 一样点击即编辑。
 
 2. **极致纯粹的「无类型 Section 积木流」**
-   * **彻底消灭数据冗余**：彻底干掉 `type`、`title`、`showHeader` 等外挂字段，标题与正文完全内联于富文本 HTML 中；
-   * **系统开箱预设（Presets）**：内置名片、工作经历、项目经历、技能矩阵等开箱即用的 HTML 模板，用户一键插入后可随心所欲微调；
-   * **极致自由度**：个人信息模块可自由拖入 `sidebar` 侧栏或 `main` 主栏，在匿名简历评审或特定作品集场景下亦可直接隐藏或删除。
+   - **彻底消灭数据冗余**：彻底干掉 `type`、`title`、`showHeader` 等外挂字段，标题与正文完全内联于富文本 HTML 中；
+   - **系统开箱预设（Presets）**：内置名片、工作经历、项目经历、技能矩阵等开箱即用的 HTML 模板，用户一键插入后可随心所欲微调；
+   - **极致自由度**：个人信息模块可自由拖入 `sidebar` 侧栏或 `main` 主栏，在匿名简历评审或特定作品集场景下亦可直接隐藏或删除。
 
 3. **双槽位自适应布局 (Unified Slot Grid)**
-   * 画布底层统一采用 `main` 与 `sidebar` 双槽位网格；
-   * **侧栏宽度支持拖拽微调**：`sidebarWidth === 0` 即为极简单栏上下流，`sidebarWidth > 0` 即为黄金比例双栏网格，无需冗余维护 `mode` 字段；
-   * **纸张规格锁死工业级 A4 (210mm × 297mm)**：摒弃无用纸张下拉配置，保障打印与导出绝对一致。
+   - 画布底层统一采用 `main` 与 `sidebar` 双槽位网格；
+   - **侧栏宽度支持拖拽微调**：`sidebarWidth === 0` 即为极简单栏上下流，`sidebarWidth > 0` 即为黄金比例双栏网格，无需冗余维护 `mode` 字段；
+   - **纸张规格锁死工业级 A4 (210mm × 297mm)**：摒弃无用纸张下拉配置，保障打印与导出绝对一致。
 
 4. **语义化 DOM 与稳定 Style Hooks**
-   * 摒弃无序嵌套的 Div 结构，输出扁平语义化标签（`<section>`、`<article>`、`<time>`）；
-   * 暴露稳定、层级浅的样式钩子（如 `.cv-section`、`.cv-entry`），由全局 CSS 变量驱动；
-   * 既保证开箱即用的高审美排版，又赋予高级用户通过全局 CSS 窗口进行像素级定制的自由，确保打印与机筛稳定性。
+   - 摒弃无序嵌套的 Div 结构，输出扁平语义化标签（`<section>`、`<article>`、`<time>`）；
+   - 暴露稳定、层级浅的样式钩子（如 `.cv-section`、`.cv-entry`），由全局 CSS 变量驱动；
+   - 既保证开箱即用的高审美排版，又赋予高级用户通过全局 CSS 窗口进行像素级定制的自由，确保打印与机筛稳定性。
 
 5. **本地优先与 BYOK (Bring Your Own Key)**
-   * **数据安全**：核心简历数据保存在本地浏览器中，不强制登录，零隐私泄露风险；
-   * **自备算力**：支持用户自填 DeepSeek / OpenAI 等大模型 API Key 免费调用 AI 润色能力，零门槛开箱即用。
+   - **数据安全**：核心简历数据保存在本地浏览器中，不强制登录，零隐私泄露风险；
+   - **自备算力**：支持用户自填 DeepSeek / OpenAI 等大模型 API Key 免费调用 AI 润色能力，零门槛开箱即用。
 
 6. **局部内容敏感脱敏 (Redaction / Blur)**
-   * 支持选中文本一键标记为脱敏内容；
-   * 在公开发享或社交平台展示时自动应用高阶磨砂模糊遮盖，免去手动截图打码的繁琐流程。
+   - 支持选中文本一键标记为脱敏内容；
+   - 在公开发享或社交平台展示时自动应用高阶磨砂模糊遮盖，免去手动截图打码的繁琐流程。
 
 ---
 
@@ -47,38 +47,38 @@
 ```typescript
 /** 通用 Section 积木块（无冗余字段，内容完全由 Tiptap 富文本内联驱动） */
 export interface ResumeSection {
-  id: string;               // 唯一标识 (nanoid)
-  slot: 'main' | 'sidebar'; // 物理槽位：主栏 或 侧栏
-  visible: boolean;         // 可见性开关
-  content: string;          // Tiptap 富文本 HTML (标题、正文全部包含其中)
+  id: string; // 唯一标识 (nanoid)
+  slot: "main" | "sidebar"; // 物理槽位：主栏 或 侧栏
+  visible: boolean; // 可见性开关
+  content: string; // Tiptap 富文本 HTML (标题、正文全部包含其中)
 }
 
 /** 双槽位自适应布局配置 (Unified Slot Grid) */
 export interface ResumeLayout {
-  sidebarWidth: number;     // 侧栏宽度 (px，0 = 纯单栏上下流；>0 = 双栏网格，默认 260px)
-  sidebarPosition: 'left' | 'right';
+  sidebarWidth: number; // 侧栏宽度 (px，0 = 纯单栏上下流；>0 = 双栏网格，默认 260px)
+  sidebarPosition: "left" | "right";
 }
 
 /** 设计规范与排版弹性 Tokens */
 export interface ResumeDesign {
-  themeColor: string;       // 主题强调色 (Hex)
-  fontFamily: 'sans' | 'serif' | 'mono';
-  fontSize: number;         // 基准字号 (pt，默认 10.5pt，9~12pt 弹性伸缩)
-  lineHeight: number;       // 基准行高 (默认 1.45，1.2~1.8 弹性伸缩)
-  sectionGap: number;       // 模块垂直间距 (px，默认 16px)
-  pagePadding: number;      // A4 画布内边距 (mm，默认 16mm)
-  customCss: string;        // 高级用户自定义 CSS 覆写代码
+  themeColor: string; // 主题强调色 (Hex)
+  fontFamily: "sans" | "serif" | "mono";
+  fontSize: number; // 基准字号 (pt，默认 10.5pt，9~12pt 弹性伸缩)
+  lineHeight: number; // 基准行高 (默认 1.45，1.2~1.8 弹性伸缩)
+  sectionGap: number; // 模块垂直间距 (px，默认 16px)
+  pagePadding: number; // A4 画布内边距 (mm，默认 16mm)
+  customCss: string; // 高级用户自定义 CSS 覆写代码
 }
 
 /** 顶层完整简历文档（极致扁平的积木流模型） */
 export interface YizhiResume {
-  version: '2.0.0';
+  version: "2.0.0";
   metadata: {
     id: string;
-    title: string;          // 简历文档名称，如 "前端专家简历"
+    title: string; // 简历文档名称，如 "前端专家简历"
     createdAt: string;
     updatedAt: string;
-    language: 'zh' | 'en';
+    language: "zh" | "en";
   };
   layout: ResumeLayout;
   sections: ResumeSection[]; // 所有的内容积木，统一编排与排序
@@ -152,26 +152,27 @@ A：注册登录、看广告、有收费功能、收集个人信息、样式过�
 
 ## 技术栈
 
-* **核心框架**：[Next.js](https://nextjs.org/) (App Router, Turbopack) + [React 19](https://react.dev/)
-* **语言与类型**：[TypeScript](https://www.typescriptlang.org/) + [Zod](https://zod.dev/) (运行时类型校验与 Schema 推导)
-* **样式系统**：[Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) (Radix / Base UI)
-* **状态管理**：[Zustand](https://github.com/pmndrs/zustand) (轻量响应式与 LocalStorage 持久化)
-* **富文本引擎**：[Tiptap 全家桶](https://tiptap.dev/) (`@tiptap/react`, `@tiptap/pm`, StarterKit, 链接/下划线/颜色/脱敏扩展)
-* **拖拽编排**：[@dnd-kit](https://dndkit.com/) (`@dnd-kit/core`, `@dnd-kit/sortable`, 现代化 React 19 弹性拖拽排序)
-* **代码编辑器**：[CodeMirror 6](https://codemirror.net/) (`@uiw/react-codemirror` + `@codemirror/lang-css`, 轻量无 WebWorker 负担)
-* **图标系统**：[Lucide React](https://lucide.dev/) + [@icons-pack/react-simple-icons](https://simpleicons.org/) (技术品牌与社交全量 SVG 图标)
-* **图片裁剪**：[react-image-crop](https://github.com/DominicTobias/react-image-crop) (轻量无头头像裁剪器)
-* **通知与工具**：[Sonner](https://sonner.emilkowal.ski/) (现代化 Toast 通知) + [nanoid](https://github.com/ai/nanoid) (紧凑安全唯一 ID)
-* **代码质量**：[Biome](https://biomejs.dev/) (极速格式化与代码规范检查)
-* **包管理器**：[pnpm](https://pnpm.io/)
+- **核心框架**：[Next.js](https://nextjs.org/) (App Router, Turbopack) + [React 19](https://react.dev/)
+- **语言与类型**：[TypeScript](https://www.typescriptlang.org/) + [Zod](https://zod.dev/) (运行时类型校验与 Schema 推导)
+- **样式系统**：[Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) (Radix / Base UI)
+- **状态管理**：[Zustand](https://github.com/pmndrs/zustand) (轻量响应式与 LocalStorage 持久化)
+- **富文本引擎**：[Tiptap 全家桶](https://tiptap.dev/) (`@tiptap/react`, `@tiptap/pm`, StarterKit, 链接/下划线/颜色/脱敏扩展)
+- **拖拽编排**：[@dnd-kit](https://dndkit.com/) (`@dnd-kit/core`, `@dnd-kit/sortable`, 现代化 React 19 弹性拖拽排序)
+- **代码编辑器**：[CodeMirror 6](https://codemirror.net/) (`@uiw/react-codemirror` + `@codemirror/lang-css`, 轻量无 WebWorker 负担)
+- **图标系统**：[Lucide React](https://lucide.dev/) + [@icons-pack/react-simple-icons](https://simpleicons.org/) (技术品牌与社交全量 SVG 图标)
+- **图片裁剪**：[react-image-crop](https://github.com/DominicTobias/react-image-crop) (轻量无头头像裁剪器)
+- **通知与工具**：[Sonner](https://sonner.emilkowal.ski/) (现代化 Toast 通知) + [nanoid](https://github.com/ai/nanoid) (紧凑安全唯一 ID)
+- **代码质量**：[Biome](https://biomejs.dev/) (极速格式化与代码规范检查)
+- **包管理器**：[pnpm](https://pnpm.io/)
 
 ---
 
 ## 快速开始
 
 ### 1. 环境要求
-* Node.js >= 18.18.0
-* pnpm >= 9.0.0
+
+- Node.js >= 18.18.0
+- pnpm >= 9.0.0
 
 ### 2. 本地运行
 
