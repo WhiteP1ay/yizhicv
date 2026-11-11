@@ -159,22 +159,22 @@ export const AppTopBar: React.FC = () => {
 
       {/* 1. 左侧：品牌与文件菜单 */}
       <div className="flex items-center gap-1">
-        <span className="text-xs font-bold text-slate-900 tracking-tight px-2 py-1 select-none">
+        <div className="h-7 px-2 flex items-center text-xs font-bold text-slate-900 tracking-tight select-none">
           一纸简历
-        </span>
+        </div>
 
         {/* 品牌与菜单分隔线 */}
         <div className="h-3.5 w-px bg-slate-200 mx-0.5" />
 
         {/* 核心文件菜单 (支持新建、导入、导出 -> 导出PDF/JSON) */}
-        <div className="relative" ref={menuContainerRef}>
+        <div className="relative flex items-center" ref={menuContainerRef}>
           <button
             type="button"
             onClick={() => {
               setIsFileMenuOpen((prev) => !prev);
               setIsExportSubmenuOpen(false);
             }}
-            className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+            className={`h-7 px-2.5 flex items-center text-xs font-medium rounded-md transition-colors cursor-pointer ${
               isFileMenuOpen
                 ? "bg-slate-200 text-slate-900"
                 : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
@@ -269,7 +269,7 @@ export const AppTopBar: React.FC = () => {
                 setIsEditingTitle(false);
               }
             }}
-            className="text-xs font-medium text-slate-800 bg-slate-100 px-2.5 py-1 rounded border border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-900 w-44 text-center"
+            className="h-7 text-xs font-medium text-slate-800 bg-slate-100 px-2.5 rounded border border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-900 w-44 text-center"
             autoFocus
           />
         ) : (
@@ -279,7 +279,7 @@ export const AppTopBar: React.FC = () => {
               setTitleInput(resume.metadata.title || "未命名");
               setIsEditingTitle(true);
             }}
-            className="group flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+            className="group h-7 flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 px-2.5 rounded-md transition-colors cursor-pointer"
             title="点击重命名简历"
           >
             <span>{resume.metadata.title || "未命名"}</span>
@@ -295,7 +295,7 @@ export const AppTopBar: React.FC = () => {
           href="https://github.com/WhiteP1ay/yizhicv"
           target="_blank"
           rel="noopener noreferrer"
-          className="p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded transition-colors"
+          className="h-7 w-7 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors"
           title="GitHub 开源仓库"
         >
           <SiGithub className="w-3.5 h-3.5" />
