@@ -113,7 +113,7 @@ export function useResumeHistory() {
     redo,
     clear,
     isMac,
-    undoShortcut: isMac ? "⌘Z" : "Ctrl+Z",
-    redoShortcut: isMac ? "⇧⌘Z" : "Ctrl+Shift+Z",
+    undoShortcut: isMac ? "Cmd+Z" : "Ctrl+Z",
+    redoShortcut: isMac ? "Shift+Cmd+Z" : "Ctrl+Shift+Z",
   };
 }

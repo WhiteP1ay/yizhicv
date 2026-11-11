@@ -224,7 +224,7 @@ export const AppTopBar: React.FC = () => {
           </Button>
 
           {isEditMenuOpen && (
-            <div className="absolute left-0 top-full mt-1 w-44 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 text-xs">
+            <div className="absolute left-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 text-xs">
               {/* 撤销 */}
               <Button
                 type="button"
@@ -338,33 +338,6 @@ export const AppTopBar: React.FC = () => {
               </div>
             </div>
           )}
-        </div>
-
-        {/* 历史记录时间机器：撤销与重做 */}
-        <div className="h-3.5 w-px bg-slate-200 mx-1" />
-        <div className="flex items-center gap-0.5">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-xs"
-            onClick={undo}
-            disabled={!canUndo}
-            className="size-7 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-25 disabled:pointer-events-none transition-opacity"
-            title={`撤销 / 上一步 (${undoShortcut})`}
-          >
-            <Undo2 className="size-3.5" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-xs"
-            onClick={redo}
-            disabled={!canRedo}
-            className="size-7 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-25 disabled:pointer-events-none transition-opacity"
-            title={`重做 / 下一步 (${redoShortcut})`}
-          >
-            <Redo2 className="size-3.5" />
-          </Button>
         </div>
       </div>
 
