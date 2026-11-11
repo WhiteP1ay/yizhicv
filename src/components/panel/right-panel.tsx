@@ -4,6 +4,7 @@ import { ChevronRight, FileCode, Layers, Palette } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useRightPanelResize } from "@/hooks/use-right-panel-resize";
 import { useResumeStore } from "@/store/resume";
 import { DesignTokenPanel } from "./design-token-panel";
 import { JsonEditorPanel } from "./json-editor-panel";
@@ -32,7 +33,15 @@ const BASE_TABS: TabItem[] = [
 export const RightPanel: React.FC = () => {
   const { isJsonEditorEnabled } = useResumeStore();
   const [activeTab, setActiveTab] = useState<PanelTab | null>("design");
-  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const {
+    width,
+    isCollapsed,
+    setIsCollapsed,
+    isResizing,
+    handlePointerDownResize,
+    handleDoubleClickResize,
+  } = useRightPanelResize();
 
   // 当开启 JSON 编辑器时，若当前收起则自动展开并切换到 json tab；关闭时回退到 design
   useEffect(() => {
@@ -42,7 +51,7 @@ export const RightPanel: React.FC = () => {
     } else {
       setActiveTab((prev) => (prev === "json" ? "design" : prev));
     }
-  }, [isJsonEditorEnabled]);
+  }, [isJsonEditorEnabled, setIsCollapsed]);
 
   const availableTabs: TabItem[] = [
     ...BASE_TABS,
@@ -71,16 +80,87 @@ export const RightPanel: React.FC = () => {
 
   return (
     <aside
-      className={`no-print h-full border-l border-slate-200 bg-white/95 backdrop-blur-md flex flex-col z-20 flex-shrink-0 transition-all duration-200 ease-in-out select-none shadow-xs ${
-        isCollapsed ? "w-14" : "w-84"
+      data-testid="right-panel"
+      style={{ width: isCollapsed ? 56 : width }}
+      className={`no-print relative h-full border-l border-slate-200 bg-white/95 backdrop-blur-md flex flex-col z-20 flex-shrink-0 select-none shadow-xs ${
+        isResizing
+          ? "transition-none select-none"
+          : "transition-[width] duration-200 ease-in-out"
       }`}
     >
+      {/* 拖拽调节宽度的左边缘分割线 (Resize Handle) */}
+      <div
+        data-testid="right-panel-resize-handle"
+        onPointerDown={handlePointerDownResize}
+        onDoubleClick={handleDoubleClickResize}
+        className="absolute -left-1.5 top-0 bottom-0 w-3 cursor-col-resize z-30 group flex items-center justify-center select-none"
+        title="按住左右拖拽调节面板宽度，双击重置"
+      >
+        <div
+          className={`w-0.5 h-full transition-all duration-150 ${
+            isResizing
+              ? "bg-blue-500 w-1 shadow-xs"
+              : "group-hover:bg-blue-400 group-hover:w-0.5"
+          }`}
+        />
+      </div>
+
       {/* Panel 顶部：圆 tab 切换区 (只放 icon，无文字) */}
-      <div className="h-13 px-2.5 border-b border-slate-100 flex items-center justify-between gap-1 flex-shrink-0">
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+      <div
+        className={`h-13 px-2.5 border-b border-slate-100 flex items-center gap-1 flex-shrink-0 ${
+          isCollapsed ? "justify-center" : "justify-between"
+        }`}
+      >
+        {!isCollapsed && (
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            {availableTabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+
+              return (
+                <Button
+                  key={tab.id}
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleTabClick(tab.id)}
+                  className={`size-8 rounded-full transition-all duration-150 relative ${
+                    isActive
+                      ? "bg-slate-900 text-white shadow-xs hover:bg-slate-800 hover:text-white"
+                      : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+                  }`}
+                  title={tab.title}
+                >
+                  <Icon className="size-4" />
+                </Button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* 展开/收起切换把手 */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-xs"
+          onClick={() => setIsCollapsed((prev) => !prev)}
+          className="size-7 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors flex-shrink-0"
+          title={isCollapsed ? "展开右侧面板" : "收起面板"}
+        >
+          <ChevronRight
+            className={`size-3.5 transition-transform duration-200 ${
+              isCollapsed ? "rotate-180" : ""
+            }`}
+          />
+        </Button>
+      </div>
+
+      {/* 折叠时：垂直展示圆 tab 图标，点击任一图标均可直接展开并切到对应 tab */}
+      {isCollapsed && (
+        <div className="flex flex-col items-center gap-2 py-3">
           {availableTabs.map((tab) => {
             const Icon = tab.icon;
-            const isActive = !isCollapsed && activeTab === tab.id;
+            const isActive = activeTab === tab.id;
 
             return (
               <Button
@@ -89,7 +169,7 @@ export const RightPanel: React.FC = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => handleTabClick(tab.id)}
-                className={`size-8 rounded-full transition-all duration-150 relative ${
+                className={`size-8 rounded-full transition-all duration-150 ${
                   isActive
                     ? "bg-slate-900 text-white shadow-xs hover:bg-slate-800 hover:text-white"
                     : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"
@@ -101,23 +181,7 @@ export const RightPanel: React.FC = () => {
             );
           })}
         </div>
-
-        {/* 展开/收起切换把手 */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-xs"
-          onClick={() => setIsCollapsed((prev) => !prev)}
-          className="size-7 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-          title={isCollapsed ? "展开右侧面板" : "收起面板"}
-        >
-          <ChevronRight
-            className={`size-3.5 transition-transform duration-200 ${
-              isCollapsed ? "rotate-180" : ""
-            }`}
-          />
-        </Button>
-      </div>
+      )}
 
       {/* Panel 内部主体：折叠时隐藏内容，展开时渲染激活 tab */}
       {!isCollapsed && (
