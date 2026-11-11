@@ -15,6 +15,8 @@ interface ResumeState {
   isPaddingHighlight: boolean; // 是否高亮显示页面边距辅助参考框
   isJsonEditorEnabled: boolean; // 是否在右侧面板开启 JSON 源码编辑 Tab
   previewScale: number; // 画布缩放比例 (0.5 ~ 1.3)
+  rightPanelWidth: number; // 右侧面板展开宽度 (px)
+  isRightPanelCollapsed: boolean; // 右侧面板是否折叠
 
   // Actions
   setActiveSectionId: (id: string | null) => void;
@@ -23,11 +25,14 @@ interface ResumeState {
   setJsonEditorEnabled: (enabled: boolean) => void;
   setIsPaddingHighlight: (highlight: boolean) => void;
   setPreviewScale: (scale: number) => void;
+  setRightPanelWidth: (width: number) => void;
+  setIsRightPanelCollapsed: (
+    collapsed: boolean | ((prev: boolean) => boolean),
+  ) => void;
   setTitle: (title: string) => void;
 
   // Layout & Design
   setSidebarWidth: (width: number) => void;
-  setSidebarPosition: (position: "left" | "right") => void;
   setThemeColor: (color: string) => void;
   setFontFamily: (font: "sans" | "serif" | "mono") => void;
   setFontSize: (size: number) => void;
@@ -63,20 +68,100 @@ export const useResumeStore = create<ResumeState>()(
     (set) => ({
       resume: defaultResume,
       activeSectionId: defaultResume.sections[0]?.id || null,
-      isBlurMode: false,
+      isBlurMode: defaultResume.setting.isBlurMode,
       isPaddingHighlight: false,
-      isJsonEditorEnabled: false,
-      previewScale: 0.88,
+      isJsonEditorEnabled: defaultResume.setting.isJsonEditorEnabled,
+      previewScale: defaultResume.setting.previewScale,
+      rightPanelWidth: defaultResume.setting.rightPanelWidth,
+      isRightPanelCollapsed: defaultResume.setting.isRightPanelCollapsed,
 
       setActiveSectionId: (id) => set({ activeSectionId: id }),
-      toggleBlurMode: () => set((state) => ({ isBlurMode: !state.isBlurMode })),
+      toggleBlurMode: () =>
+        set((state) => {
+          const next = !state.isBlurMode;
+          return {
+            isBlurMode: next,
+            resume: {
+              ...state.resume,
+              setting: {
+                ...state.resume.setting,
+                isBlurMode: next,
+              },
+            },
+          };
+        }),
       toggleJsonEditor: () =>
-        set((state) => ({ isJsonEditorEnabled: !state.isJsonEditorEnabled })),
-      setJsonEditorEnabled: (enabled) => set({ isJsonEditorEnabled: enabled }),
+        set((state) => {
+          const next = !state.isJsonEditorEnabled;
+          return {
+            isJsonEditorEnabled: next,
+            resume: {
+              ...state.resume,
+              setting: {
+                ...state.resume.setting,
+                isJsonEditorEnabled: next,
+              },
+            },
+          };
+        }),
+      setJsonEditorEnabled: (enabled) =>
+        set((state) => ({
+          isJsonEditorEnabled: enabled,
+          resume: {
+            ...state.resume,
+            setting: {
+              ...state.resume.setting,
+              isJsonEditorEnabled: enabled,
+            },
+          },
+        })),
       setIsPaddingHighlight: (isPaddingHighlight) =>
         set({ isPaddingHighlight }),
       setPreviewScale: (scale) =>
-        set({ previewScale: Math.max(0.4, Math.min(1.4, scale)) }),
+        set((state) => {
+          const clamped = Math.max(0.4, Math.min(1.4, scale));
+          return {
+            previewScale: clamped,
+            resume: {
+              ...state.resume,
+              setting: {
+                ...state.resume.setting,
+                previewScale: clamped,
+              },
+            },
+          };
+        }),
+      setRightPanelWidth: (width) =>
+        set((state) => {
+          const clamped = Math.max(200, Math.min(1000, Math.round(width)));
+          return {
+            rightPanelWidth: clamped,
+            resume: {
+              ...state.resume,
+              setting: {
+                ...state.resume.setting,
+                rightPanelWidth: clamped,
+              },
+            },
+          };
+        }),
+      setIsRightPanelCollapsed: (collapsed) =>
+        set((state) => {
+          const next =
+            typeof collapsed === "function"
+              ? collapsed(state.isRightPanelCollapsed)
+              : collapsed;
+          return {
+            isRightPanelCollapsed: next,
+            resume: {
+              ...state.resume,
+              setting: {
+                ...state.resume.setting,
+                isRightPanelCollapsed: next,
+              },
+            },
+          };
+        }),
 
       setTitle: (title) =>
         set((state) => ({
@@ -101,17 +186,6 @@ export const useResumeStore = create<ResumeState>()(
             metadata: {
               ...state.resume.metadata,
               updatedAt: new Date().toISOString(),
-            },
-          },
-        })),
-
-      setSidebarPosition: (sidebarPosition) =>
-        set((state) => ({
-          resume: {
-            ...state.resume,
-            layout: {
-              ...state.resume.layout,
-              sidebarPosition,
             },
           },
         })),
@@ -392,16 +466,26 @@ export const useResumeStore = create<ResumeState>()(
         set({
           resume: defaultResume,
           activeSectionId: defaultResume.sections[0]?.id || null,
+          rightPanelWidth: defaultResume.setting.rightPanelWidth,
+          isRightPanelCollapsed: defaultResume.setting.isRightPanelCollapsed,
+          isBlurMode: defaultResume.setting.isBlurMode,
+          isJsonEditorEnabled: defaultResume.setting.isJsonEditorEnabled,
+          previewScale: defaultResume.setting.previewScale,
         }),
 
       importResume: (newResume) =>
         set({
           resume: newResume,
           activeSectionId: newResume.sections[0]?.id || null,
+          rightPanelWidth: newResume.setting.rightPanelWidth,
+          isRightPanelCollapsed: newResume.setting.isRightPanelCollapsed,
+          isBlurMode: newResume.setting.isBlurMode,
+          isJsonEditorEnabled: newResume.setting.isJsonEditorEnabled,
+          previewScale: newResume.setting.previewScale,
         }),
 
       createNewResume: () =>
-        set({
+        set((state) => ({
           resume: {
             ...defaultResume,
             metadata: {
@@ -411,9 +495,12 @@ export const useResumeStore = create<ResumeState>()(
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
             },
+            setting: {
+              ...state.resume.setting,
+            },
           },
           activeSectionId: defaultResume.sections[0]?.id || null,
-        }),
+        })),
     }),
     {
       name: "yizhicv_resume_v2",
@@ -421,6 +508,59 @@ export const useResumeStore = create<ResumeState>()(
         resume: state.resume,
         isJsonEditorEnabled: state.isJsonEditorEnabled,
       }),
+      merge: (persistedState: unknown, currentState: ResumeState) => {
+        const persisted = (persistedState || {}) as {
+          resume?: Partial<YizhiResume>;
+          isJsonEditorEnabled?: boolean;
+        };
+        const rawResume = persisted.resume || {};
+        const rawSetting =
+          (
+            rawResume as {
+              setting?: Partial<YizhiResume["setting"]>;
+              settings?: Partial<YizhiResume["setting"]>;
+            }
+          ).setting ||
+          (
+            rawResume as {
+              setting?: Partial<YizhiResume["setting"]>;
+              settings?: Partial<YizhiResume["setting"]>;
+            }
+          ).settings ||
+          {};
+
+        const mergedResume: YizhiResume = {
+          ...currentState.resume,
+          ...rawResume,
+          layout: {
+            sidebarWidth:
+              rawResume.layout?.sidebarWidth ??
+              currentState.resume.layout.sidebarWidth,
+          },
+          setting: {
+            ...currentState.resume.setting,
+            ...rawSetting,
+            isJsonEditorEnabled:
+              persisted.isJsonEditorEnabled ??
+              rawSetting.isJsonEditorEnabled ??
+              currentState.resume.setting.isJsonEditorEnabled,
+          },
+        };
+
+        // 彻底剔除历史遗留的无用字段 sidebarPosition
+        delete (mergedResume.layout as unknown as Record<string, unknown>)
+          .sidebarPosition;
+
+        return {
+          ...currentState,
+          resume: mergedResume,
+          isBlurMode: mergedResume.setting.isBlurMode,
+          isJsonEditorEnabled: mergedResume.setting.isJsonEditorEnabled,
+          previewScale: mergedResume.setting.previewScale,
+          rightPanelWidth: mergedResume.setting.rightPanelWidth,
+          isRightPanelCollapsed: mergedResume.setting.isRightPanelCollapsed,
+        };
+      },
     },
   ),
 );

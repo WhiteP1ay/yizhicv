@@ -56,7 +56,15 @@ export interface ResumeSection {
 /** 双槽位自适应布局配置 (Unified Slot Grid) */
 export interface ResumeLayout {
   sidebarWidth: number; // 侧栏宽度 (px，0 = 纯单栏上下流；>0 = 双栏网格，默认 260px)
-  sidebarPosition: "left" | "right";
+}
+
+/** 工作台偏好设置 (Workspace Settings) */
+export interface ResumeSetting {
+  rightPanelWidth: number; // 右侧面板展开宽度 (px, 默认 336px)
+  isRightPanelCollapsed: boolean; // 右侧面板是否折叠 (默认 false)
+  previewScale: number; // 画布缩放比例 (默认 0.88)
+  isBlurMode: boolean; // 是否开启全局脱敏预览 (默认 false)
+  isJsonEditorEnabled: boolean; // 是否开启 JSON 源码编辑模式 (默认 false)
 }
 
 /** 设计规范与排版弹性 Tokens */
@@ -81,6 +89,7 @@ export interface YizhiResume {
     language: "zh" | "en";
   };
   layout: ResumeLayout;
+  setting: ResumeSetting; // 工作台与编辑器设置项
   sections: ResumeSection[]; // 所有的内容积木，统一编排与排序
   design: ResumeDesign;
 }
@@ -99,8 +108,14 @@ export interface YizhiResume {
     "language": "zh"
   },
   "layout": {
-    "sidebarWidth": 260,
-    "sidebarPosition": "left"
+    "sidebarWidth": 260
+  },
+  "setting": {
+    "rightPanelWidth": 336,
+    "isRightPanelCollapsed": false,
+    "previewScale": 0.88,
+    "isBlurMode": false,
+    "isJsonEditorEnabled": false
   },
   "sections": [
     {

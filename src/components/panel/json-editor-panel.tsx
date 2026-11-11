@@ -73,6 +73,21 @@ export const JsonEditorPanel: React.FC = () => {
       }
 
       // 4. 组装具备完备保底的 YizhiResume 对象，确保系统鲁棒性
+      const rawSetting =
+        (
+          parsed as {
+            setting?: Partial<YizhiResume["setting"]>;
+            settings?: Partial<YizhiResume["setting"]>;
+          }
+        ).setting ||
+        (
+          parsed as {
+            setting?: Partial<YizhiResume["setting"]>;
+            settings?: Partial<YizhiResume["setting"]>;
+          }
+        ).settings ||
+        {};
+
       const fullResume: YizhiResume = {
         version: "2.0.0",
         ...parsed,
@@ -85,9 +100,31 @@ export const JsonEditorPanel: React.FC = () => {
           language: parsed.metadata.language || "zh",
         },
         layout: {
-          sidebarWidth: defaultResume.layout.sidebarWidth,
-          sidebarPosition: defaultResume.layout.sidebarPosition,
-          ...parsed.layout,
+          sidebarWidth:
+            typeof parsed.layout?.sidebarWidth === "number"
+              ? parsed.layout.sidebarWidth
+              : defaultResume.layout.sidebarWidth,
+        },
+        setting: {
+          ...defaultResume.setting,
+          ...rawSetting,
+          rightPanelWidth:
+            typeof rawSetting.rightPanelWidth === "number"
+              ? rawSetting.rightPanelWidth
+              : defaultResume.setting.rightPanelWidth,
+          isRightPanelCollapsed:
+            rawSetting.isRightPanelCollapsed ??
+            (rawSetting as { rightPanelCollapsed?: boolean })
+              .rightPanelCollapsed ??
+            defaultResume.setting.isRightPanelCollapsed,
+          previewScale:
+            typeof rawSetting.previewScale === "number"
+              ? rawSetting.previewScale
+              : defaultResume.setting.previewScale,
+          isBlurMode: rawSetting.isBlurMode ?? defaultResume.setting.isBlurMode,
+          isJsonEditorEnabled:
+            rawSetting.isJsonEditorEnabled ??
+            defaultResume.setting.isJsonEditorEnabled,
         },
         design: {
           ...defaultResume.design,
@@ -100,6 +137,10 @@ export const JsonEditorPanel: React.FC = () => {
           content: typeof s.content === "string" ? s.content : "",
         })),
       };
+
+      // 彻底清理无用冗余字段
+      delete (fullResume.layout as unknown as Record<string, unknown>)
+        .sidebarPosition;
 
       // 同步提交到 Zustand 状态机
       importResume(fullResume);

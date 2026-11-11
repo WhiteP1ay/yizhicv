@@ -15,15 +15,27 @@ export type ResumeSection = z.infer<typeof resumeSectionSchema>;
 
 /**
  * 双槽位自适应布局配置 (Unified Slot Grid)
- * 摒弃冗余的 mode 字段：
+ * 摒弃冗余的 mode 与 position 字段：
  * - sidebarWidth === 0: 纯单栏自然文档流
  * - sidebarWidth > 0: 开启侧边栏 (默认 260px，支持 180~360px 自由拖拽)
  */
 export const resumeLayoutSchema = z.object({
   sidebarWidth: z.number().min(0).max(400).default(260),
-  sidebarPosition: z.enum(["left", "right"]).default("left"),
 });
 export type ResumeLayout = z.infer<typeof resumeLayoutSchema>;
+
+/**
+ * 工作台偏好设置 (Workspace Settings)
+ * 记录右侧面板宽度、折叠状态、脱敏模式、预览比例及 JSON 源码编辑开关
+ */
+export const resumeSettingSchema = z.object({
+  rightPanelWidth: z.number().min(200).max(1000).default(336),
+  isRightPanelCollapsed: z.boolean().default(false),
+  previewScale: z.number().min(0.4).max(1.4).default(0.88),
+  isBlurMode: z.boolean().default(false),
+  isJsonEditorEnabled: z.boolean().default(false),
+});
+export type ResumeSetting = z.infer<typeof resumeSettingSchema>;
 
 /**
  * 设计规范与排版弹性 Tokens
@@ -53,6 +65,13 @@ export const yizhiResumeSchema = z.object({
     language: z.enum(["zh", "en"]).default("zh"),
   }),
   layout: resumeLayoutSchema,
+  setting: resumeSettingSchema.default({
+    rightPanelWidth: 336,
+    isRightPanelCollapsed: false,
+    previewScale: 0.88,
+    isBlurMode: false,
+    isJsonEditorEnabled: false,
+  }),
   sections: z.array(resumeSectionSchema).default([]),
   design: resumeDesignSchema,
 });
@@ -233,7 +252,13 @@ export const defaultResume: YizhiResume = {
   },
   layout: {
     sidebarWidth: 260,
-    sidebarPosition: "left",
+  },
+  setting: {
+    rightPanelWidth: 336,
+    isRightPanelCollapsed: false,
+    previewScale: 0.88,
+    isBlurMode: false,
+    isJsonEditorEnabled: false,
   },
   sections: [
     {
