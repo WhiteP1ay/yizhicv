@@ -67,18 +67,16 @@ interface ResumeState {
 
 let paddingHighlightTimer: ReturnType<typeof setTimeout> | null = null;
 
-const stripBlurMarks = (html: string): string =>
-  html
-    .replace(/<span[^>]*data-blur[^>]*>(.*?)<\/span>/gi, "$1")
-    .replace(/<mark[^>]*data-blur[^>]*>(.*?)<\/mark>/gi, "$1")
-    .replace(
-      /<span[^>]*class="[^"]*cv-blur-mark[^"]*"[^>]*>(.*?)<\/span>/gi,
-      "$1",
-    )
-    .replace(
-      /<mark[^>]*class="[^"]*cv-blur-mark[^"]*"[^>]*>(.*?)<\/mark>/gi,
-      "$1",
-    );
+const createInitialResume = (): YizhiResume => ({
+  ...defaultResume,
+  metadata: {
+    ...defaultResume.metadata,
+    id: `cv_${nanoid(8)}`,
+    title: "未命名",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+});
 
 export const useResumeStore = create<ResumeState>()(
   temporal(
@@ -521,50 +519,23 @@ export const useResumeStore = create<ResumeState>()(
 
         resetResume: () =>
           set({
-            resume: {
-              ...defaultResume,
-              settings: {
-                ...defaultResume.settings,
-                isBlurMode: false,
-              },
-              sections: defaultResume.sections.map((s) => ({
-                ...s,
-                content: stripBlurMarks(s.content),
-              })),
-            },
+            resume: defaultResume,
             activeSectionId: defaultResume.sections[0]?.id || null,
             rightPanelWidth: defaultResume.settings.rightPanelWidth,
             isRightPanelCollapsed: defaultResume.settings.isRightPanelCollapsed,
-            isBlurMode: false,
+            isBlurMode: defaultResume.settings.isBlurMode,
             isJsonEditorEnabled: defaultResume.settings.isJsonEditorEnabled,
             previewScale: defaultResume.settings.previewScale,
           }),
 
         clearResume: () =>
           set({
-            resume: {
-              ...defaultResume,
-              metadata: {
-                ...defaultResume.metadata,
-                id: `cv_${nanoid(8)}`,
-                title: "未命名",
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              },
-              settings: {
-                ...defaultResume.settings,
-                isBlurMode: false,
-              },
-              sections: defaultResume.sections.map((s) => ({
-                ...s,
-                content: stripBlurMarks(s.content),
-              })),
-            },
+            resume: createInitialResume(),
             activeSectionId: defaultResume.sections[0]?.id || null,
             rightPanelWidth: defaultResume.settings.rightPanelWidth,
             isRightPanelCollapsed: defaultResume.settings.isRightPanelCollapsed,
             isBlurMode: false,
-            isJsonEditorEnabled: defaultResume.settings.isJsonEditorEnabled,
+            isJsonEditorEnabled: false,
             previewScale: defaultResume.settings.previewScale,
           }),
 
@@ -581,24 +552,7 @@ export const useResumeStore = create<ResumeState>()(
 
         createNewResume: () =>
           set({
-            resume: {
-              ...defaultResume,
-              metadata: {
-                ...defaultResume.metadata,
-                id: `cv_${nanoid(8)}`,
-                title: "未命名",
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              },
-              settings: {
-                ...defaultResume.settings,
-                isBlurMode: false,
-              },
-              sections: defaultResume.sections.map((s) => ({
-                ...s,
-                content: stripBlurMarks(s.content),
-              })),
-            },
+            resume: createInitialResume(),
             activeSectionId: defaultResume.sections[0]?.id || null,
             isBlurMode: false,
           }),
