@@ -117,9 +117,9 @@ export const JsonEditorPanel: React.FC = () => {
             typeof rawSettings.isJsonEditorEnabled === "boolean"
               ? rawSettings.isJsonEditorEnabled
               : defaultResume.settings.isJsonEditorEnabled,
-          customTextColors: Array.isArray(rawSettings.customTextColors)
-            ? rawSettings.customTextColors.slice(0, 5)
-            : defaultResume.settings.customTextColors,
+          customColors: Array.isArray(rawSettings.customColors)
+            ? rawSettings.customColors.slice(0, 5)
+            : defaultResume.settings.customColors,
         },
         design: {
           ...defaultResume.design,
