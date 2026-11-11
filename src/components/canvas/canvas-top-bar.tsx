@@ -3,6 +3,7 @@
 import { Columns2, Pencil, RectangleVertical } from "lucide-react";
 import type React from "react";
 import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface CanvasTopBarProps {
   title: string;
@@ -58,38 +59,34 @@ export const CanvasTopBar: React.FC<CanvasTopBarProps> = ({
       </div>
 
       {/* 右侧：单双列布局切换器 */}
-      <div className="inline-flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 shadow-2xs">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={onSetSingleColumn}
-          className={`h-6 px-2.5 text-[11px] font-medium rounded-md gap-1 transition-all ${
-            !isSplitMode
-              ? "bg-white text-slate-900 shadow-xs"
-              : "text-slate-500 hover:text-slate-800 hover:bg-slate-200/50"
-          }`}
+      <ToggleGroup
+        value={[isSplitMode ? "double" : "single"]}
+        onValueChange={(val) => {
+          if (val.includes("single") && isSplitMode) {
+            onSetSingleColumn();
+          } else if (val.includes("double") && !isSplitMode) {
+            onSetDoubleColumn();
+          }
+        }}
+        className="bg-slate-100 p-0.5 rounded-lg border border-slate-200 shadow-2xs gap-0.5"
+      >
+        <ToggleGroupItem
+          value="single"
+          className="h-6 px-2.5 text-[11px] font-medium rounded-md gap-1 data-pressed:bg-white data-pressed:text-slate-900 data-pressed:shadow-xs text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 cursor-pointer"
           title="单列文档流布局"
         >
           <RectangleVertical className="w-3 h-3" />
           <span>单列</span>
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={onSetDoubleColumn}
-          className={`h-6 px-2.5 text-[11px] font-medium rounded-md gap-1 transition-all ${
-            isSplitMode
-              ? "bg-white text-slate-900 shadow-xs"
-              : "text-slate-500 hover:text-slate-800 hover:bg-slate-200/50"
-          }`}
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="double"
+          className="h-6 px-2.5 text-[11px] font-medium rounded-md gap-1 data-pressed:bg-white data-pressed:text-slate-900 data-pressed:shadow-xs text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 cursor-pointer"
           title="双栏侧边栏布局"
         >
           <Columns2 className="w-3 h-3" />
           <span>双列</span>
-        </Button>
-      </div>
+        </ToggleGroupItem>
+      </ToggleGroup>
     </div>
   );
 };

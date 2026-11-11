@@ -7,6 +7,7 @@ import { nanoid } from "nanoid";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { useResumeStore } from "@/store/resume";
 import { defaultResume, type YizhiResume } from "@/types/resume";
 
@@ -318,7 +319,10 @@ export const JsonEditorPanel: React.FC = () => {
             <RefreshCw className="size-3" />
           </Button>
 
-          <div className="h-3 w-px bg-slate-200 mx-0.5" />
+          <Separator
+            orientation="vertical"
+            className="h-3 mx-0.5 bg-slate-200"
+          />
 
           {/* 核心同步按钮 */}
           <Button

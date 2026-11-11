@@ -3,6 +3,9 @@
 import { Minus, Plus, RotateCcw, Sliders, Type } from "lucide-react";
 import type React from "react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useResumeStore } from "@/store/resume";
 import { TextInspector } from "./text-inspector";
 
@@ -55,41 +58,42 @@ export const DesignTokenPanel: React.FC = () => {
             <span>字体族群</span>
           </div>
 
-          <div className="grid grid-cols-3 gap-1.5 bg-slate-100/80 p-1 rounded-lg border border-slate-200">
-            {FONT_OPTIONS.map((f) => {
-              const isSelected = design.fontFamily === f.key;
-              return (
-                <Button
-                  key={f.key}
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setFontFamily(f.key)}
-                  className={`h-auto py-1.5 px-2 flex flex-col items-center justify-center rounded-md transition-all ${
-                    isSelected
-                      ? "bg-white text-slate-900 shadow-xs font-medium"
-                      : "text-slate-500 hover:text-slate-800 hover:bg-slate-200/50"
+          <ToggleGroup
+            value={[design.fontFamily]}
+            onValueChange={(val) => {
+              if (val.length > 0) {
+                setFontFamily(val[val.length - 1] as "sans" | "serif" | "mono");
+              }
+            }}
+            className="grid grid-cols-3 gap-1.5 bg-slate-100/80 p-1 rounded-lg border border-slate-200 w-full"
+          >
+            {FONT_OPTIONS.map((f) => (
+              <ToggleGroupItem
+                key={f.key}
+                value={f.key}
+                className="h-auto py-1.5 px-2 flex flex-col items-center justify-center rounded-md transition-all data-pressed:bg-white data-pressed:text-slate-900 data-pressed:shadow-xs data-pressed:font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 cursor-pointer"
+              >
+                <span
+                  className={`text-sm ${
+                    f.key === "serif"
+                      ? "font-serif"
+                      : f.key === "mono"
+                        ? "font-mono"
+                        : "font-sans"
                   }`}
                 >
-                  <span
-                    className={`text-sm ${
-                      f.key === "serif"
-                        ? "font-serif"
-                        : f.key === "mono"
-                          ? "font-mono"
-                          : "font-sans"
-                    }`}
-                  >
-                    {f.sample}
-                  </span>
-                  <span className="text-[10px] mt-0.5">{f.label}</span>
-                </Button>
-              );
-            })}
-          </div>
+                  {f.sample}
+                </span>
+                <span className="text-[10px] mt-0.5">{f.label}</span>
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </section>
 
+        <Separator className="my-2 bg-slate-200/60" />
+
         {/* 设计排版数值 Token */}
-        <section className="space-y-4 pt-2 border-t border-slate-200/60">
+        <section className="space-y-4">
           {/* 字号大小 */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
@@ -113,17 +117,16 @@ export const DesignTokenPanel: React.FC = () => {
               >
                 <Minus className="size-3" />
               </Button>
-              <input
-                type="range"
-                min="9"
-                max="13"
-                step="0.5"
+              <Slider
+                min={9}
+                max={13}
+                step={0.5}
                 value={design.fontSize}
-                onChange={(e) => setFontSize(Number.parseFloat(e.target.value))}
-                onInput={(e) =>
-                  setFontSize(Number.parseFloat(e.currentTarget.value))
-                }
-                className="flex-1 accent-slate-900 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                onValueChange={(val) => {
+                  const num = Array.isArray(val) ? val[0] : val;
+                  setFontSize(Number(num.toFixed(1)));
+                }}
+                className="flex-1"
               />
               <Button
                 type="button"
@@ -168,19 +171,16 @@ export const DesignTokenPanel: React.FC = () => {
               >
                 <Minus className="size-3" />
               </Button>
-              <input
-                type="range"
-                min="1.0"
-                max="2.2"
-                step="0.05"
+              <Slider
+                min={1.0}
+                max={2.2}
+                step={0.05}
                 value={design.lineHeight}
-                onChange={(e) =>
-                  setLineHeight(Number.parseFloat(e.target.value))
-                }
-                onInput={(e) =>
-                  setLineHeight(Number.parseFloat(e.currentTarget.value))
-                }
-                className="flex-1 accent-slate-900 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                onValueChange={(val) => {
+                  const num = Array.isArray(val) ? val[0] : val;
+                  setLineHeight(Number(num.toFixed(2)));
+                }}
+                className="flex-1"
               />
               <Button
                 type="button"
@@ -223,19 +223,16 @@ export const DesignTokenPanel: React.FC = () => {
               >
                 <Minus className="size-3" />
               </Button>
-              <input
-                type="range"
-                min="0"
-                max="32"
-                step="2"
+              <Slider
+                min={0}
+                max={32}
+                step={2}
                 value={design.sectionGap}
-                onChange={(e) =>
-                  setSectionGap(Number.parseInt(e.target.value, 10))
-                }
-                onInput={(e) =>
-                  setSectionGap(Number.parseInt(e.currentTarget.value, 10))
-                }
-                className="flex-1 accent-slate-900 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                onValueChange={(val) => {
+                  const num = Array.isArray(val) ? val[0] : val;
+                  setSectionGap(Math.round(num));
+                }}
+                className="flex-1"
               />
               <Button
                 type="button"
@@ -278,25 +275,18 @@ export const DesignTokenPanel: React.FC = () => {
               >
                 <Minus className="size-3" />
               </Button>
-              <input
-                type="range"
-                min="0"
-                max="24"
-                step="1"
+              <Slider
+                min={0}
+                max={24}
+                step={1}
                 value={design.pagePadding}
-                onChange={(e) =>
-                  setPagePadding(Number.parseInt(e.target.value, 10))
-                }
-                onInput={(e) =>
-                  setPagePadding(Number.parseInt(e.currentTarget.value, 10))
-                }
+                onValueChange={(val) => {
+                  const num = Array.isArray(val) ? val[0] : val;
+                  setPagePadding(Math.round(num));
+                }}
                 onPointerDown={() => setIsPaddingHighlight(true)}
                 onPointerUp={() => setIsPaddingHighlight(false)}
-                onFocus={() => setIsPaddingHighlight(true)}
-                onBlur={() => setIsPaddingHighlight(false)}
-                onTouchStart={() => setIsPaddingHighlight(true)}
-                onTouchEnd={() => setIsPaddingHighlight(false)}
-                className="flex-1 accent-indigo-600 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                className="flex-1"
               />
               <Button
                 type="button"

@@ -4,6 +4,7 @@ import { Check, Palette, Plus, RotateCcw, X } from "lucide-react";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { useResumeStore } from "@/store/resume";
 
 export interface ColorPreset {
@@ -219,7 +220,8 @@ export const ColorPickerPalette: React.FC<ColorPickerPaletteProps> = ({
       </div>
 
       {/* 3. 5 个自定义颜色槽位 (圈里一个加号，点击弹窗拾色器，自动保存) */}
-      <div className="space-y-1.5 pt-1.5 border-t border-slate-100">
+      <Separator className="my-1.5 bg-slate-100" />
+      <div className="space-y-1.5">
         <div className="flex items-center justify-between text-[11px]">
           <span className="font-medium text-slate-600">自定义颜色槽</span>
           <span className="text-[10px] text-slate-400 font-mono">5 个色槽</span>

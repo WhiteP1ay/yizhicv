@@ -3,6 +3,7 @@
 import { Heading1, Heading2, Heading3, Minus, Plus, Type } from "lucide-react";
 import type React from "react";
 import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { ColorPickerPalette } from "./color-picker-palette";
 
@@ -38,7 +39,6 @@ export const TextInspector: React.FC = () => {
   const isH1 = editor.isActive("heading", { level: 1 });
   const isH2 = editor.isActive("heading", { level: 2 });
   const isH3 = editor.isActive("heading", { level: 3 });
-  const isParagraph = editor.isActive("paragraph") || (!isH1 && !isH2 && !isH3);
 
   const textStyleAttrs = editor.getAttributes("textStyle") || {};
   const currentColor = (textStyleAttrs.color as string) || "";
@@ -133,80 +133,58 @@ export const TextInspector: React.FC = () => {
       {/* 1. 段落 ｜ 标题选择 (Segmented Group) */}
       <div className="space-y-1.5">
         <div className="text-[11px] font-medium text-slate-600">文本层级</div>
-        <div className="grid grid-cols-4 gap-1 p-1 bg-white rounded-lg border border-slate-200 shadow-2xs">
-          <Button
-            type="button"
-            variant="ghost"
-            size="xs"
+        <ToggleGroup
+          value={[isH1 ? "h1" : isH2 ? "h2" : isH3 ? "h3" : "p"]}
+          onValueChange={(val) => {
+            if (val.includes("p")) editor.chain().focus().setParagraph().run();
+            else if (val.includes("h1"))
+              editor.chain().focus().toggleHeading({ level: 1 }).run();
+            else if (val.includes("h2"))
+              editor.chain().focus().toggleHeading({ level: 2 }).run();
+            else if (val.includes("h3"))
+              editor.chain().focus().toggleHeading({ level: 3 }).run();
+          }}
+          className="grid grid-cols-4 gap-1 p-1 bg-white rounded-lg border border-slate-200 shadow-2xs w-full"
+        >
+          <ToggleGroupItem
+            value="p"
             onPointerDown={(e) => e.preventDefault()}
-            onClick={() => editor.chain().focus().setParagraph().run()}
-            className={`h-7 px-1 text-xs font-medium rounded transition-all ${
-              isParagraph
-                ? "bg-slate-900 text-white shadow-2xs hover:bg-slate-900 hover:text-white"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-            }`}
+            className="h-7 px-1 text-xs font-medium rounded transition-all data-pressed:bg-slate-900 data-pressed:text-white data-pressed:shadow-2xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
             title="恢复普通正文段落"
           >
             正文
-          </Button>
+          </ToggleGroupItem>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="xs"
+          <ToggleGroupItem
+            value="h1"
             onPointerDown={(e) => e.preventDefault()}
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 1 }).run()
-            }
-            className={`h-7 px-1 text-xs font-medium rounded transition-all gap-1 ${
-              isH1
-                ? "bg-slate-900 text-white shadow-2xs hover:bg-slate-900 hover:text-white"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-            }`}
+            className="h-7 px-1 text-xs font-medium rounded transition-all gap-1 data-pressed:bg-slate-900 data-pressed:text-white data-pressed:shadow-2xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
             title="设为一级标题 (候选人姓名 / 主标题)"
           >
             <Heading1 className="size-3" />
             <span>H1</span>
-          </Button>
+          </ToggleGroupItem>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="xs"
+          <ToggleGroupItem
+            value="h2"
             onPointerDown={(e) => e.preventDefault()}
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 2 }).run()
-            }
-            className={`h-7 px-1 text-xs font-medium rounded transition-all gap-1 ${
-              isH2
-                ? "bg-slate-900 text-white shadow-2xs hover:bg-slate-900 hover:text-white"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-            }`}
+            className="h-7 px-1 text-xs font-medium rounded transition-all gap-1 data-pressed:bg-slate-900 data-pressed:text-white data-pressed:shadow-2xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
             title="设为二级标题 (经历大模块标题)"
           >
             <Heading2 className="size-3" />
             <span>H2</span>
-          </Button>
+          </ToggleGroupItem>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="xs"
+          <ToggleGroupItem
+            value="h3"
             onPointerDown={(e) => e.preventDefault()}
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 3 }).run()
-            }
-            className={`h-7 px-1 text-xs font-medium rounded transition-all gap-1 ${
-              isH3
-                ? "bg-slate-900 text-white shadow-2xs hover:bg-slate-900 hover:text-white"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-            }`}
+            className="h-7 px-1 text-xs font-medium rounded transition-all gap-1 data-pressed:bg-slate-900 data-pressed:text-white data-pressed:shadow-2xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
             title="设为三级标题 (职位 / 项目 / 学校)"
           >
             <Heading3 className="size-3" />
             <span>H3</span>
-          </Button>
-        </div>
+          </ToggleGroupItem>
+        </ToggleGroup>
       </div>
 
       {/* 2. 文字色彩 (统一组件：预设色板 + 5 个自定义槽位 + 弹窗拾色器) */}

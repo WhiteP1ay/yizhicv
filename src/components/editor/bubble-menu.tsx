@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import type React from "react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 interface CanvasBubbleMenuProps {
   editor: Editor | null;
@@ -141,7 +142,10 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
         <Highlighter className="w-3.5 h-3.5" />
       </Button>
 
-      <span className="w-px h-4 bg-slate-700 my-auto mx-0.5" />
+      <Separator
+        orientation="vertical"
+        className="h-4 bg-slate-700 my-auto mx-0.5"
+      />
 
       <Button
         type="button"
@@ -191,7 +195,10 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
         <Heading3 className="w-3.5 h-3.5" />
       </Button>
 
-      <span className="w-px h-4 bg-slate-700 my-auto mx-0.5" />
+      <Separator
+        orientation="vertical"
+        className="h-4 bg-slate-700 my-auto mx-0.5"
+      />
 
       {/* 王牌特色：脱敏 */}
       <Button
