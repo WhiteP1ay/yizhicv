@@ -213,3 +213,22 @@
     page-break-inside: avoid;
   }
 }
+
+/* 画布内联直接编辑微调 */
+.cv-inline-editor {
+  outline: none !important;
+}
+.cv-inline-editor > *:first-child {
+  margin-top: 0 !important;
+}
+.cv-inline-editor > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* 打印时彻底隐藏辅助控制线与按钮 */
+@media print {
+  .cv-section-container {
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+}

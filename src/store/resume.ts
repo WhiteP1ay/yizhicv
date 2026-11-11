@@ -12,7 +12,7 @@ interface ResumeState {
   resume: YizhiResume;
   activeSectionId: string | null;
   isBlurMode: boolean; // 是否开启全局脱敏预览（模糊遮盖）
-  previewScale: number; // 画布缩放比例 (0.5 ~ 1.2)
+  previewScale: number; // 画布缩放比例 (0.5 ~ 1.3)
 
   // Actions
   setActiveSectionId: (id: string | null) => void;
@@ -36,9 +36,12 @@ interface ResumeState {
   setSectionSlot: (id: string, slot: "main" | "sidebar") => void;
   toggleSectionVisible: (id: string) => void;
   removeSection: (id: string) => void;
+  moveSectionUp: (id: string) => void;
+  moveSectionDown: (id: string) => void;
   addSectionFromPreset: (
     presetKey: string,
     slot?: "main" | "sidebar",
+    insertAfterId?: string,
   ) => string;
   reorderSections: (newSections: ResumeSection[]) => void;
   resetResume: () => void;
@@ -50,7 +53,7 @@ export const useResumeStore = create<ResumeState>()(
       resume: defaultResume,
       activeSectionId: defaultResume.sections[0]?.id || null,
       isBlurMode: false,
-      previewScale: 0.85,
+      previewScale: 0.88,
 
       setActiveSectionId: (id) => set({ activeSectionId: id }),
       toggleBlurMode: () => set((state) => ({ isBlurMode: !state.isBlurMode })),
@@ -190,10 +193,6 @@ export const useResumeStore = create<ResumeState>()(
       removeSection: (id) =>
         set((state) => {
           const newSections = state.resume.sections.filter((s) => s.id !== id);
-          const nextActiveId =
-            state.activeSectionId === id
-              ? newSections[0]?.id || null
-              : state.activeSectionId;
           return {
             resume: {
               ...state.resume,
@@ -203,11 +202,71 @@ export const useResumeStore = create<ResumeState>()(
                 updatedAt: new Date().toISOString(),
               },
             },
-            activeSectionId: nextActiveId,
+            activeSectionId:
+              state.activeSectionId === id
+                ? newSections[0]?.id || null
+                : state.activeSectionId,
           };
         }),
 
-      addSectionFromPreset: (presetKey, slotOverride) => {
+      moveSectionUp: (id) =>
+        set((state) => {
+          const idx = state.resume.sections.findIndex((s) => s.id === id);
+          if (idx <= 0) return state;
+          const currentSlot = state.resume.sections[idx].slot;
+          // 找到当前 slot 内的上一个同类元素并交换
+          let prevIdx = -1;
+          for (let i = idx - 1; i >= 0; i--) {
+            if (state.resume.sections[i].slot === currentSlot) {
+              prevIdx = i;
+              break;
+            }
+          }
+          if (prevIdx === -1) return state;
+
+          const updated = [...state.resume.sections];
+          const temp = updated[idx];
+          updated[idx] = updated[prevIdx];
+          updated[prevIdx] = temp;
+
+          return {
+            resume: {
+              ...state.resume,
+              sections: updated,
+            },
+          };
+        }),
+
+      moveSectionDown: (id) =>
+        set((state) => {
+          const idx = state.resume.sections.findIndex((s) => s.id === id);
+          if (idx === -1 || idx >= state.resume.sections.length - 1)
+            return state;
+          const currentSlot = state.resume.sections[idx].slot;
+          // 找到当前 slot 内的下一个同类元素并交换
+          let nextIdx = -1;
+          for (let i = idx + 1; i < state.resume.sections.length; i++) {
+            if (state.resume.sections[i].slot === currentSlot) {
+              nextIdx = i;
+              break;
+            }
+          }
+          if (nextIdx === -1) return state;
+
+          const updated = [...state.resume.sections];
+          const temp = updated[idx];
+          updated[idx] = updated[nextIdx];
+          updated[nextIdx] = temp;
+
+          return {
+            resume: {
+              ...state.resume,
+              sections: updated,
+            },
+          };
+        }),
+
+      addSectionFromPreset: (presetKey, slotOverride, insertAfterId) => {
         const preset = SECTION_PRESETS[presetKey] || SECTION_PRESETS.custom;
         const newId = `sec_${nanoid(8)}`;
         const newSection: ResumeSection = {
@@ -217,17 +276,31 @@ export const useResumeStore = create<ResumeState>()(
           content: preset.initialContent,
         };
 
-        set((state) => ({
-          resume: {
-            ...state.resume,
-            sections: [...state.resume.sections, newSection],
-            metadata: {
-              ...state.resume.metadata,
-              updatedAt: new Date().toISOString(),
+        set((state) => {
+          const sections = [...state.resume.sections];
+          if (insertAfterId) {
+            const idx = sections.findIndex((s) => s.id === insertAfterId);
+            if (idx !== -1) {
+              sections.splice(idx + 1, 0, newSection);
+            } else {
+              sections.push(newSection);
+            }
+          } else {
+            sections.push(newSection);
+          }
+
+          return {
+            resume: {
+              ...state.resume,
+              sections,
+              metadata: {
+                ...state.resume.metadata,
+                updatedAt: new Date().toISOString(),
+              },
             },
-          },
-          activeSectionId: newId,
-        }));
+            activeSectionId: newId,
+          };
+        });
 
         return newId;
       },
