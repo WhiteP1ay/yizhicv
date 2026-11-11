@@ -246,6 +246,9 @@
   color: var(--cv-theme, #0f172a) !important;
   margin-top: 0.5em;
   margin-bottom: 0.35em;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--cv-theme, #0f172a) 25%, #e2e8f0) !important;
+  padding-bottom: 0.25em !important;
 }
 
 #cv-print-target h3,
@@ -258,12 +261,17 @@
   margin-bottom: 0.2em;
 }
 
-/* 消除 flex 横向容器中标题的外边距，确保与日期等元数据基线完美对齐 */
-#cv-print-target .flex h1,
-#cv-print-target .flex h2,
-#cv-print-target .flex h3 {
+/* 消除条目内横向 flex 容器中标题的外边距与底边线，确保与日期等元数据基线完美对齐 */
+#cv-print-target .cv-entry .flex h1,
+#cv-print-target .cv-entry .flex h2,
+#cv-print-target .cv-entry .flex h3,
+#cv-print-target .justify-between h1,
+#cv-print-target .justify-between h2,
+#cv-print-target .justify-between h3 {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
 }
 
 /* 标题下划线响应主题色 */
