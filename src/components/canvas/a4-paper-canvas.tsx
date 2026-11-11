@@ -64,40 +64,35 @@ export const A4PaperCanvas: React.FC = () => {
         } ${paperFontClass}`}
         style={paperStyle}
       >
-        {/* 画布核心排版层级与主题色彩内联样式引擎 (杜绝 Turbopack 外部 CSS 缓存失效问题) */}
+        {/* 画布基础排版与分割线规则 (不锁死颜色与边框，由右侧面板自由排版) */}
         <style>{`
           #cv-print-target h1,
           #cv-print-target .cv-inline-editor h1 {
-            font-size: 2em !important;
-            font-weight: 700 !important;
-            line-height: 1.25 !important;
-            letter-spacing: -0.02em !important;
-            color: var(--cv-theme, #0f172a) !important;
-            margin-top: 0.35em !important;
-            margin-bottom: 0.25em !important;
+            font-size: 1.75em;
+            font-weight: 700;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+            margin-top: 0.35em;
+            margin-bottom: 0.25em;
           }
 
           #cv-print-target h2,
           #cv-print-target .cv-inline-editor h2 {
-            font-size: 1.35em !important;
-            font-weight: 700 !important;
-            line-height: 1.35 !important;
-            letter-spacing: -0.01em !important;
-            color: var(--cv-theme, #0f172a) !important;
-            margin-top: 0.5em !important;
-            margin-bottom: 0.35em !important;
-            border-bottom: 1px solid color-mix(in srgb, var(--cv-theme, #0f172a) 25%, #e2e8f0) !important;
-            padding-bottom: 0.25em !important;
+            font-size: 1.25em;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -0.01em;
+            margin-top: 0.45em;
+            margin-bottom: 0.3em;
           }
 
           #cv-print-target h3,
           #cv-print-target .cv-inline-editor h3 {
-            font-size: 1.15em !important;
-            font-weight: 600 !important;
-            line-height: 1.4 !important;
-            color: var(--cv-theme, #0f172a) !important;
-            margin-top: 0.4em !important;
-            margin-bottom: 0.2em !important;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-top: 0.35em;
+            margin-bottom: 0.2em;
           }
 
           #cv-print-target .cv-entry .flex h1,
@@ -108,24 +103,19 @@ export const A4PaperCanvas: React.FC = () => {
           #cv-print-target .justify-between h3 {
             margin-top: 0 !important;
             margin-bottom: 0 !important;
-            border-bottom: none !important;
-            padding-bottom: 0 !important;
-          }
-
-          #cv-print-target h1.border-b,
-          #cv-print-target h2.border-b,
-          #cv-print-target h3.border-b,
-          #cv-print-target .cv-inline-editor h1.border-b,
-          #cv-print-target .cv-inline-editor h2.border-b,
-          #cv-print-target .cv-inline-editor h3.border-b {
-            border-bottom: 1px solid color-mix(in srgb, var(--cv-theme, #0f172a) 25%, #e2e8f0) !important;
           }
 
           #cv-print-target p,
           #cv-print-target .cv-inline-editor p {
-            font-size: 1em !important;
-            margin-top: 0 !important;
-            margin-bottom: 0.35em !important;
+            font-size: 1em;
+            margin-top: 0;
+            margin-bottom: 0.35em;
+          }
+
+          #cv-print-target hr {
+            border: none !important;
+            border-top: 1px solid #e2e8f0 !important;
+            margin: 0.6em 0 !important;
           }
         `}</style>
 

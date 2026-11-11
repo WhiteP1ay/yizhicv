@@ -225,43 +225,37 @@
   margin-bottom: 0 !important;
 }
 
-/* 简历排版层级规范：H1 / H2 / H3 统一继承主题色彩并建立严格的 em 字号阶梯 */
+/* 简历排版层级规范：自然排版与自由自定义，不强制主题色彩与底边框 */
 #cv-print-target h1,
 #cv-print-target .cv-inline-editor h1 {
-  font-size: 2em !important;
-  font-weight: 700 !important;
-  line-height: 1.25 !important;
+  font-size: 1.75em;
+  font-weight: 700;
+  line-height: 1.25;
   letter-spacing: -0.02em;
-  color: var(--cv-theme, #0f172a) !important;
   margin-top: 0.35em;
   margin-bottom: 0.25em;
 }
 
 #cv-print-target h2,
 #cv-print-target .cv-inline-editor h2 {
-  font-size: 1.35em !important;
-  font-weight: 700 !important;
-  line-height: 1.35 !important;
+  font-size: 1.25em;
+  font-weight: 700;
+  line-height: 1.35;
   letter-spacing: -0.01em;
-  color: var(--cv-theme, #0f172a) !important;
-  margin-top: 0.5em;
-  margin-bottom: 0.35em;
-  border-bottom: 1px solid
-    color-mix(in srgb, var(--cv-theme, #0f172a) 25%, #e2e8f0) !important;
-  padding-bottom: 0.25em !important;
+  margin-top: 0.45em;
+  margin-bottom: 0.3em;
 }
 
 #cv-print-target h3,
 #cv-print-target .cv-inline-editor h3 {
-  font-size: 1.15em !important;
-  font-weight: 600 !important;
-  line-height: 1.4 !important;
-  color: var(--cv-theme, #0f172a) !important;
-  margin-top: 0.4em;
+  font-size: 1.1em;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 0.35em;
   margin-bottom: 0.2em;
 }
 
-/* 消除条目内横向 flex 容器中标题的外边距与底边线，确保与日期等元数据基线完美对齐 */
+/* 消除条目内横向 flex 容器中标题的外边距，确保与日期等元数据基线完美对齐 */
 #cv-print-target .cv-entry .flex h1,
 #cv-print-target .cv-entry .flex h2,
 #cv-print-target .cv-entry .flex h3,
@@ -270,22 +264,13 @@
 #cv-print-target .justify-between h3 {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
-  border-bottom: none !important;
-  padding-bottom: 0 !important;
 }
 
-/* 标题下划线响应主题色 */
-#cv-print-target h1.border-b,
-#cv-print-target h2.border-b,
-#cv-print-target h3.border-b,
-#cv-print-target .cv-inline-editor h1.border-b,
-#cv-print-target .cv-inline-editor h2.border-b,
-#cv-print-target .cv-inline-editor h3.border-b {
-  border-bottom-color: color-mix(
-    in srgb,
-    var(--cv-theme, #0f172a) 25%,
-    #e2e8f0
-  ) !important;
+/* 水平分割线规则 */
+#cv-print-target hr {
+  border: none !important;
+  border-top: 1px solid #e2e8f0 !important;
+  margin: 0.6em 0 !important;
 }
 
 /* 正文段落与列表基准 */

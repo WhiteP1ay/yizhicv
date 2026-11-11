@@ -3,8 +3,10 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import BubbleMenuExtension from "@tiptap/extension-bubble-menu";
+import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
+import { FontSize, TextStyle } from "@tiptap/extension-text-style";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { GripVertical, Trash2 } from "lucide-react";
@@ -12,8 +14,8 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { CanvasBubbleMenu } from "@/components/editor/bubble-menu";
 import { BlurMark } from "@/components/editor/extensions/blur-mark";
-import { SectionToolbar } from "@/components/editor/section-toolbar";
 import { Button } from "@/components/ui/button";
+import { useActiveEditorStore } from "@/store/active-editor";
 import { useResumeStore } from "@/store/resume";
 import type { ResumeSection } from "@/types/resume";
 
@@ -24,8 +26,14 @@ interface EditableSectionProps {
 export const EditableSection: React.FC<EditableSectionProps> = ({
   section,
 }) => {
-  const { updateSectionContent, removeSection, setActiveSectionId, resume } =
-    useResumeStore();
+  const {
+    updateSectionContent,
+    removeSection,
+    setActiveSectionId,
+    activeSectionId,
+    resume,
+  } = useResumeStore();
+  const { setActiveEditor, notifySelectionUpdate } = useActiveEditorStore();
 
   // dnd-kit 拖拽排序集成
   const {
@@ -53,6 +61,9 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
         },
         link: false, // 纸质简历排版不需要超链接扩展，消除重名警告与非预期样式
       }),
+      TextStyle,
+      Color,
+      FontSize,
       Highlight.configure({ multicolor: true }),
       Placeholder.configure({
         placeholder: "点击输入模块标题或正文...",
@@ -71,10 +82,16 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
     onFocus: () => {
       setIsFocused(true);
       setActiveSectionId(section.id);
+      setActiveEditor(editor, section.id);
     },
     onBlur: () => {
       setIsFocused(false);
-      setActiveSectionId(null);
+    },
+    onSelectionUpdate: () => {
+      notifySelectionUpdate();
+    },
+    onTransaction: () => {
+      notifySelectionUpdate();
     },
     onUpdate: ({ editor }) => {
       updateSectionContent(section.id, editor.getHTML());
@@ -88,8 +105,15 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
     }
   }, [section.content, editor]);
 
-  // 仅在当前编辑器处于聚焦状态时，才显示高亮边框和顶部格式工具栏；失焦立即隐藏
-  const isActive = isFocused;
+  // 当当前模块被置为活跃模块时，更新全局 activeEditor
+  useEffect(() => {
+    if (editor && activeSectionId === section.id) {
+      setActiveEditor(editor, section.id);
+    }
+  }, [activeSectionId, editor, section.id, setActiveEditor]);
+
+  // 激活态：聚焦或当前模块被选中
+  const isActive = isFocused || activeSectionId === section.id;
 
   return (
     <div
@@ -101,13 +125,6 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
           : "hover:ring-1 hover:ring-slate-300/60"
       }`}
     >
-      {/* 模块顶部工具栏：仅在当前模块处于聚焦编辑时显示，失焦完全隐藏，打印隐藏 */}
-      {editor && isActive && (
-        <div className="no-print absolute -top-9 left-1 z-30 flex">
-          <SectionToolbar editor={editor} />
-        </div>
-      )}
-
       {/* 悬停与激活把手控制栏 (仅拖拽把手与删除，打印时隐藏) */}
       <div
         className={`no-print absolute -top-9 right-1 z-30 ${

@@ -115,7 +115,7 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
     defaultSlot: "main",
     initialContent: `
 <div class="cv-section-block mb-4">
-  <h2 class="border-b border-slate-200 pb-1 mb-3">工作经历</h2>
+  <h2 class="mb-2">工作经历</h2>
   <div class="cv-entry mb-4">
     <div class="flex justify-between items-baseline font-semibold">
       <h3 class="font-semibold">高级全栈工程师 · 某知名互联网科技公司</h3>
@@ -137,7 +137,7 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
     defaultSlot: "main",
     initialContent: `
 <div class="cv-section-block mb-4">
-  <h2 class="border-b border-slate-200 pb-1 mb-3">项目经历</h2>
+  <h2 class="mb-2">项目经历</h2>
   <div class="cv-entry mb-3">
     <div class="flex justify-between items-baseline font-semibold">
       <h3 class="font-semibold">一纸简历 (YizhiCV) 2.0 · 独立开发者</h3>
@@ -155,7 +155,7 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
     defaultSlot: "main",
     initialContent: `
 <div class="cv-section-block mb-4">
-  <h2 class="border-b border-slate-200 pb-1 mb-3">教育背景</h2>
+  <h2 class="mb-2">教育背景</h2>
   <div class="cv-entry">
     <div class="flex justify-between items-baseline font-semibold">
       <h3 class="font-semibold">某重点大学 · 计算机科学与技术</h3>
@@ -173,7 +173,7 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
     defaultSlot: "sidebar",
     initialContent: `
 <div class="cv-section-block mb-4">
-  <h2 class="border-b border-slate-200 pb-1 mb-3">专业技能</h2>
+  <h2 class="mb-2">专业技能</h2>
   <div class="cv-entry text-sm text-slate-700 space-y-2">
     <div>
       <span class="font-semibold text-slate-900">前端技术：</span>
@@ -194,7 +194,7 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
     defaultSlot: "main",
     initialContent: `
 <div class="cv-section-block mb-4">
-  <h2 class="border-b border-slate-200 pb-1 mb-3">更多信息</h2>
+  <h2 class="mb-2">更多信息</h2>
   <p class="text-sm text-slate-700">在这里输入任何自由富文本内容，支持行内加粗、高亮、超链接与列表...</p>
 </div>
 `.trim(),
