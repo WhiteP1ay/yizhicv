@@ -12,141 +12,45 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useResumeStore } from "@/store/resume";
-import { getResumeExportName, yizhiResumeSchema } from "@/types/resume";
+import { useClickOutside } from "@/hooks/use-click-outside";
+import { useResumeFileActions } from "@/hooks/use-resume-file-actions";
+import { useResumeTitle } from "@/hooks/use-resume-title";
 
 export const AppTopBar: React.FC = () => {
-  const { resume, setTitle, createNewResume, importResume } = useResumeStore();
-
   const [isFileMenuOpen, setIsFileMenuOpen] = useState(false);
   const [isExportSubmenuOpen, setIsExportSubmenuOpen] = useState(false);
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [titleInput, setTitleInput] = useState(
-    resume.metadata.title || "未命名",
-  );
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const menuContainerRef = useRef<HTMLDivElement>(null);
 
-  // 监听外部点击与 Esc 键，实现无感、零阻碍的菜单自动收起
-  useEffect(() => {
-    if (!isFileMenuOpen) return;
-
-    const handlePointerDown = (event: PointerEvent) => {
-      if (
-        menuContainerRef.current &&
-        !menuContainerRef.current.contains(event.target as Node)
-      ) {
-        setIsFileMenuOpen(false);
-        setIsExportSubmenuOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsFileMenuOpen(false);
-        setIsExportSubmenuOpen(false);
-      }
-    };
-
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isFileMenuOpen]);
-
-  // 1. 新建简历
-  const handleNew = () => {
+  const closeMenu = useCallback(() => {
     setIsFileMenuOpen(false);
     setIsExportSubmenuOpen(false);
-    if (window.confirm("确定要新建一份简历吗？当前未导出的修改将被覆盖。")) {
-      createNewResume();
-    }
-  };
+  }, []);
 
-  // 2. 导入 JSON 文件
-  const handleTriggerImport = () => {
-    setIsFileMenuOpen(false);
-    setIsExportSubmenuOpen(false);
-    fileInputRef.current?.click();
-  };
+  // 1. 通用点击外部与 Esc 键自动收起菜单
+  useClickOutside(menuContainerRef, closeMenu, { enabled: isFileMenuOpen });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // 2. 简历标题管理 (重命名草稿、按键确认/取消、输入框失焦同步)
+  const {
+    title,
+    titleInput,
+    isEditing: isEditingTitle,
+    setTitleInput,
+    startEditing: startEditingTitle,
+    submitTitle: handleTitleSubmit,
+    handleKeyDown: handleTitleKeyDown,
+  } = useResumeTitle();
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const raw = JSON.parse(event.target?.result as string);
-        const parsed = yizhiResumeSchema.safeParse(raw);
-
-        if (parsed.success) {
-          importResume(parsed.data);
-          alert("简历导入成功！");
-        } else {
-          // 尝试宽松兼容
-          if (raw && Array.isArray(raw.sections)) {
-            const normalized = {
-              ...resume,
-              ...raw,
-              metadata: {
-                ...resume.metadata,
-                ...(raw.metadata || {}),
-                updatedAt: new Date().toISOString(),
-              },
-            };
-            importResume(normalized);
-            alert("简历已兼容导入！");
-          } else {
-            alert("导入失败：文件格式不符合一纸简历规范。");
-          }
-        }
-      } catch {
-        alert("导入失败：无效的 JSON 文件。");
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = "";
-  };
-
-  // 3. 导出 PDF
-  const handleExportPdf = () => {
-    setIsFileMenuOpen(false);
-    setIsExportSubmenuOpen(false);
-    window.print();
-  };
-
-  // 4. 导出 JSON
-  const handleExportJson = () => {
-    setIsFileMenuOpen(false);
-    setIsExportSubmenuOpen(false);
-    const jsonString = JSON.stringify(resume, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const fileName = `${getResumeExportName(resume)}.json`;
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleTitleSubmit = () => {
-    const trimmed = titleInput.trim();
-    const finalTitle = trimmed || "未命名";
-    setTitle(finalTitle);
-    setTitleInput(finalTitle);
-    setIsEditingTitle(false);
-  };
+  // 3. 文件操作生命周期 (新建文档、导入校验、PDF/JSON导出)
+  const {
+    fileInputRef,
+    handleNew,
+    triggerImport,
+    handleFileChange,
+    exportPdf,
+    exportJson,
+  } = useResumeFileActions({ onActionComplete: closeMenu });
 
   return (
     <header className="no-print h-11 px-3 bg-white/95 backdrop-blur-md border-b border-slate-200 flex items-center justify-between z-30 select-none shadow-2xs">
@@ -207,7 +111,7 @@ export const AppTopBar: React.FC = () => {
               <Button
                 type="button"
                 variant="ghost"
-                onClick={handleTriggerImport}
+                onClick={triggerImport}
                 className="w-full h-8 px-3 justify-start text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 gap-2 rounded-md"
               >
                 <Upload className="w-3.5 h-3.5 text-slate-500" />
@@ -242,7 +146,7 @@ export const AppTopBar: React.FC = () => {
                       <Button
                         type="button"
                         variant="ghost"
-                        onClick={handleExportPdf}
+                        onClick={exportPdf}
                         className="w-full h-8 px-3 justify-start text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 gap-2 rounded-md"
                       >
                         <Printer className="w-3.5 h-3.5 text-slate-500" />
@@ -251,7 +155,7 @@ export const AppTopBar: React.FC = () => {
                       <Button
                         type="button"
                         variant="ghost"
-                        onClick={handleExportJson}
+                        onClick={exportJson}
                         className="w-full h-8 px-3 justify-start text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 gap-2 rounded-md"
                       >
                         <FileCode className="w-3.5 h-3.5 text-slate-500" />
@@ -274,13 +178,7 @@ export const AppTopBar: React.FC = () => {
             value={titleInput}
             onChange={(e) => setTitleInput(e.target.value)}
             onBlur={handleTitleSubmit}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleTitleSubmit();
-              if (e.key === "Escape") {
-                setTitleInput(resume.metadata.title || "未命名");
-                setIsEditingTitle(false);
-              }
-            }}
+            onKeyDown={handleTitleKeyDown}
             className="h-7 text-xs font-medium text-slate-800 bg-slate-100 px-2.5 rounded border border-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-900 w-44 text-center"
             autoFocus
           />
@@ -288,14 +186,11 @@ export const AppTopBar: React.FC = () => {
           <Button
             type="button"
             variant="ghost"
-            onClick={() => {
-              setTitleInput(resume.metadata.title || "未命名");
-              setIsEditingTitle(true);
-            }}
+            onClick={startEditingTitle}
             className="group h-7 flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 px-2.5 rounded-md transition-colors"
             title="点击重命名简历"
           >
-            <span>{resume.metadata.title || "未命名"}</span>
+            <span>{title}</span>
             <Pencil className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition-colors" />
           </Button>
         )}
