@@ -2,48 +2,24 @@
 
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import {
-  Check,
   ChevronRight,
   Download,
   FileCode,
   FilePlus,
   FileText,
   Printer,
-  ShieldAlert,
-  ShieldCheck,
   Upload,
-  ZoomIn,
-  ZoomOut,
 } from "lucide-react";
 import type React from "react";
 import { useRef, useState } from "react";
 import { useResumeStore } from "@/store/resume";
 import { getResumeExportName, yizhiResumeSchema } from "@/types/resume";
 
-const THEME_COLORS = [
-  { name: "极简暗石 (Slate)", value: "#0f172a" },
-  { name: "商务深蓝 (Blue)", value: "#1e40af" },
-  { name: "自然松绿 (Emerald)", value: "#065f46" },
-  { name: "典雅深紫 (Violet)", value: "#5b21b6" },
-  { name: "纯黑原色 (Black)", value: "#000000" },
-];
-
 export const AppTopBar: React.FC = () => {
-  const {
-    resume,
-    isBlurMode,
-    previewScale,
-    setTitle,
-    setThemeColor,
-    toggleBlurMode,
-    setPreviewScale,
-    createNewResume,
-    importResume,
-  } = useResumeStore();
+  const { resume, setTitle, createNewResume, importResume } = useResumeStore();
 
   const [isFileMenuOpen, setIsFileMenuOpen] = useState(false);
   const [isExportSubmenuOpen, setIsExportSubmenuOpen] = useState(false);
-  const [isColorMenuOpen, setIsColorMenuOpen] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState(resume.metadata.title);
 
@@ -288,114 +264,14 @@ export const AppTopBar: React.FC = () => {
         )}
       </div>
 
-      {/* 3. 右侧：精简工具（主题色、脱敏预览、缩放、GitHub） */}
+      {/* 3. 右侧：GitHub */}
       <div className="flex items-center gap-1.5">
-        {/* 主题色选择 */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setIsColorMenuOpen(!isColorMenuOpen)}
-            className="p-1 hover:bg-slate-100 rounded-md transition-colors flex items-center gap-1"
-            title="选择主题主色"
-          >
-            <span
-              className="w-3.5 h-3.5 rounded-full border border-black/10 shadow-xs"
-              style={{ backgroundColor: resume.design.themeColor }}
-            />
-          </button>
-
-          {isColorMenuOpen && (
-            <>
-              <button
-                type="button"
-                aria-label="关闭颜色选择菜单"
-                className="fixed inset-0 z-40 cursor-default"
-                onClick={() => setIsColorMenuOpen(false)}
-              />
-              <div className="absolute right-0 top-full mt-1.5 w-44 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-50 text-xs">
-                {THEME_COLORS.map((color) => {
-                  const isSelected = resume.design.themeColor === color.value;
-                  return (
-                    <button
-                      key={color.value}
-                      type="button"
-                      onClick={() => {
-                        setThemeColor(color.value);
-                        setIsColorMenuOpen(false);
-                      }}
-                      className="w-full px-3 py-1.5 text-left flex items-center justify-between hover:bg-slate-50 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="w-3 h-3 rounded-full border border-black/10"
-                          style={{ backgroundColor: color.value }}
-                        />
-                        <span className="text-slate-700">{color.name}</span>
-                      </div>
-                      {isSelected && (
-                        <Check className="w-3.5 h-3.5 text-slate-900" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* 脱敏模式开关 */}
-        <button
-          type="button"
-          onClick={toggleBlurMode}
-          className={`px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 transition-all ${
-            isBlurMode
-              ? "bg-purple-600 text-white shadow-xs"
-              : "text-slate-600 hover:bg-slate-100"
-          }`}
-          title="开启后，所有标记为脱敏的信息将自动高斯毛玻璃遮盖"
-        >
-          {isBlurMode ? (
-            <>
-              <ShieldCheck className="w-3 h-3" />
-              <span>脱敏中</span>
-            </>
-          ) : (
-            <>
-              <ShieldAlert className="w-3 h-3 text-slate-400" />
-              <span>脱敏</span>
-            </>
-          )}
-        </button>
-
-        {/* 画布缩放 */}
-        <div className="flex items-center bg-slate-100/90 rounded p-0.5 text-slate-600">
-          <button
-            type="button"
-            onClick={() => setPreviewScale(previewScale - 0.1)}
-            className="p-1 hover:bg-white rounded transition-colors"
-            title="缩小"
-          >
-            <ZoomOut className="w-3 h-3" />
-          </button>
-          <span className="px-1 text-[10px] font-mono text-slate-600 min-w-[34px] text-center">
-            {Math.round(previewScale * 100)}%
-          </span>
-          <button
-            type="button"
-            onClick={() => setPreviewScale(previewScale + 0.1)}
-            className="p-1 hover:bg-white rounded transition-colors"
-            title="放大"
-          >
-            <ZoomIn className="w-3 h-3" />
-          </button>
-        </div>
-
         {/* GitHub 链接 */}
         <a
           href="https://github.com/WhiteP1ay/yizhicv"
           target="_blank"
           rel="noopener noreferrer"
-          className="p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded transition-colors ml-0.5"
+          className="p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded transition-colors"
           title="GitHub 开源仓库"
         >
           <SiGithub className="w-3.5 h-3.5" />
