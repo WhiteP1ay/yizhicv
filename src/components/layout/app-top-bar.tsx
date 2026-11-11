@@ -24,10 +24,15 @@ import { useResumeHistory } from "@/hooks/use-resume-history";
 import { useResumeStore } from "@/store/resume";
 
 export const AppTopBar: React.FC = () => {
-  const { canUndo, canRedo, undo, redo } = useResumeHistory();
+  const { canUndo, canRedo, undo, redo, undoShortcut, redoShortcut } =
+    useResumeHistory();
   const [isFileMenuOpen, setIsFileMenuOpen] = useState(false);
   const [isExportSubmenuOpen, setIsExportSubmenuOpen] = useState(false);
   const menuContainerRef = useRef<HTMLDivElement>(null);
+
+  // 编辑菜单状态 (撤销、重做)
+  const [isEditMenuOpen, setIsEditMenuOpen] = useState(false);
+  const editMenuContainerRef = useRef<HTMLDivElement>(null);
 
   // 窗口菜单状态 (含二级开发者选项 -> 勾选 JSON 编辑)
   const [isWindowMenuOpen, setIsWindowMenuOpen] = useState(false);
@@ -41,6 +46,10 @@ export const AppTopBar: React.FC = () => {
     setIsExportSubmenuOpen(false);
   }, []);
 
+  const closeEditMenu = useCallback(() => {
+    setIsEditMenuOpen(false);
+  }, []);
+
   const closeWindowMenu = useCallback(() => {
     setIsWindowMenuOpen(false);
     setIsDevSubmenuOpen(false);
@@ -48,9 +57,32 @@ export const AppTopBar: React.FC = () => {
 
   // 1. 通用点击外部与 Esc 键自动收起菜单
   useClickOutside(menuContainerRef, closeMenu, { enabled: isFileMenuOpen });
+  useClickOutside(editMenuContainerRef, closeEditMenu, {
+    enabled: isEditMenuOpen,
+  });
   useClickOutside(windowMenuContainerRef, closeWindowMenu, {
     enabled: isWindowMenuOpen,
   });
+
+  const toggleFileMenu = () => {
+    setIsFileMenuOpen((prev) => !prev);
+    setIsExportSubmenuOpen(false);
+    setIsEditMenuOpen(false);
+    setIsWindowMenuOpen(false);
+  };
+
+  const toggleEditMenu = () => {
+    setIsEditMenuOpen((prev) => !prev);
+    setIsFileMenuOpen(false);
+    setIsWindowMenuOpen(false);
+  };
+
+  const toggleWindowMenu = () => {
+    setIsWindowMenuOpen((prev) => !prev);
+    setIsDevSubmenuOpen(false);
+    setIsFileMenuOpen(false);
+    setIsEditMenuOpen(false);
+  };
 
   // 2. 文件操作生命周期 (新建文档、导入校验、PDF/JSON导出)
   const {
@@ -91,10 +123,7 @@ export const AppTopBar: React.FC = () => {
           <Button
             type="button"
             variant="ghost"
-            onClick={() => {
-              setIsFileMenuOpen((prev) => !prev);
-              setIsExportSubmenuOpen(false);
-            }}
+            onClick={toggleFileMenu}
             className={`h-7 px-2.5 text-xs font-medium rounded-md transition-colors ${
               isFileMenuOpen
                 ? "bg-slate-200 text-slate-900"
@@ -179,6 +208,66 @@ export const AppTopBar: React.FC = () => {
           )}
         </div>
 
+        {/* 核心编辑菜单 (撤销、重做与快捷键) */}
+        <div className="relative flex items-center" ref={editMenuContainerRef}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={toggleEditMenu}
+            className={`h-7 px-2.5 text-xs font-medium rounded-md transition-colors ${
+              isEditMenuOpen
+                ? "bg-slate-200 text-slate-900"
+                : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+            }`}
+          >
+            编辑
+          </Button>
+
+          {isEditMenuOpen && (
+            <div className="absolute left-0 top-full mt-1 w-44 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 text-xs">
+              {/* 撤销 */}
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={!canUndo}
+                onClick={() => {
+                  undo();
+                  closeEditMenu();
+                }}
+                className="w-full h-8 px-3 justify-between text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-md disabled:opacity-40 disabled:pointer-events-none"
+              >
+                <div className="flex items-center gap-2">
+                  <Undo2 className="w-3.5 h-3.5 text-slate-500" />
+                  <span>撤销</span>
+                </div>
+                <span className="text-[11px] font-mono text-slate-400">
+                  {undoShortcut}
+                </span>
+              </Button>
+
+              {/* 重做 */}
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={!canRedo}
+                onClick={() => {
+                  redo();
+                  closeEditMenu();
+                }}
+                className="w-full h-8 px-3 justify-between text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-md disabled:opacity-40 disabled:pointer-events-none"
+              >
+                <div className="flex items-center gap-2">
+                  <Redo2 className="w-3.5 h-3.5 text-slate-500" />
+                  <span>重做</span>
+                </div>
+                <span className="text-[11px] font-mono text-slate-400">
+                  {redoShortcut}
+                </span>
+              </Button>
+            </div>
+          )}
+        </div>
+
         {/* 窗口菜单 (含二级开发者选项 -> 勾选 JSON 编辑) */}
         <div
           className="relative flex items-center"
@@ -187,11 +276,7 @@ export const AppTopBar: React.FC = () => {
           <Button
             type="button"
             variant="ghost"
-            onClick={() => {
-              setIsWindowMenuOpen((prev) => !prev);
-              setIsDevSubmenuOpen(false);
-              setIsFileMenuOpen(false);
-            }}
+            onClick={toggleWindowMenu}
             className={`h-7 px-2.5 text-xs font-medium rounded-md transition-colors ${
               isWindowMenuOpen
                 ? "bg-slate-200 text-slate-900"
@@ -265,7 +350,7 @@ export const AppTopBar: React.FC = () => {
             onClick={undo}
             disabled={!canUndo}
             className="size-7 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-25 disabled:pointer-events-none transition-opacity"
-            title="撤销 / 上一步 (⌘Z)"
+            title={`撤销 / 上一步 (${undoShortcut})`}
           >
             <Undo2 className="size-3.5" />
           </Button>
@@ -276,7 +361,7 @@ export const AppTopBar: React.FC = () => {
             onClick={redo}
             disabled={!canRedo}
             className="size-7 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-25 disabled:pointer-events-none transition-opacity"
-            title="重做 / 下一步 (⌘⇧Z)"
+            title={`重做 / 下一步 (${redoShortcut})`}
           >
             <Redo2 className="size-3.5" />
           </Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useStore } from "zustand";
 import { useResumeStore } from "@/store/resume";
 
@@ -9,9 +9,12 @@ import { useResumeStore } from "@/store/resume";
  *
  * 核心特性：
  * 1. 深度集成 zundo temporal 状态机；
- * 2. 响应式感知历史栈深度：canUndo 与 canRedo 驱动顶部按钮的显隐与禁用态；
- * 3. 焦点防冲突：在用户于普通 input / textarea 或 contenteditable 富文本内部输入时，
- *    优先交给原生/Tiptap处理内部微观撤销；其他区域按 ⌘Z / ⌘⇧Z 触发宏观文档级快照撤销。
+ * 2. 响应式感知历史栈深度：canUndo 与 canRedo 驱动顶部按钮与菜单的禁用态；
+ * 3. document 全局键盘事件监听与平台自适应：
+ *    - Mac: ⌘Z (撤销) / ⇧⌘Z (重做)
+ *    - Windows / Linux: Ctrl+Z (撤销) / Ctrl+Shift+Z 或 Ctrl+Y (重做)
+ * 4. 焦点防冲突守护：在普通 Input、Textarea、CodeMirror 或富文本内部打字时，
+ *    优先让输入组件内部处理本地微观打字撤销；在非输入区时触发宏观文档快照回退。
  */
 export function useResumeHistory() {
   const temporal = useResumeStore.temporal;
@@ -19,26 +22,42 @@ export function useResumeHistory() {
   const canUndo = useStore(temporal, (s) => s.pastStates.length > 0);
   const canRedo = useStore(temporal, (s) => s.futureStates.length > 0);
 
-  const undo = () => {
+  // 客户端挂载后探测操作系统，避免 SSR 阶段水合不一致
+  const [isMac, setIsMac] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== "undefined") {
+      setIsMac(
+        /(mac|iphone|ipod|ipad)/i.test(
+          navigator.platform || navigator.userAgent,
+        ),
+      );
+    }
+  }, []);
+
+  const undo = useCallback(() => {
     if (canUndo) {
       temporal.getState().undo();
     }
-  };
+  }, [canUndo]);
 
-  const redo = () => {
+  const redo = useCallback(() => {
     if (canRedo) {
       temporal.getState().redo();
     }
-  };
+  }, [canRedo]);
 
-  const clear = () => {
+  const clear = useCallback(() => {
     temporal.getState().clear();
-  };
+  }, []);
 
-  // 全局 ⌘Z / ⌘⇧Z 快捷键监听
+  // document 全局快捷键监听（适配 Mac 与 Windows）
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // 若当前焦点在文本输入、CodeMirror 或可编辑节点内，避免与微观文本撤销冲突
+      // 若事件已被内部编辑器拦截消费，忽略
+      if (e.defaultPrevented) return;
+
+      // 若当前焦点在文本输入组件、CodeMirror 或富文本 ProseMirror 中，保留原生的微观撤销
       const target = e.target as HTMLElement | null;
       const isInput =
         target &&
@@ -48,20 +67,43 @@ export function useResumeHistory() {
           target.closest(".cm-editor") ||
           target.closest(".ProseMirror"));
 
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") {
-        if (isInput) return;
+      if (isInput) return;
 
+      const macPlatform =
+        typeof navigator !== "undefined" &&
+        /(mac|iphone|ipod|ipad)/i.test(
+          navigator.platform || navigator.userAgent,
+        );
+
+      // Mac: ⌘Z, Win: Ctrl+Z
+      const isUndo =
+        (macPlatform ? e.metaKey : e.ctrlKey) &&
+        !e.shiftKey &&
+        e.key.toLowerCase() === "z";
+
+      // Mac: ⇧⌘Z, Win: Ctrl+Shift+Z 或 Ctrl+Y
+      const isRedo =
+        (macPlatform &&
+          e.metaKey &&
+          e.shiftKey &&
+          e.key.toLowerCase() === "z") ||
+        (!macPlatform &&
+          e.ctrlKey &&
+          e.shiftKey &&
+          e.key.toLowerCase() === "z") ||
+        (!macPlatform && e.ctrlKey && e.key.toLowerCase() === "y");
+
+      if (isUndo) {
         e.preventDefault();
-        if (e.shiftKey) {
-          temporal.getState().redo();
-        } else {
-          temporal.getState().undo();
-        }
+        temporal.getState().undo();
+      } else if (isRedo) {
+        e.preventDefault();
+        temporal.getState().redo();
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   return {
@@ -70,5 +112,8 @@ export function useResumeHistory() {
     undo,
     redo,
     clear,
+    isMac,
+    undoShortcut: isMac ? "⌘Z" : "Ctrl+Z",
+    redoShortcut: isMac ? "⇧⌘Z" : "Ctrl+Shift+Z",
   };
 }
