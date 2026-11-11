@@ -15,12 +15,10 @@ import {
 } from "@dnd-kit/sortable";
 import { Columns2, Pencil, Plus, RectangleVertical } from "lucide-react";
 import type React from "react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useResumeTitle } from "@/hooks/use-resume-title";
 import { useSidebarResize } from "@/hooks/use-sidebar-resize";
 import { useResumeStore } from "@/store/resume";
-import { SECTION_PRESETS } from "@/types/resume";
 import { EditableSection } from "./editable-section";
 
 export const A4PaperCanvas: React.FC = () => {
@@ -29,7 +27,7 @@ export const A4PaperCanvas: React.FC = () => {
     isBlurMode,
     previewScale,
     setSidebarWidth,
-    addSectionFromPreset,
+    addDefaultSection,
     reorderSections,
   } = useResumeStore();
 
@@ -46,9 +44,6 @@ export const A4PaperCanvas: React.FC = () => {
   const { isResizing, handlePointerDownResize } = useSidebarResize();
 
   const { layout, sections, design } = resume;
-  const [activeAddSlot, setActiveAddSlot] = useState<"main" | "sidebar" | null>(
-    null,
-  );
 
   const isSplitMode = layout.sidebarWidth > 0;
   const sidebarSections = sections.filter(
@@ -221,46 +216,17 @@ export const A4PaperCanvas: React.FC = () => {
                   ))}
                 </SortableContext>
 
-                {/* 侧栏底部添加按钮 (永远保持水平居中，仅虚线框+加号) */}
-                <div className="no-print mt-3 flex justify-center items-center w-full relative">
+                {/* 侧栏底部添加按钮 (仅虚线框+加号，点击直接追加默认编辑块) */}
+                <div className="no-print mt-3 flex justify-center items-center w-full">
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setActiveAddSlot("sidebar")}
+                    onClick={() => addDefaultSection("sidebar")}
                     className="w-full h-7 border-dashed border-slate-300 text-slate-400 hover:border-slate-400 hover:bg-slate-50/50 hover:text-slate-600 shadow-none transition-all flex items-center justify-center"
                     title="添加侧栏模块"
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </Button>
-
-                  {activeAddSlot === "sidebar" && (
-                    <>
-                      <div
-                        role="presentation"
-                        className="fixed inset-0 z-40 cursor-default"
-                        onClick={() => setActiveAddSlot(null)}
-                      />
-                      <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 w-48 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 text-left">
-                        <div className="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                          添加预设至侧栏
-                        </div>
-                        {Object.values(SECTION_PRESETS).map((p) => (
-                          <Button
-                            key={p.key}
-                            type="button"
-                            variant="ghost"
-                            onClick={() => {
-                              addSectionFromPreset(p.key, "sidebar");
-                              setActiveAddSlot(null);
-                            }}
-                            className="w-full h-8 px-3 hover:bg-slate-50 text-xs text-slate-700 justify-start font-normal rounded-md"
-                          >
-                            {p.name}
-                          </Button>
-                        ))}
-                      </div>
-                    </>
-                  )}
                 </div>
               </aside>
 
@@ -309,51 +275,17 @@ export const A4PaperCanvas: React.FC = () => {
                   ))}
                 </SortableContext>
 
-                {/* 主栏底部添加按钮 (仅虚线框+加号) */}
-                <div className="no-print mt-4 relative">
+                {/* 主栏底部添加按钮 (仅虚线框+加号，点击直接追加默认编辑块) */}
+                <div className="no-print mt-4">
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setActiveAddSlot("main")}
+                    onClick={() => addDefaultSection("main")}
                     className="w-full h-8 border-dashed border-slate-300 text-slate-400 hover:border-slate-500 hover:bg-slate-50/60 hover:text-slate-700 shadow-none transition-all flex items-center justify-center"
                     title="添加新模块"
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </Button>
-
-                  {activeAddSlot === "main" && (
-                    <>
-                      <div
-                        role="presentation"
-                        className="fixed inset-0 z-40 cursor-default"
-                        onClick={() => setActiveAddSlot(null)}
-                      />
-                      <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 w-56 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 text-left">
-                        <div className="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                          添加预设模块
-                        </div>
-                        {Object.values(SECTION_PRESETS).map((p) => (
-                          <Button
-                            key={p.key}
-                            type="button"
-                            variant="ghost"
-                            onClick={() => {
-                              addSectionFromPreset(p.key, "main");
-                              setActiveAddSlot(null);
-                            }}
-                            className="w-full h-auto px-3 py-2 hover:bg-slate-50 flex flex-col items-start text-left justify-start transition-colors rounded-md"
-                          >
-                            <span className="text-xs font-medium text-slate-800">
-                              {p.name}
-                            </span>
-                            <span className="text-[10px] text-slate-400">
-                              {p.description}
-                            </span>
-                          </Button>
-                        ))}
-                      </div>
-                    </>
-                  )}
                 </div>
               </main>
             </div>
@@ -373,51 +305,17 @@ export const A4PaperCanvas: React.FC = () => {
                     ))}
                 </SortableContext>
 
-                {/* 底部添加按钮 (仅虚线框+加号) */}
-                <div className="no-print mt-4 relative">
+                {/* 底部添加按钮 (仅虚线框+加号，点击直接追加默认编辑块) */}
+                <div className="no-print mt-4">
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setActiveAddSlot("main")}
+                    onClick={() => addDefaultSection("main")}
                     className="w-full h-8 border-dashed border-slate-300 text-slate-400 hover:border-slate-500 hover:bg-slate-50/60 hover:text-slate-700 shadow-none transition-all flex items-center justify-center"
                     title="添加新模块"
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </Button>
-
-                  {activeAddSlot === "main" && (
-                    <>
-                      <div
-                        role="presentation"
-                        className="fixed inset-0 z-40 cursor-default"
-                        onClick={() => setActiveAddSlot(null)}
-                      />
-                      <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 w-56 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 text-left">
-                        <div className="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                          添加预设模块
-                        </div>
-                        {Object.values(SECTION_PRESETS).map((p) => (
-                          <Button
-                            key={p.key}
-                            type="button"
-                            variant="ghost"
-                            onClick={() => {
-                              addSectionFromPreset(p.key, "main");
-                              setActiveAddSlot(null);
-                            }}
-                            className="w-full h-auto px-3 py-2 hover:bg-slate-50 flex flex-col items-start text-left justify-start transition-colors rounded-md"
-                          >
-                            <span className="text-xs font-medium text-slate-800">
-                              {p.name}
-                            </span>
-                            <span className="text-[10px] text-slate-400">
-                              {p.description}
-                            </span>
-                          </Button>
-                        ))}
-                      </div>
-                    </>
-                  )}
                 </div>
               </main>
             </div>
