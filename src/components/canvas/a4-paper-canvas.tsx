@@ -221,16 +221,16 @@ export const A4PaperCanvas: React.FC = () => {
                   ))}
                 </SortableContext>
 
-                {/* 侧栏底部添加按钮 (永远保持水平居中) */}
+                {/* 侧栏底部添加按钮 (永远保持水平居中，仅虚线框+加号) */}
                 <div className="no-print mt-3 flex justify-center items-center w-full relative">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setActiveAddSlot("sidebar")}
-                    className="w-full h-auto py-2 border-dashed border-slate-300 text-slate-400 hover:border-slate-400 hover:bg-slate-50/50 hover:text-slate-600 text-[11px] gap-1.5 shadow-none transition-all flex items-center justify-center text-center"
+                    className="w-full h-7 border-dashed border-slate-300 text-slate-400 hover:border-slate-400 hover:bg-slate-50/50 hover:text-slate-600 shadow-none transition-all flex items-center justify-center"
+                    title="添加侧栏模块"
                   >
-                    <Plus className="size-3" />
-                    <span>添加侧栏模块</span>
+                    <Plus className="w-3.5 h-3.5" />
                   </Button>
 
                   {activeAddSlot === "sidebar" && (
@@ -309,16 +309,16 @@ export const A4PaperCanvas: React.FC = () => {
                   ))}
                 </SortableContext>
 
-                {/* 主栏底部添加按钮 */}
+                {/* 主栏底部添加按钮 (仅虚线框+加号) */}
                 <div className="no-print mt-4 relative">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setActiveAddSlot("main")}
-                    className="w-full h-auto py-2.5 border-dashed border-slate-300 text-slate-400 hover:border-slate-500 hover:bg-slate-50/60 hover:text-slate-700 text-xs gap-1.5 shadow-none transition-all"
+                    className="w-full h-8 border-dashed border-slate-300 text-slate-400 hover:border-slate-500 hover:bg-slate-50/60 hover:text-slate-700 shadow-none transition-all flex items-center justify-center"
+                    title="添加新模块"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    <span>在此处添加新模块 (经历 / 作品 / 技能)</span>
                   </Button>
 
                   {activeAddSlot === "main" && (
@@ -373,16 +373,16 @@ export const A4PaperCanvas: React.FC = () => {
                     ))}
                 </SortableContext>
 
-                {/* 底部添加按钮 */}
+                {/* 底部添加按钮 (仅虚线框+加号) */}
                 <div className="no-print mt-4 relative">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setActiveAddSlot("main")}
-                    className="w-full h-auto py-2.5 border-dashed border-slate-300 text-slate-400 hover:border-slate-500 hover:bg-slate-50/60 hover:text-slate-700 text-xs gap-1.5 shadow-none transition-all"
+                    className="w-full h-8 border-dashed border-slate-300 text-slate-400 hover:border-slate-500 hover:bg-slate-50/60 hover:text-slate-700 shadow-none transition-all flex items-center justify-center"
+                    title="添加新模块"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    <span>在此处添加新模块</span>
                   </Button>
 
                   {activeAddSlot === "main" && (
