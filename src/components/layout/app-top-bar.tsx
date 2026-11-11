@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Code2,
   Download,
+  EyeOff,
   FileCode,
   FilePlus,
   Printer,
@@ -23,7 +24,7 @@ import { useResumeFileActions } from "@/hooks/use-resume-file-actions";
 import { useResumeHistory } from "@/hooks/use-resume-history";
 import { useResumeStore } from "@/store/resume";
 
-type TopBarMenuId = "file" | "edit" | "window";
+type TopBarMenuId = "file" | "edit" | "view" | "window";
 
 export const AppTopBar: React.FC = () => {
   const { canUndo, canRedo, undo, redo, undoShortcut, redoShortcut } =
@@ -37,7 +38,8 @@ export const AppTopBar: React.FC = () => {
   // 整个菜单栏统一监听容器
   const menuBarRef = useRef<HTMLDivElement>(null);
 
-  const { isJsonEditorEnabled, toggleJsonEditor } = useResumeStore();
+  const { isJsonEditorEnabled, toggleJsonEditor, isBlurMode, toggleBlurMode } =
+    useResumeStore();
 
   const closeAllMenus = useCallback(() => {
     setActiveMenu(null);
@@ -255,6 +257,50 @@ export const AppTopBar: React.FC = () => {
                   <span className="text-[11px] font-mono text-slate-400">
                     {redoShortcut}
                   </span>
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* 显示菜单 */}
+          <div className="relative flex items-center">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => handleTriggerClick("view")}
+              onMouseEnter={() => handleTriggerMouseEnter("view")}
+              className={`h-7 px-2.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                activeMenu === "view"
+                  ? "bg-slate-200 text-slate-900"
+                  : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              显示
+            </Button>
+
+            {activeMenu === "view" && (
+              <div className="absolute left-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-75 text-xs">
+                {/* 隐藏敏感内容 */}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    toggleBlurMode();
+                    closeAllMenus();
+                  }}
+                  className="w-full h-8 px-3 justify-between text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-md cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <EyeOff className="w-3.5 h-3.5 text-slate-500" />
+                    <span>隐藏敏感内容</span>
+                  </div>
+                  {isBlurMode ? (
+                    <div className="size-4 rounded bg-blue-600 text-white flex items-center justify-center">
+                      <Check className="size-3 stroke-[2.5]" />
+                    </div>
+                  ) : (
+                    <div className="size-4 rounded border border-slate-300" />
+                  )}
                 </Button>
               </div>
             )}

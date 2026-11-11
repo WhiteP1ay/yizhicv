@@ -105,8 +105,8 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
   <h1 class="tracking-tight">求职者</h1>
   <p class="text-base font-medium text-slate-600 mt-1">资深前端全栈工程师</p>
   <div class="cv-contacts-wrap flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-2 text-sm text-slate-600">
-    <span>📱 138-0000-0000</span>
-    <span>✉️ me@example.com</span>
+    <span>📱 <span data-blur="true" class="cv-blur-mark">138-0000-0000</span></span>
+    <span>✉️ <span data-blur="true" class="cv-blur-mark">me@example.com</span></span>
     <span>📍 北京</span>
     <span>🌐 github.com</span>
   </div>
@@ -123,7 +123,7 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
   <h2 class="mb-2">工作经历</h2>
   <div class="cv-entry mb-4">
     <div class="flex justify-between items-baseline font-semibold">
-      <h3 class="font-semibold">高级全栈工程师 · 某知名互联网科技公司</h3>
+      <h3 class="font-semibold">高级全栈工程师 · <span data-blur="true" class="cv-blur-mark">某知名互联网科技公司</span></h3>
       <span class="text-sm font-normal text-slate-500">2023.03 - 至今</span>
     </div>
     <div class="text-sm text-slate-500 mb-1">北京 · 核心平台研发部</div>
