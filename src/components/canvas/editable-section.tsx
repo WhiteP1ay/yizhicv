@@ -65,6 +65,7 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
         },
         horizontalRule: false, // 禁用默认 hr，使用支持高度与颜色的 CustomDivider
         link: false, // 纸质简历排版不需要超链接扩展，消除重名警告与非预期样式
+        trailingNode: false, // 禁用强制末尾追加空白段落，防止列表后产生无法删除的空白行
       }),
       CustomDivider,
       TextStyle,
