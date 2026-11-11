@@ -11,7 +11,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { GripVertical, Trash2 } from "lucide-react";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { CanvasBubbleMenu } from "@/components/editor/bubble-menu";
 import { BlurMark } from "@/components/editor/extensions/blur-mark";
 import { CustomDivider } from "@/components/editor/extensions/custom-divider";
@@ -57,8 +57,6 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
     opacity: isDragging ? 0.35 : 1,
   };
 
-  const [isFocused, setIsFocused] = useState(false);
-
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -88,12 +86,8 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
       },
     },
     onFocus: () => {
-      setIsFocused(true);
       setActiveSectionId(section.id);
       setActiveEditor(editor, section.id);
-    },
-    onBlur: () => {
-      setIsFocused(false);
     },
     onSelectionUpdate: () => {
       notifySelectionUpdate();
@@ -130,13 +124,22 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
     }
   }, [activeSectionId, editor, section.id, setActiveEditor]);
 
-  // 激活态：聚焦或当前模块被选中
-  const isActive = isFocused || activeSectionId === section.id;
+  // 激活态：当前模块被置为活跃模块
+  const isActive = activeSectionId === section.id;
 
   return (
     <div
       ref={setNodeRef}
       style={style}
+      data-section-id={section.id}
+      onPointerDown={() => {
+        if (activeSectionId !== section.id) {
+          setActiveSectionId(section.id);
+          if (editor) {
+            setActiveEditor(editor, section.id);
+          }
+        }
+      }}
       className={`cv-section-container relative group rounded transition-all duration-150 ${
         isActive
           ? "ring-1 ring-blue-500/40 bg-blue-50/10"
