@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import { CanvasBubbleMenu } from "@/components/editor/bubble-menu";
 import { BlurMark } from "@/components/editor/extensions/blur-mark";
 import { Button } from "@/components/ui/button";
+import { useActiveEditorStore } from "@/store/active-editor";
 import { useResumeStore } from "@/store/resume";
 import type { ResumeSection } from "@/types/resume";
 
@@ -32,6 +33,13 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
     activeSectionId,
     resume,
   } = useResumeStore();
+
+  const {
+    registerEditor,
+    unregisterEditor,
+    setActiveEditor,
+    syncHeadingState,
+  } = useActiveEditorStore();
 
   // dnd-kit 拖拽排序集成
   const {
@@ -78,13 +86,38 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
           "cv-inline-editor focus:outline-none min-h-[30px] prose prose-slate max-w-none text-slate-800 leading-normal",
       },
     },
-    onFocus: () => {
+    onFocus: ({ editor }) => {
       setActiveSectionId(section.id);
+      setActiveEditor(editor, section.id);
+      syncHeadingState(editor);
+    },
+    onSelectionUpdate: ({ editor }) => {
+      syncHeadingState(editor);
+    },
+    onTransaction: ({ editor }) => {
+      syncHeadingState(editor);
     },
     onUpdate: ({ editor }) => {
       updateSectionContent(section.id, editor.getHTML());
     },
   });
+
+  // 注册并维护全局活跃编辑器映射
+  useEffect(() => {
+    if (editor) {
+      registerEditor(section.id, editor);
+    }
+    return () => {
+      unregisterEditor(section.id);
+    };
+  }, [editor, section.id, registerEditor, unregisterEditor]);
+
+  // 当外部选中的模块变化时，同步活跃编辑器
+  useEffect(() => {
+    if (editor && activeSectionId === section.id) {
+      setActiveEditor(editor, section.id);
+    }
+  }, [editor, activeSectionId, section.id, setActiveEditor]);
 
   // 外部 content 变化时同步内容
   useEffect(() => {

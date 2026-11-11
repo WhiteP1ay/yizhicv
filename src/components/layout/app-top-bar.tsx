@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import { EditorTopToolbar } from "@/components/editor/top-toolbar";
 import { Button } from "@/components/ui/button";
 import { useResumeStore } from "@/store/resume";
 import { getResumeExportName, yizhiResumeSchema } from "@/types/resume";
@@ -264,6 +265,12 @@ export const AppTopBar: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* 文件与富文本工具栏分隔线 */}
+        <div className="h-3.5 w-px bg-slate-200 mx-0.5" />
+
+        {/* 富文本固定工具栏 (用于插入/切换标题与段落) */}
+        <EditorTopToolbar />
       </div>
 
       {/* 2. 中间：简历标题微调 (点击改名，默认未命名，后带铅笔 icon) */}

@@ -50,6 +50,7 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
         type="button"
         variant="ghost"
         size="icon-xs"
+        onPointerDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleBold().run()}
         className={`h-7 w-7 rounded transition-colors ${
           editor.isActive("bold")
@@ -65,6 +66,7 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
         type="button"
         variant="ghost"
         size="icon-xs"
+        onPointerDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleItalic().run()}
         className={`h-7 w-7 rounded transition-colors ${
           editor.isActive("italic")
@@ -80,6 +82,7 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
         type="button"
         variant="ghost"
         size="icon-xs"
+        onPointerDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleUnderline().run()}
         className={`h-7 w-7 rounded transition-colors ${
           editor.isActive("underline")
@@ -95,6 +98,7 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
         type="button"
         variant="ghost"
         size="icon-xs"
+        onPointerDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleHighlight().run()}
         className={`h-7 w-7 rounded transition-colors ${
           editor.isActive("highlight")
@@ -112,6 +116,7 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
         type="button"
         variant="ghost"
         size="icon-xs"
+        onPointerDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         className={`h-7 w-7 rounded transition-colors ${
           editor.isActive("heading", { level: 2 })
@@ -127,6 +132,7 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
         type="button"
         variant="ghost"
         size="icon-xs"
+        onPointerDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         className={`h-7 w-7 rounded transition-colors ${
           editor.isActive("heading", { level: 3 })
@@ -144,6 +150,7 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
         type="button"
         variant="ghost"
         size="icon-xs"
+        onPointerDown={(e) => e.preventDefault()}
         onClick={setLink}
         className={`h-7 w-7 rounded transition-colors ${
           editor.isActive("link")
@@ -160,6 +167,7 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
           type="button"
           variant="ghost"
           size="icon-xs"
+          onPointerDown={(e) => e.preventDefault()}
           onClick={() => editor.chain().focus().unsetLink().run()}
           className="h-7 w-7 rounded hover:bg-slate-700/80 text-rose-400 hover:text-rose-300 transition-colors"
           title="移除链接"
@@ -173,6 +181,7 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
         type="button"
         variant="ghost"
         size="xs"
+        onPointerDown={(e) => e.preventDefault()}
         onClick={() => editor.chain().focus().toggleMark("blur").run()}
         className={`h-7 px-2 rounded flex items-center gap-1 text-xs font-medium transition-colors ${
           editor.isActive("blur")
