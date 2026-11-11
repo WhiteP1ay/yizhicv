@@ -156,9 +156,8 @@ export const A4PaperCanvas: React.FC = () => {
 
                   {activeAddSlot === "sidebar" && (
                     <>
-                      <button
-                        type="button"
-                        aria-label="关闭选择菜单"
+                      <div
+                        role="presentation"
                         className="fixed inset-0 z-40 cursor-default"
                         onClick={() => setActiveAddSlot(null)}
                       />
@@ -167,17 +166,18 @@ export const A4PaperCanvas: React.FC = () => {
                           添加预设至侧栏
                         </div>
                         {Object.values(SECTION_PRESETS).map((p) => (
-                          <button
+                          <Button
                             key={p.key}
                             type="button"
+                            variant="ghost"
                             onClick={() => {
                               addSectionFromPreset(p.key, "sidebar");
                               setActiveAddSlot(null);
                             }}
-                            className="w-full px-3 py-1.5 hover:bg-slate-50 text-xs text-slate-700 block text-left"
+                            className="w-full h-8 px-3 hover:bg-slate-50 text-xs text-slate-700 justify-start font-normal rounded-md"
                           >
                             {p.name}
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     </>
@@ -244,9 +244,8 @@ export const A4PaperCanvas: React.FC = () => {
 
                   {activeAddSlot === "main" && (
                     <>
-                      <button
-                        type="button"
-                        aria-label="关闭选择菜单"
+                      <div
+                        role="presentation"
                         className="fixed inset-0 z-40 cursor-default"
                         onClick={() => setActiveAddSlot(null)}
                       />
@@ -255,14 +254,15 @@ export const A4PaperCanvas: React.FC = () => {
                           添加预设模块
                         </div>
                         {Object.values(SECTION_PRESETS).map((p) => (
-                          <button
+                          <Button
                             key={p.key}
                             type="button"
+                            variant="ghost"
                             onClick={() => {
                               addSectionFromPreset(p.key, "main");
                               setActiveAddSlot(null);
                             }}
-                            className="w-full px-3 py-2 hover:bg-slate-50 flex flex-col text-left transition-colors"
+                            className="w-full h-auto px-3 py-2 hover:bg-slate-50 flex flex-col items-start text-left justify-start transition-colors rounded-md"
                           >
                             <span className="text-xs font-medium text-slate-800">
                               {p.name}
@@ -270,7 +270,7 @@ export const A4PaperCanvas: React.FC = () => {
                             <span className="text-[10px] text-slate-400">
                               {p.description}
                             </span>
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     </>
@@ -323,9 +323,8 @@ export const A4PaperCanvas: React.FC = () => {
 
                   {activeAddSlot === "main" && (
                     <>
-                      <button
-                        type="button"
-                        aria-label="关闭选择菜单"
+                      <div
+                        role="presentation"
                         className="fixed inset-0 z-40 cursor-default"
                         onClick={() => setActiveAddSlot(null)}
                       />
@@ -334,14 +333,15 @@ export const A4PaperCanvas: React.FC = () => {
                           添加预设模块
                         </div>
                         {Object.values(SECTION_PRESETS).map((p) => (
-                          <button
+                          <Button
                             key={p.key}
                             type="button"
+                            variant="ghost"
                             onClick={() => {
                               addSectionFromPreset(p.key, "main");
                               setActiveAddSlot(null);
                             }}
-                            className="w-full px-3 py-2 hover:bg-slate-50 flex flex-col text-left transition-colors"
+                            className="w-full h-auto px-3 py-2 hover:bg-slate-50 flex flex-col items-start text-left justify-start transition-colors rounded-md"
                           >
                             <span className="text-xs font-medium text-slate-800">
                               {p.name}
@@ -349,7 +349,7 @@ export const A4PaperCanvas: React.FC = () => {
                             <span className="text-[10px] text-slate-400">
                               {p.description}
                             </span>
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     </>

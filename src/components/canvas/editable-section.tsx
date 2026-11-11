@@ -14,6 +14,7 @@ import type React from "react";
 import { useEffect } from "react";
 import { CanvasBubbleMenu } from "@/components/editor/bubble-menu";
 import { BlurMark } from "@/components/editor/extensions/blur-mark";
+import { Button } from "@/components/ui/button";
 import { useResumeStore } from "@/store/resume";
 import type { ResumeSection } from "@/types/resume";
 
@@ -107,30 +108,34 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
       {/* 悬停把手控制栏 (仅拖拽把手与删除，打印时隐藏) */}
       <div className="no-print absolute -top-3.5 right-1 z-30 hidden group-hover:flex items-center gap-1 bg-slate-900/90 text-white px-1.5 py-0.5 rounded-full text-[10px] shadow-lg backdrop-blur-sm animate-in fade-in zoom-in-95 duration-100">
         {/* 拖拽把手 */}
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-xs"
           {...attributes}
           {...listeners}
-          className="p-1 hover:bg-slate-700/80 rounded cursor-grab active:cursor-grabbing text-slate-300 hover:text-white transition-colors"
+          className="h-5 w-5 p-0 hover:bg-slate-700/80 rounded cursor-grab active:cursor-grabbing text-slate-300 hover:text-white transition-colors"
           title="按住拖拽调整模块顺序或跨栏移动"
         >
           <GripVertical className="w-3.5 h-3.5" />
-        </button>
+        </Button>
 
         {/* 删除模块 */}
         {resume.sections.length > 1 && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon-xs"
             onClick={() => {
               if (window.confirm("确定要删除当前模块吗？")) {
                 removeSection(section.id);
               }
             }}
-            className="p-1 hover:bg-rose-600/80 text-rose-300 hover:text-white rounded transition-colors"
+            className="h-5 w-5 p-0 hover:bg-rose-600/80 text-rose-300 hover:text-white rounded transition-colors"
             title="删除此模块"
           >
             <Trash2 className="w-3 h-3" />
-          </button>
+          </Button>
         )}
       </div>
 

@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { useResumeStore } from "@/store/resume";
 import { getResumeExportName, yizhiResumeSchema } from "@/types/resume";
 
@@ -173,42 +174,45 @@ export const AppTopBar: React.FC = () => {
 
         {/* 核心文件菜单 (支持新建、导入、导出 -> 导出PDF/JSON) */}
         <div className="relative flex items-center" ref={menuContainerRef}>
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => {
               setIsFileMenuOpen((prev) => !prev);
               setIsExportSubmenuOpen(false);
             }}
-            className={`h-7 px-2.5 flex items-center text-xs font-medium rounded-md transition-colors cursor-pointer ${
+            className={`h-7 px-2.5 text-xs font-medium rounded-md transition-colors ${
               isFileMenuOpen
                 ? "bg-slate-200 text-slate-900"
                 : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
             文件
-          </button>
+          </Button>
 
           {isFileMenuOpen && (
             <div className="absolute left-0 top-full mt-1 w-44 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 text-xs">
               {/* 新建 */}
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={handleNew}
-                className="w-full px-3 py-1.5 text-left text-slate-700 hover:bg-slate-100 hover:text-slate-900 flex items-center gap-2 transition-colors cursor-pointer"
+                className="w-full h-8 px-3 justify-start text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 gap-2 rounded-md"
               >
                 <FilePlus className="w-3.5 h-3.5 text-slate-500" />
                 <span>新建</span>
-              </button>
+              </Button>
 
               {/* 导入 JSON */}
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={handleTriggerImport}
-                className="w-full px-3 py-1.5 text-left text-slate-700 hover:bg-slate-100 hover:text-slate-900 flex items-center gap-2 transition-colors cursor-pointer"
+                className="w-full h-8 px-3 justify-start text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 gap-2 rounded-md"
               >
                 <Upload className="w-3.5 h-3.5 text-slate-500" />
                 <span>导入 JSON</span>
-              </button>
+              </Button>
 
               <div className="h-px bg-slate-100 my-1" />
 
@@ -218,38 +222,41 @@ export const AppTopBar: React.FC = () => {
                 onMouseEnter={() => setIsExportSubmenuOpen(true)}
                 onMouseLeave={() => setIsExportSubmenuOpen(false)}
               >
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={() => setIsExportSubmenuOpen((prev) => !prev)}
-                  className="w-full px-3 py-1.5 text-left text-slate-700 hover:bg-slate-100 hover:text-slate-900 flex items-center justify-between transition-colors cursor-pointer"
+                  className="w-full h-8 px-3 justify-between text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-md"
                 >
                   <div className="flex items-center gap-2">
                     <Download className="w-3.5 h-3.5 text-slate-500" />
                     <span>导出</span>
                   </div>
                   <ChevronRight className="w-3 h-3 text-slate-400" />
-                </button>
+                </Button>
 
                 {/* 二级子菜单 - 增加无缝衔接防丢焦 */}
                 {isExportSubmenuOpen && (
                   <div className="absolute left-full top-0 -ml-1 pl-1 w-40 z-50">
                     <div className="bg-white border border-slate-200 rounded-lg shadow-xl py-1 animate-in fade-in zoom-in-95 duration-100">
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
                         onClick={handleExportPdf}
-                        className="w-full px-3 py-1.5 text-left text-slate-700 hover:bg-slate-100 hover:text-slate-900 flex items-center gap-2 transition-colors cursor-pointer"
+                        className="w-full h-8 px-3 justify-start text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 gap-2 rounded-md"
                       >
                         <Printer className="w-3.5 h-3.5 text-slate-500" />
                         <span>导出 PDF</span>
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
+                        variant="ghost"
                         onClick={handleExportJson}
-                        className="w-full px-3 py-1.5 text-left text-slate-700 hover:bg-slate-100 hover:text-slate-900 flex items-center gap-2 transition-colors cursor-pointer"
+                        className="w-full h-8 px-3 justify-start text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 gap-2 rounded-md"
                       >
                         <FileCode className="w-3.5 h-3.5 text-slate-500" />
                         <span>导出 JSON</span>
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -278,18 +285,19 @@ export const AppTopBar: React.FC = () => {
             autoFocus
           />
         ) : (
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => {
               setTitleInput(resume.metadata.title || "未命名");
               setIsEditingTitle(true);
             }}
-            className="group h-7 flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 px-2.5 rounded-md transition-colors cursor-pointer"
+            className="group h-7 flex items-center gap-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 px-2.5 rounded-md transition-colors"
             title="点击重命名简历"
           >
             <span>{resume.metadata.title || "未命名"}</span>
             <Pencil className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition-colors" />
-          </button>
+          </Button>
         )}
       </div>
 
