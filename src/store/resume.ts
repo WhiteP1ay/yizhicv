@@ -429,7 +429,7 @@ export const useResumeStore = create<ResumeState>()(
           const newId = `sec_${nanoid(8)}`;
           const defaultContent = `
 <div class="cv-section-block mb-4">
-  <h2 class="text-lg font-bold text-slate-900 border-b border-slate-200 pb-1 mb-3">模块标题</h2>
+  <h2 class="border-b border-slate-200 pb-1 mb-3">模块标题</h2>
   <p class="text-sm text-slate-700">点击此处输入正文内容...</p>
 </div>
 `.trim();

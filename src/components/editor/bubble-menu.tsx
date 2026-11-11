@@ -5,6 +5,7 @@ import { BubbleMenu as TiptapBubbleMenu } from "@tiptap/react/menus";
 import {
   Bold,
   EyeOff,
+  Heading1,
   Heading2,
   Heading3,
   Highlighter,
@@ -93,6 +94,22 @@ export const CanvasBubbleMenu: React.FC<CanvasBubbleMenuProps> = ({
       </Button>
 
       <span className="w-px h-4 bg-slate-700 my-auto mx-0.5" />
+
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon-xs"
+        onPointerDown={(e) => e.preventDefault()}
+        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+        className={`h-7 w-7 rounded transition-colors ${
+          editor.isActive("heading", { level: 1 })
+            ? "bg-slate-700 text-white hover:bg-slate-700 hover:text-white"
+            : "text-slate-300 hover:bg-slate-700/80 hover:text-white"
+        }`}
+        title="一级标题 (主标题 / 姓名)"
+      >
+        <Heading1 className="w-3.5 h-3.5" />
+      </Button>
 
       <Button
         type="button"

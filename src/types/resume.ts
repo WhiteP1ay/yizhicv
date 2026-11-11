@@ -97,7 +97,7 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
     defaultSlot: "main",
     initialContent: `
 <div class="cv-profile-card text-center pb-2">
-  <h1 class="text-3xl font-bold tracking-tight text-slate-900">求职者</h1>
+  <h1 class="tracking-tight">求职者</h1>
   <p class="text-base font-medium text-slate-600 mt-1">资深前端全栈工程师</p>
   <div class="cv-contacts-wrap flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-2 text-sm text-slate-600">
     <span>📱 138-0000-0000</span>
@@ -115,10 +115,10 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
     defaultSlot: "main",
     initialContent: `
 <div class="cv-section-block mb-4">
-  <h2 class="text-lg font-bold text-slate-900 border-b border-slate-200 pb-1 mb-3">工作经历</h2>
+  <h2 class="border-b border-slate-200 pb-1 mb-3">工作经历</h2>
   <div class="cv-entry mb-4">
-    <div class="flex justify-between items-baseline font-semibold text-slate-900">
-      <span class="text-base">高级全栈工程师 · 某知名互联网科技公司</span>
+    <div class="flex justify-between items-baseline font-semibold">
+      <h3 class="font-semibold">高级全栈工程师 · 某知名互联网科技公司</h3>
       <span class="text-sm font-normal text-slate-500">2023.03 - 至今</span>
     </div>
     <div class="text-sm text-slate-500 mb-1">北京 · 核心平台研发部</div>
@@ -137,10 +137,10 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
     defaultSlot: "main",
     initialContent: `
 <div class="cv-section-block mb-4">
-  <h2 class="text-lg font-bold text-slate-900 border-b border-slate-200 pb-1 mb-3">项目经历</h2>
+  <h2 class="border-b border-slate-200 pb-1 mb-3">项目经历</h2>
   <div class="cv-entry mb-3">
-    <div class="flex justify-between items-baseline font-semibold text-slate-900">
-      <span class="text-base">一纸简历 (YizhiCV) 2.0 · 独立开发者</span>
+    <div class="flex justify-between items-baseline font-semibold">
+      <h3 class="font-semibold">一纸简历 (YizhiCV) 2.0 · 独立开发者</h3>
       <span class="text-sm font-normal text-slate-500">2024.01 - 至今</span>
     </div>
     <p class="text-sm text-slate-700 mt-1">基于 Next.js 15、Tailwind CSS 与 Tiptap 构建的现代化开源简历编辑器，提供双轨 AI 协作与高自由度排版引擎。</p>
@@ -155,10 +155,10 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
     defaultSlot: "main",
     initialContent: `
 <div class="cv-section-block mb-4">
-  <h2 class="text-lg font-bold text-slate-900 border-b border-slate-200 pb-1 mb-3">教育背景</h2>
+  <h2 class="border-b border-slate-200 pb-1 mb-3">教育背景</h2>
   <div class="cv-entry">
-    <div class="flex justify-between items-baseline font-semibold text-slate-900">
-      <span class="text-base">某重点大学 · 计算机科学与技术</span>
+    <div class="flex justify-between items-baseline font-semibold">
+      <h3 class="font-semibold">某重点大学 · 计算机科学与技术</h3>
       <span class="text-sm font-normal text-slate-500">2018.09 - 2022.06</span>
     </div>
     <div class="text-sm text-slate-500">本科 · 学士学位 · 获国家励志奖学金</div>
@@ -173,7 +173,7 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
     defaultSlot: "sidebar",
     initialContent: `
 <div class="cv-section-block mb-4">
-  <h2 class="text-lg font-bold text-slate-900 border-b border-slate-200 pb-1 mb-3">专业技能</h2>
+  <h2 class="border-b border-slate-200 pb-1 mb-3">专业技能</h2>
   <div class="cv-entry text-sm text-slate-700 space-y-2">
     <div>
       <span class="font-semibold text-slate-900">前端技术：</span>
@@ -194,7 +194,7 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
     defaultSlot: "main",
     initialContent: `
 <div class="cv-section-block mb-4">
-  <h2 class="text-lg font-bold text-slate-900 border-b border-slate-200 pb-1 mb-3">更多信息</h2>
+  <h2 class="border-b border-slate-200 pb-1 mb-3">更多信息</h2>
   <p class="text-sm text-slate-700">在这里输入任何自由富文本内容，支持行内加粗、高亮、超链接与列表...</p>
 </div>
 `.trim(),
