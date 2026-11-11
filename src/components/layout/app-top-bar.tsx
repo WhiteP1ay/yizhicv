@@ -2,11 +2,14 @@
 
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import {
+  Check,
   ChevronRight,
+  Code2,
   Download,
   FileCode,
   FilePlus,
   Printer,
+  Terminal,
   Upload,
 } from "lucide-react";
 import Link from "next/link";
@@ -15,19 +18,35 @@ import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useClickOutside } from "@/hooks/use-click-outside";
 import { useResumeFileActions } from "@/hooks/use-resume-file-actions";
+import { useResumeStore } from "@/store/resume";
 
 export const AppTopBar: React.FC = () => {
   const [isFileMenuOpen, setIsFileMenuOpen] = useState(false);
   const [isExportSubmenuOpen, setIsExportSubmenuOpen] = useState(false);
   const menuContainerRef = useRef<HTMLDivElement>(null);
 
+  // 窗口菜单状态 (含二级开发者选项 -> 勾选 JSON 编辑)
+  const [isWindowMenuOpen, setIsWindowMenuOpen] = useState(false);
+  const [isDevSubmenuOpen, setIsDevSubmenuOpen] = useState(false);
+  const windowMenuContainerRef = useRef<HTMLDivElement>(null);
+
+  const { isJsonEditorEnabled, toggleJsonEditor } = useResumeStore();
+
   const closeMenu = useCallback(() => {
     setIsFileMenuOpen(false);
     setIsExportSubmenuOpen(false);
   }, []);
 
+  const closeWindowMenu = useCallback(() => {
+    setIsWindowMenuOpen(false);
+    setIsDevSubmenuOpen(false);
+  }, []);
+
   // 1. 通用点击外部与 Esc 键自动收起菜单
   useClickOutside(menuContainerRef, closeMenu, { enabled: isFileMenuOpen });
+  useClickOutside(windowMenuContainerRef, closeWindowMenu, {
+    enabled: isWindowMenuOpen,
+  });
 
   // 2. 文件操作生命周期 (新建文档、导入校验、PDF/JSON导出)
   const {
@@ -147,6 +166,82 @@ export const AppTopBar: React.FC = () => {
                       >
                         <FileCode className="w-3.5 h-3.5 text-slate-500" />
                         <span>导出 JSON</span>
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* 窗口菜单 (含二级开发者选项 -> 勾选 JSON 编辑) */}
+        <div
+          className="relative flex items-center"
+          ref={windowMenuContainerRef}
+        >
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => {
+              setIsWindowMenuOpen((prev) => !prev);
+              setIsDevSubmenuOpen(false);
+              setIsFileMenuOpen(false);
+            }}
+            className={`h-7 px-2.5 text-xs font-medium rounded-md transition-colors ${
+              isWindowMenuOpen
+                ? "bg-slate-200 text-slate-900"
+                : "text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+            }`}
+          >
+            窗口
+          </Button>
+
+          {isWindowMenuOpen && (
+            <div className="absolute left-0 top-full mt-1 w-44 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 text-xs">
+              {/* 开发者 (带有二级子菜单：JSON 编辑勾选) */}
+              <div
+                className="relative group/devsubmenu"
+                onMouseEnter={() => setIsDevSubmenuOpen(true)}
+                onMouseLeave={() => setIsDevSubmenuOpen(false)}
+              >
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setIsDevSubmenuOpen((prev) => !prev)}
+                  className="w-full h-8 px-3 justify-between text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-md"
+                >
+                  <div className="flex items-center gap-2">
+                    <Terminal className="w-3.5 h-3.5 text-slate-500" />
+                    <span>开发者</span>
+                  </div>
+                  <ChevronRight className="w-3 h-3 text-slate-400" />
+                </Button>
+
+                {/* 二级开发者子菜单 */}
+                {isDevSubmenuOpen && (
+                  <div className="absolute left-full top-0 -ml-1 pl-1 w-44 z-50">
+                    <div className="bg-white border border-slate-200 rounded-lg shadow-xl py-1 animate-in fade-in zoom-in-95 duration-100">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => {
+                          toggleJsonEditor();
+                          closeWindowMenu();
+                        }}
+                        className="w-full h-8 px-3 justify-between text-xs font-normal text-slate-700 hover:bg-slate-100 hover:text-slate-900 rounded-md"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Code2 className="w-3.5 h-3.5 text-slate-500" />
+                          <span>JSON 编辑</span>
+                        </div>
+                        {isJsonEditorEnabled ? (
+                          <div className="size-4 rounded bg-blue-600 text-white flex items-center justify-center">
+                            <Check className="size-3 stroke-[2.5]" />
+                          </div>
+                        ) : (
+                          <div className="size-4 rounded border border-slate-300" />
+                        )}
                       </Button>
                     </div>
                   </div>

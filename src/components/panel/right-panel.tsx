@@ -1,12 +1,14 @@
 "use client";
 
-import { ChevronRight, Layers, Palette } from "lucide-react";
+import { ChevronRight, FileCode, Layers, Palette } from "lucide-react";
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useResumeStore } from "@/store/resume";
 import { DesignTokenPanel } from "./design-token-panel";
+import { JsonEditorPanel } from "./json-editor-panel";
 
-type PanelTab = "design" | "sections";
+type PanelTab = "design" | "sections" | "json";
 
 interface TabItem {
   id: PanelTab;
@@ -14,7 +16,7 @@ interface TabItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-const TABS: TabItem[] = [
+const BASE_TABS: TabItem[] = [
   {
     id: "design",
     title: "设计与排版 Token",
@@ -28,8 +30,32 @@ const TABS: TabItem[] = [
 ];
 
 export const RightPanel: React.FC = () => {
+  const { isJsonEditorEnabled } = useResumeStore();
   const [activeTab, setActiveTab] = useState<PanelTab | null>("design");
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // 当开启 JSON 编辑器时，若当前收起则自动展开并切换到 json tab；关闭时回退到 design
+  useEffect(() => {
+    if (isJsonEditorEnabled) {
+      setIsCollapsed(false);
+      setActiveTab("json");
+    } else {
+      setActiveTab((prev) => (prev === "json" ? "design" : prev));
+    }
+  }, [isJsonEditorEnabled]);
+
+  const availableTabs: TabItem[] = [
+    ...BASE_TABS,
+    ...(isJsonEditorEnabled
+      ? [
+          {
+            id: "json" as const,
+            title: "JSON 数据结构编辑",
+            icon: FileCode,
+          },
+        ]
+      : []),
+  ];
 
   const handleTabClick = (tabId: PanelTab) => {
     if (isCollapsed) {
@@ -46,13 +72,13 @@ export const RightPanel: React.FC = () => {
   return (
     <aside
       className={`no-print h-full border-l border-slate-200 bg-white/95 backdrop-blur-md flex flex-col z-20 flex-shrink-0 transition-all duration-200 ease-in-out select-none shadow-xs ${
-        isCollapsed ? "w-14" : "w-80"
+        isCollapsed ? "w-14" : "w-84"
       }`}
     >
       {/* Panel 顶部：圆 tab 切换区 (只放 icon，无文字) */}
       <div className="h-13 px-2.5 border-b border-slate-100 flex items-center justify-between gap-1 flex-shrink-0">
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
-          {TABS.map((tab) => {
+          {availableTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = !isCollapsed && activeTab === tab.id;
 
@@ -106,6 +132,7 @@ export const RightPanel: React.FC = () => {
               </p>
             </div>
           )}
+          {activeTab === "json" && isJsonEditorEnabled && <JsonEditorPanel />}
         </div>
       )}
     </aside>

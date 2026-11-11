@@ -13,11 +13,14 @@ interface ResumeState {
   activeSectionId: string | null;
   isBlurMode: boolean; // 是否开启全局脱敏预览（模糊遮盖）
   isPaddingHighlight: boolean; // 是否高亮显示页面边距辅助参考框
+  isJsonEditorEnabled: boolean; // 是否在右侧面板开启 JSON 源码编辑 Tab
   previewScale: number; // 画布缩放比例 (0.5 ~ 1.3)
 
   // Actions
   setActiveSectionId: (id: string | null) => void;
   toggleBlurMode: () => void;
+  toggleJsonEditor: () => void;
+  setJsonEditorEnabled: (enabled: boolean) => void;
   setIsPaddingHighlight: (highlight: boolean) => void;
   setPreviewScale: (scale: number) => void;
   setTitle: (title: string) => void;
@@ -62,10 +65,14 @@ export const useResumeStore = create<ResumeState>()(
       activeSectionId: defaultResume.sections[0]?.id || null,
       isBlurMode: false,
       isPaddingHighlight: false,
+      isJsonEditorEnabled: false,
       previewScale: 0.88,
 
       setActiveSectionId: (id) => set({ activeSectionId: id }),
       toggleBlurMode: () => set((state) => ({ isBlurMode: !state.isBlurMode })),
+      toggleJsonEditor: () =>
+        set((state) => ({ isJsonEditorEnabled: !state.isJsonEditorEnabled })),
+      setJsonEditorEnabled: (enabled) => set({ isJsonEditorEnabled: enabled }),
       setIsPaddingHighlight: (isPaddingHighlight) =>
         set({ isPaddingHighlight }),
       setPreviewScale: (scale) =>
@@ -410,7 +417,10 @@ export const useResumeStore = create<ResumeState>()(
     }),
     {
       name: "yizhicv_resume_v2",
-      partialize: (state) => ({ resume: state.resume }),
+      partialize: (state) => ({
+        resume: state.resume,
+        isJsonEditorEnabled: state.isJsonEditorEnabled,
+      }),
     },
   ),
 );
