@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import type React from "react";
 import { useCallback, useEffect } from "react";
+import { Toaster } from "sonner";
 import { AppTopBar } from "@/components/layout/app-top-bar";
 import { RightPanel } from "@/components/panel/right-panel";
 import { useActiveEditorStore } from "@/store/active-editor";
@@ -92,6 +93,9 @@ export default function AppPage() {
         {/* 右侧设计面板 */}
         <RightPanel />
       </div>
+
+      {/* 全局消息提示 */}
+      <Toaster position="top-center" richColors />
     </div>
   );
 }

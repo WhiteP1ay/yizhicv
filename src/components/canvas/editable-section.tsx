@@ -15,6 +15,10 @@ import { useEffect } from "react";
 import { CanvasBubbleMenu } from "@/components/editor/bubble-menu";
 import { BlurMark } from "@/components/editor/extensions/blur-mark";
 import { CustomDivider } from "@/components/editor/extensions/custom-divider";
+import {
+  ResumeBlockImage,
+  ResumeInlineImage,
+} from "@/components/editor/extensions/resume-image";
 import { Button } from "@/components/ui/button";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { useResumeStore } from "@/store/resume";
@@ -76,6 +80,8 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
         placeholder: "点击输入模块标题或正文...",
       }),
       BlurMark,
+      ResumeBlockImage,
+      ResumeInlineImage,
       BubbleMenuExtension,
     ],
     content: section.content,
@@ -84,6 +90,37 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
       attributes: {
         class:
           "cv-inline-editor focus:outline-none min-h-[30px] prose prose-slate max-w-none text-slate-800",
+      },
+      handleDrop: (view, event, _slice, moved) => {
+        if (moved) return false;
+        const raw = event.dataTransfer?.getData(
+          "application/yizhicv-image-slot",
+        );
+        if (raw) {
+          try {
+            const slot = JSON.parse(raw);
+            if (slot?.base64) {
+              event.preventDefault();
+              const coords = view.posAtCoords({
+                left: event.clientX,
+                top: event.clientY,
+              });
+              if (coords) {
+                const node = view.state.schema.nodes.inlineImage.create({
+                  src: slot.base64,
+                  alt: slot.fileName || "image",
+                });
+                const tr = view.state.tr.insert(coords.pos, node);
+                view.dispatch(tr);
+                view.focus();
+                return true;
+              }
+            }
+          } catch {
+            // ignore JSON parse error
+          }
+        }
+        return false;
       },
     },
     onFocus: () => {

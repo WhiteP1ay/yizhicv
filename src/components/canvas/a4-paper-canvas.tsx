@@ -1,13 +1,8 @@
 "use client";
 
 import { closestCenter, DndContext } from "@dnd-kit/core";
-import { nanoid } from "nanoid";
 import type React from "react";
-import { useCallback } from "react";
 import { useA4Canvas } from "@/hooks/use-a4-canvas";
-import { useCanvasImagesStore } from "@/store/canvas-images";
-import type { ImageSlot } from "@/types/resume";
-import { CanvasImageLayer } from "./canvas-image-layer";
 import { CanvasPaddingHighlight } from "./canvas-padding-highlight";
 import { CanvasSingleLayout } from "./canvas-single-layout";
 import { CanvasSplitLayout } from "./canvas-split-layout";
@@ -42,45 +37,6 @@ export const A4PaperCanvas: React.FC = () => {
     paperFontClass,
   } = useA4Canvas();
 
-  const { addItem } = useCanvasImagesStore();
-
-  // 接收从插槽面板拖来的图片
-  const handleDrop = useCallback(
-    (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      const raw = e.dataTransfer.getData("application/yizhicv-image-slot");
-      if (!raw) return;
-
-      let slot: ImageSlot;
-      try {
-        slot = JSON.parse(raw) as ImageSlot;
-      } catch {
-        return;
-      }
-
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = Math.max(0, e.clientX - rect.left - 50);
-      const y = Math.max(0, e.clientY - rect.top - 50);
-
-      addItem({
-        id: `cimg_${nanoid(6)}`,
-        slot,
-        x,
-        y,
-        width: 100,
-        height: 100,
-      });
-    },
-    [addItem],
-  );
-
-  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    if (e.dataTransfer.types.includes("application/yizhicv-image-slot")) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "copy";
-    }
-  }, []);
-
   return (
     <div
       style={containerStyle}
@@ -107,8 +63,6 @@ export const A4PaperCanvas: React.FC = () => {
           isBlurMode ? "cv-preview-blur" : ""
         } ${paperFontClass}`}
         style={paperStyle}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
       >
         {/* 画布基础排版与分割线规则 (标题绝不自带分割线，分割线支持自由高度与色彩) */}
         <style>{`
@@ -207,9 +161,6 @@ export const A4PaperCanvas: React.FC = () => {
             />
           )}
         </DndContext>
-
-        {/* 画布浮动图片层（拖拽放置、自由定位、可拖移） */}
-        <CanvasImageLayer />
       </div>
     </div>
   );

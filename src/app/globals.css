@@ -351,6 +351,22 @@
   margin-bottom: 0 !important;
 }
 
+/* 图片在简历排版内原生流式渲染规则 */
+#cv-print-target img {
+  max-width: 100%;
+  object-fit: cover;
+}
+
+#cv-print-target img.cv-image-block {
+  display: block;
+  clear: both;
+}
+
+#cv-print-target img.cv-image-inline {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 /* 打印时彻底隐藏辅助控制线与按钮 */
 @media print {
   .cv-section-container {

@@ -221,7 +221,13 @@ export const useResumeStore = create<ResumeState>()(
         setImageSlot: (index, slot) =>
           set((state) => {
             const currentSlots = [
-              ...(state.resume.settings.imageSlots || [null, null, null, null, null]),
+              ...(state.resume.settings.imageSlots || [
+                null,
+                null,
+                null,
+                null,
+                null,
+              ]),
             ];
             while (currentSlots.length < 5) currentSlots.push(null);
             currentSlots[index] = slot;
