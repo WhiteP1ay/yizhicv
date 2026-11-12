@@ -1,10 +1,33 @@
 #!/usr/bin/env node
 
-const { spawn } = require("node:child_process");
+const { execSync, spawn } = require("node:child_process");
 const net = require("node:net");
 
 const LOCAL_PORT = 5432;
 const REMOTE_HOST = "my"; // 对应 ~/.ssh/config 中的 Host 别名
+
+function freePort(port) {
+  try {
+    const stdout = execSync(`lsof -tiTCP:${port} -sTCP:LISTEN`, {
+      encoding: "utf8",
+    });
+    const pids = stdout.trim().split("\n").filter(Boolean);
+    if (pids.length > 0) {
+      console.log(
+        `\x1b[33m🧹 [Port ${port}] 发现旧进程 (${pids.join(", ")}) 占用，已自动清理释放\x1b[0m`,
+      );
+      for (const pid of pids) {
+        try {
+          process.kill(Number(pid), "SIGKILL");
+        } catch {
+          // ignore
+        }
+      }
+    }
+  } catch {
+    // 端口无监听进程，直接跳过
+  }
+}
 
 function checkPort(port, host = "127.0.0.1", timeout = 500) {
   return new Promise((resolve) => {
@@ -90,7 +113,10 @@ async function start() {
     }
   }
 
-  // 3. 启动 Next.js Dev Server
+  // 3. 检查并清理 3000 端口（防止其他终端残留的 next 实例导致冲突）
+  freePort(3000);
+
+  // 4. 启动 Next.js Dev Server
   const nextDev = spawn("pnpm", ["exec", "next", "dev"], {
     stdio: "inherit",
   });
