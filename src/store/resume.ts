@@ -5,6 +5,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { idbStorage } from "@/lib/idb-storage";
 import {
   defaultResume,
+  type ImageSlot,
   type ResumeSection,
   SECTION_PRESETS,
   type YizhiResume,
@@ -32,6 +33,7 @@ interface ResumeState {
     collapsed: boolean | ((prev: boolean) => boolean),
   ) => void;
   setCustomColorSlot: (index: number, color: string | null) => void;
+  setImageSlot: (index: number, slot: ImageSlot | null) => void;
   setTitle: (title: string) => void;
 
   // Layout & Design
@@ -211,6 +213,25 @@ export const useResumeStore = create<ResumeState>()(
                 settings: {
                   ...state.resume.settings,
                   customColors: nextSlots,
+                },
+              },
+            };
+          }),
+
+        setImageSlot: (index, slot) =>
+          set((state) => {
+            const currentSlots = [
+              ...(state.resume.settings.imageSlots || [null, null, null, null, null]),
+            ];
+            while (currentSlots.length < 5) currentSlots.push(null);
+            currentSlots[index] = slot;
+            const nextSlots = currentSlots.slice(0, 5);
+            return {
+              resume: {
+                ...state.resume,
+                settings: {
+                  ...state.resume.settings,
+                  imageSlots: nextSlots,
                 },
               },
             };
