@@ -44,7 +44,9 @@ const BASE_TABS: TabItem[] = [
 ];
 
 export const RightPanel: React.FC = () => {
-  const { isJsonEditorEnabled } = useResumeStore();
+  const isJsonEditorEnabled = useResumeStore(
+    (state) => state.resume.settings.isJsonEditorEnabled,
+  );
   const { getEffectiveEditor, selectionTick } = useActiveEditorStore();
   const [activeTab, setActiveTab] = useState<PanelTab | null>("design");
 

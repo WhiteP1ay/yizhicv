@@ -17,13 +17,12 @@ import type { ResumeSection } from "@/types/resume";
 export function useA4Canvas() {
   const {
     resume,
-    isBlurMode,
     isPaddingHighlight,
-    previewScale,
     setSidebarWidth,
     addDefaultSection,
     reorderSections,
   } = useResumeStore();
+  const { isBlurMode, previewScale } = resume.settings;
 
   const {
     title,

@@ -1,5 +1,7 @@
 import { mergeAttributes } from "@tiptap/core";
 import Image from "@tiptap/extension-image";
+import { ReactNodeViewRenderer } from "@tiptap/react";
+import { ImageNodeView } from "@/components/editor/node-views/image-node-view";
 
 export interface ImageAttributes {
   src: string;
@@ -62,6 +64,10 @@ export const ResumeBlockImage = Image.extend({
         tag: "img:not([data-display='inline'])",
       },
     ];
+  },
+
+  addNodeView() {
+    return ReactNodeViewRenderer(ImageNodeView);
   },
 
   renderHTML({ HTMLAttributes }) {
@@ -137,6 +143,10 @@ export const ResumeInlineImage = Image.extend({
         tag: 'img[data-display="inline"]',
       },
     ];
+  },
+
+  addNodeView() {
+    return ReactNodeViewRenderer(ImageNodeView);
   },
 
   renderHTML({ HTMLAttributes }) {

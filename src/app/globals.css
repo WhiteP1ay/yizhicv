@@ -351,6 +351,140 @@
   margin-bottom: 0 !important;
 }
 
+/* 左右布局：一行两格，左格宽度是 --cv-side-left 的百分比 */
+#cv-print-target table.cv-side-layout {
+  width: 100%;
+  max-width: 100%;
+  margin: 0.35em 0;
+  border: none;
+  border-collapse: collapse;
+  table-layout: fixed;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+#cv-print-target table.cv-side-layout td {
+  width: auto;
+  border: none !important;
+  padding: 0.15rem 0.45rem;
+  vertical-align: top;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+#cv-print-target table.cv-side-layout td:first-child {
+  width: calc(var(--cv-side-left, 50) * 1%);
+  padding-left: 0;
+}
+
+#cv-print-target table.cv-side-layout td:last-child {
+  width: calc((100 - var(--cv-side-left, 50)) * 1%);
+  padding-right: 0;
+}
+
+@media screen {
+  #cv-print-target .ProseMirror-focused table.cv-side-layout.is-focused td {
+    outline: 1px dashed rgba(148, 163, 184, 0.7);
+    outline-offset: -1px;
+  }
+
+  #cv-print-target
+    .ProseMirror-focused
+    table.cv-side-layout.is-focused
+    td:first-child {
+    box-shadow: inset -1.5px 0 0 #cbd5e1;
+  }
+
+  #cv-print-target table.cv-side-layout.is-dragging td,
+  #cv-print-target .ProseMirror-focused table.cv-side-layout.is-dragging td {
+    outline: 1px dashed rgba(148, 163, 184, 0.7);
+    outline-offset: -1px;
+  }
+
+  #cv-print-target table.cv-side-layout.is-dragging td:first-child,
+  #cv-print-target
+    .ProseMirror-focused
+    table.cv-side-layout.is-dragging
+    td:first-child {
+    box-shadow: inset -2px 0 0 #2563eb;
+  }
+}
+
+.cv-side-resize,
+.cv-side-resize * {
+  cursor: col-resize !important;
+}
+
+.cv-image-frame {
+  position: relative;
+  max-width: 100%;
+  line-height: 0;
+}
+
+.cv-image-frame.is-block {
+  display: block;
+  width: fit-content;
+}
+
+.cv-image-frame.is-block[data-align="left"] {
+  margin: 0.5rem auto 0.5rem 0;
+}
+
+.cv-image-frame.is-block[data-align="center"] {
+  margin: 0.5rem auto;
+}
+
+.cv-image-frame.is-block[data-align="right"] {
+  margin: 0.5rem 0 0.5rem auto;
+}
+
+.cv-image-frame.is-inline {
+  display: inline-block;
+  vertical-align: middle;
+  width: fit-content;
+  margin: 0 2px;
+}
+
+.cv-image-frame.is-selected {
+  outline: 1px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+.cv-image-el {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+.cv-image-resize-handle {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  z-index: 2;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid #2563eb;
+  border-radius: 2px;
+  background: white;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.cv-image-resize-label {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 4px;
+  border-radius: 4px;
+  background: #1e293b;
+  color: white;
+  font-size: 10px;
+  line-height: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 /* 图片在简历排版内原生流式渲染规则 */
 #cv-print-target img {
   max-width: 100%;
@@ -372,5 +506,14 @@
   .cv-section-container {
     box-shadow: none !important;
     background: transparent !important;
+  }
+
+  #cv-print-target table.cv-side-layout td {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .cv-image-frame.is-selected {
+    outline: none !important;
   }
 }

@@ -9,7 +9,6 @@ interface UseRightPanelResizeOptions {
   maxWidth?: number;
   defaultWidth?: number;
   snapCollapseThreshold?: number;
-  storageKey?: string;
 }
 
 /**
@@ -29,15 +28,20 @@ export function useRightPanelResize(options: UseRightPanelResizeOptions = {}) {
     maxWidth = 780,
     defaultWidth = 336, // 对应 Tailwind w-84 (21rem)
     snapCollapseThreshold = 180,
-    storageKey = "yizhicv_right_panel_width",
   } = options;
 
-  const {
-    rightPanelWidth,
-    isRightPanelCollapsed,
-    setRightPanelWidth,
-    setIsRightPanelCollapsed,
-  } = useResumeStore();
+  const setRightPanelWidth = useResumeStore(
+    (state) => state.setRightPanelWidth,
+  );
+  const setIsRightPanelCollapsed = useResumeStore(
+    (state) => state.setIsRightPanelCollapsed,
+  );
+  const rightPanelWidth = useResumeStore(
+    (state) => state.resume.settings.rightPanelWidth,
+  );
+  const isRightPanelCollapsed = useResumeStore(
+    (state) => state.resume.settings.isRightPanelCollapsed,
+  );
 
   const width = rightPanelWidth || defaultWidth;
   const isCollapsed = isRightPanelCollapsed;
@@ -149,13 +153,6 @@ export function useRightPanelResize(options: UseRightPanelResizeOptions = {}) {
 
       const onPointerUp = () => {
         cleanupListeners();
-        try {
-          if (lastWidthRef.current >= minWidth) {
-            localStorage.setItem(storageKey, String(lastWidthRef.current));
-          }
-        } catch {
-          // ignore
-        }
       };
 
       activeMoveHandlerRef.current = onPointerMove;
@@ -170,7 +167,6 @@ export function useRightPanelResize(options: UseRightPanelResizeOptions = {}) {
       maxWidth,
       defaultWidth,
       snapCollapseThreshold,
-      storageKey,
       cleanupListeners,
       setIsRightPanelCollapsed,
       setRightPanelWidth,
@@ -185,11 +181,6 @@ export function useRightPanelResize(options: UseRightPanelResizeOptions = {}) {
     } else if (Math.abs(width - defaultWidth) > 8) {
       setRightPanelWidth(defaultWidth);
       lastWidthRef.current = defaultWidth;
-      try {
-        localStorage.setItem(storageKey, String(defaultWidth));
-      } catch {
-        // ignore
-      }
     } else {
       setIsRightPanelCollapsed(true);
     }
@@ -197,7 +188,6 @@ export function useRightPanelResize(options: UseRightPanelResizeOptions = {}) {
     isCollapsed,
     width,
     defaultWidth,
-    storageKey,
     setIsRightPanelCollapsed,
     setRightPanelWidth,
   ]);

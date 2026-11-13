@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { ColorPickerPalette } from "./color-picker-palette";
+import { ConfigCard } from "./config-card";
 
 const FONT_SIZE_PRESETS = [
   { label: "统一默认", value: "" },
@@ -21,15 +22,17 @@ export const TextInspector: React.FC = () => {
 
   if (!editor) {
     return (
-      <div className="p-3 bg-slate-50/70 border border-dashed border-slate-200 rounded-xl text-center text-xs text-slate-500 space-y-1">
-        <div className="flex items-center justify-center gap-1.5 font-medium text-slate-700">
-          <Type className="size-3.5 text-blue-600" />
-          <span>文本</span>
-        </div>
+      <ConfigCard
+        id="text"
+        dashed
+        title="文本"
+        icon={<Type className="size-3.5 text-blue-600" />}
+        className="space-y-1"
+      >
         <p className="text-[11px] text-slate-400">
           在画布中点击或选中任意文字，即可在此调整层级、色彩与字号
         </p>
-      </div>
+      </ConfigCard>
     );
   }
 
@@ -115,21 +118,18 @@ export const TextInspector: React.FC = () => {
   };
 
   return (
-    <div
+    <ConfigCard
+      id="text"
       data-testid="text-inspector"
-      className="space-y-4 p-3 bg-slate-50/70 border border-slate-200/80 rounded-xl"
-    >
-      {/* 标题栏 */}
-      <div className="flex items-center justify-between">
-        <div className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
-          <Type className="size-3.5 text-blue-600" />
-          <span>文本</span>
-        </div>
+      title="文本"
+      icon={<Type className="size-3.5 text-blue-600" />}
+      extra={
         <span className="text-[10px] text-slate-400 font-mono">
           {isH1 ? "H1" : isH2 ? "H2" : isH3 ? "H3" : "正文"}
         </span>
-      </div>
-
+      }
+      className="space-y-4"
+    >
       {/* 1. 段落 ｜ 标题选择 (Segmented Group) */}
       <div className="space-y-1.5">
         <div className="text-[11px] font-medium text-slate-600">文本层级</div>
@@ -257,6 +257,6 @@ export const TextInspector: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </ConfigCard>
   );
 };

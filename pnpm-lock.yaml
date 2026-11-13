@@ -56,6 +56,9 @@ importers:
       '@tiptap/extension-placeholder':
         specifier: ^3.33.1
         version: 3.33.1(@tiptap/extensions@3.33.1(@tiptap/core@3.33.1(@tiptap/pm@3.33.1))(@tiptap/pm@3.33.1))
+      '@tiptap/extension-table':
+        specifier: 3.33.1
+        version: 3.33.1(@tiptap/core@3.33.1(@tiptap/pm@3.33.1))(@tiptap/pm@3.33.1)
       '@tiptap/extension-text-style':
         specifier: ^3.33.1
         version: 3.33.1(@tiptap/core@3.33.1(@tiptap/pm@3.33.1))
@@ -98,9 +101,6 @@ importers:
       react-dom:
         specifier: 19.3.0
         version: 19.3.0(react@19.3.0)
-      react-image-crop:
-        specifier: ^11.1.2
-        version: 11.1.2(react@19.3.0)
       shadcn:
         specifier: ^4.23.0
         version: 4.23.0
@@ -974,6 +974,12 @@ packages:
     peerDependencies:
       '@tiptap/core': 3.33.1
 
+  '@tiptap/extension-table@3.33.1':
+    resolution: {integrity: sha512-+xGAZzkj8Ti9d0NyHonZL/0R7ubkJn34JpqsVobH7J0MLkxshGrfVTfyKPuy7x+3+fgxjS0eq2++nsc1LhsxAw==}
+    peerDependencies:
+      '@tiptap/core': 3.33.1
+      '@tiptap/pm': 3.33.1
+
   '@tiptap/extension-text-style@3.33.1':
     resolution: {integrity: sha512-TthofkRnohnsCGNJjmyg9SnmEqRX3SX1iQ9SWg+2rDyD7uA0AQ18fgwW0TpQblVDC7drIHmXWuErSjZoGkfqFA==}
     peerDependencies:
@@ -1773,11 +1779,6 @@ packages:
     resolution: {integrity: sha512-JDk8dgif51OjFoDE70+OT9ICyYr+69HlmihNwp1+Nsfbna3t5sIiCa9ZJktDmQ4/1b/rn26hIAR2uYXDMr5r0Q==}
     peerDependencies:
       react: ^19.3.0
-
-  react-image-crop@11.1.2:
-    resolution: {integrity: sha512-+0Pc2fxpwKL4u4oLmdKBw8XSwUceFbXbKEHvFOlsl/MGB1OVNic4uBlAPmEHGXYgoJIq+b63xHbc/aJMG0AVkA==}
-    peerDependencies:
-      react: '>=16.13.1'
 
   react@19.3.0:
     resolution: {integrity: sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==}
@@ -2875,6 +2876,11 @@ snapshots:
     dependencies:
       '@tiptap/core': 3.33.1(@tiptap/pm@3.33.1)
 
+  '@tiptap/extension-table@3.33.1(@tiptap/core@3.33.1(@tiptap/pm@3.33.1))(@tiptap/pm@3.33.1)':
+    dependencies:
+      '@tiptap/core': 3.33.1(@tiptap/pm@3.33.1)
+      '@tiptap/pm': 3.33.1
+
   '@tiptap/extension-text-style@3.33.1(@tiptap/core@3.33.1(@tiptap/pm@3.33.1))':
     dependencies:
       '@tiptap/core': 3.33.1(@tiptap/pm@3.33.1)
@@ -3635,10 +3641,6 @@ snapshots:
     dependencies:
       react: 19.3.0
       scheduler: 0.28.0
-
-  react-image-crop@11.1.2(react@19.3.0):
-    dependencies:
-      react: 19.3.0
 
   react@19.3.0: {}
 

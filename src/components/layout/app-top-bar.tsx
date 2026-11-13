@@ -38,8 +38,8 @@ export const AppTopBar: React.FC = () => {
   const { canUndo, canRedo, undo, redo, undoShortcut, redoShortcut } =
     useResumeHistory();
 
-  const { isJsonEditorEnabled, toggleJsonEditor, isBlurMode, toggleBlurMode } =
-    useResumeStore();
+  const { toggleJsonEditor, toggleBlurMode, resume } = useResumeStore();
+  const { isJsonEditorEnabled, isBlurMode } = resume.settings;
 
   const {
     fileInputRef,

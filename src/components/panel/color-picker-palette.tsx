@@ -2,7 +2,7 @@
 
 import { Check, Palette, Plus, RotateCcw, X } from "lucide-react";
 import type React from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useResumeStore } from "@/store/resume";
@@ -98,30 +98,6 @@ export const ColorPickerPalette: React.FC<ColorPickerPaletteProps> = ({
   const activeSlotIndexRef = useRef<number>(0);
   const slotPickerInputRef = useRef<HTMLInputElement>(null);
   const [pickerTempColor, setPickerTempColor] = useState<string>("#1d4ed8");
-
-  // LocalStorage 兜底持久化同步初始化
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const isAllNull = customColors.every((c) => !c);
-        if (isAllNull) {
-          const cached = localStorage.getItem("yizhicv_custom_colors");
-          if (cached) {
-            const parsed = JSON.parse(cached);
-            if (Array.isArray(parsed)) {
-              parsed.slice(0, 5).forEach((color, idx) => {
-                if (color && typeof color === "string") {
-                  setCustomColorSlot(idx, color);
-                }
-              });
-            }
-          }
-        }
-      } catch {
-        // ignore storage access error
-      }
-    }
-  }, [customColors, setCustomColorSlot]);
 
   // 打开指定槽位的原生拾色器弹窗
   const handleOpenSlotPicker = (index: number) => {

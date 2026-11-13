@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { ColorPickerPalette } from "./color-picker-palette";
+import { ConfigCard } from "./config-card";
 
 const HEIGHT_PRESETS = [1, 2, 3, 4];
 
@@ -110,26 +111,21 @@ export const DividerInspector: React.FC = () => {
   };
 
   return (
-    <div
+    <ConfigCard
+      id="divider"
       data-testid="divider-inspector"
-      className={`space-y-3.5 p-3 rounded-xl select-none transition-all duration-200 ${
-        isDividerSelected
-          ? "bg-blue-50/40 border border-blue-200/80 shadow-xs ring-1 ring-blue-500/20"
-          : "bg-slate-50/70 border border-slate-200/80"
-      }`}
-    >
-      {/* 头部标题与二次编辑状态指示 */}
-      <div className="flex items-center justify-between">
-        <div className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
-          <Minus className="size-3.5 text-blue-600 stroke-[2.5]" />
-          <span>分割线</span>
-          {isDividerSelected && (
-            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700 animate-in fade-in">
-              <span className="size-1.5 rounded-full bg-blue-600 animate-pulse" />
-              <span>已选中</span>
-            </span>
-          )}
-        </div>
+      title="分割线"
+      icon={<Minus className="size-3.5 text-blue-600 stroke-[2.5]" />}
+      active={isDividerSelected}
+      badge={
+        isDividerSelected ? (
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700 animate-in fade-in">
+            <span className="size-1.5 rounded-full bg-blue-600 animate-pulse" />
+            <span>已选中</span>
+          </span>
+        ) : null
+      }
+      extra={
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] text-slate-400 font-mono">
             {height}px · {color.toUpperCase()}
@@ -146,8 +142,9 @@ export const DividerInspector: React.FC = () => {
             <RotateCcw className="size-2.5" />
           </Button>
         </div>
-      </div>
-
+      }
+      className="space-y-3.5"
+    >
       {/* 实时视觉预览窗 */}
       <div className="px-3 py-2.5 bg-white rounded-lg border border-slate-200 shadow-2xs flex flex-col justify-center">
         <div className="flex items-center justify-between text-[10px] text-slate-400 mb-1.5 font-medium">
@@ -295,6 +292,6 @@ export const DividerInspector: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </ConfigCard>
   );
 };

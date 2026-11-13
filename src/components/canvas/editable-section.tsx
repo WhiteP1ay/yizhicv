@@ -6,6 +6,7 @@ import BubbleMenuExtension from "@tiptap/extension-bubble-menu";
 import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
+import { TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
 import { FontSize, TextStyle } from "@tiptap/extension-text-style";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -19,6 +20,7 @@ import {
   ResumeBlockImage,
   ResumeInlineImage,
 } from "@/components/editor/extensions/resume-image";
+import { ResumeTable } from "@/components/editor/extensions/side-layout";
 import { Button } from "@/components/ui/button";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { useResumeStore } from "@/store/resume";
@@ -72,6 +74,10 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
         trailingNode: false, // 禁用强制末尾追加空白段落，防止列表后产生无法删除的空白行
       }),
       CustomDivider,
+      ResumeTable,
+      TableRow,
+      TableHeader,
+      TableCell,
       TextStyle,
       Color,
       FontSize,
@@ -90,37 +96,6 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
       attributes: {
         class:
           "cv-inline-editor focus:outline-none min-h-[30px] prose prose-slate max-w-none text-slate-800",
-      },
-      handleDrop: (view, event, _slice, moved) => {
-        if (moved) return false;
-        const raw = event.dataTransfer?.getData(
-          "application/yizhicv-image-slot",
-        );
-        if (raw) {
-          try {
-            const slot = JSON.parse(raw);
-            if (slot?.base64) {
-              event.preventDefault();
-              const coords = view.posAtCoords({
-                left: event.clientX,
-                top: event.clientY,
-              });
-              if (coords) {
-                const node = view.state.schema.nodes.inlineImage.create({
-                  src: slot.base64,
-                  alt: slot.fileName || "image",
-                });
-                const tr = view.state.tr.insert(coords.pos, node);
-                view.dispatch(tr);
-                view.focus();
-                return true;
-              }
-            }
-          } catch {
-            // ignore JSON parse error
-          }
-        }
-        return false;
       },
     },
     onFocus: () => {

@@ -5,7 +5,6 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { idbStorage } from "@/lib/idb-storage";
 import {
   defaultResume,
-  type ImageSlot,
   type ResumeSection,
   SECTION_PRESETS,
   type YizhiResume,
@@ -14,12 +13,7 @@ import {
 interface ResumeState {
   resume: YizhiResume;
   activeSectionId: string | null;
-  isBlurMode: boolean; // 是否开启全局脱敏预览（模糊遮盖）
-  isPaddingHighlight: boolean; // 是否高亮显示页面边距辅助参考框
-  isJsonEditorEnabled: boolean; // 是否在右侧面板开启 JSON 源码编辑 Tab
-  previewScale: number; // 画布缩放比例 (0.5 ~ 1.3)
-  rightPanelWidth: number; // 右侧面板展开宽度 (px)
-  isRightPanelCollapsed: boolean; // 右侧面板是否折叠
+  isPaddingHighlight: boolean; // 悬停调节边距时的临时高亮，不写入设置
 
   // Actions
   setActiveSectionId: (id: string | null) => void;
@@ -33,7 +27,7 @@ interface ResumeState {
     collapsed: boolean | ((prev: boolean) => boolean),
   ) => void;
   setCustomColorSlot: (index: number, color: string | null) => void;
-  setImageSlot: (index: number, slot: ImageSlot | null) => void;
+  setConfigCardOpen: (id: string, open: boolean) => void;
   setTitle: (title: string) => void;
 
   // Layout & Design
@@ -86,19 +80,13 @@ export const useResumeStore = create<ResumeState>()(
       (set) => ({
         resume: defaultResume,
         activeSectionId: defaultResume.sections[0]?.id || null,
-        isBlurMode: defaultResume.settings.isBlurMode,
         isPaddingHighlight: false,
-        isJsonEditorEnabled: defaultResume.settings.isJsonEditorEnabled,
-        previewScale: defaultResume.settings.previewScale,
-        rightPanelWidth: defaultResume.settings.rightPanelWidth,
-        isRightPanelCollapsed: defaultResume.settings.isRightPanelCollapsed,
 
         setActiveSectionId: (id) => set({ activeSectionId: id }),
         toggleBlurMode: () =>
           set((state) => {
-            const next = !state.isBlurMode;
+            const next = !state.resume.settings.isBlurMode;
             return {
-              isBlurMode: next,
               resume: {
                 ...state.resume,
                 settings: {
@@ -110,9 +98,8 @@ export const useResumeStore = create<ResumeState>()(
           }),
         toggleJsonEditor: () =>
           set((state) => {
-            const next = !state.isJsonEditorEnabled;
+            const next = !state.resume.settings.isJsonEditorEnabled;
             return {
-              isJsonEditorEnabled: next,
               resume: {
                 ...state.resume,
                 settings: {
@@ -124,7 +111,6 @@ export const useResumeStore = create<ResumeState>()(
           }),
         setJsonEditorEnabled: (enabled) =>
           set((state) => ({
-            isJsonEditorEnabled: enabled,
             resume: {
               ...state.resume,
               settings: {
@@ -139,7 +125,6 @@ export const useResumeStore = create<ResumeState>()(
           set((state) => {
             const clamped = Math.max(0.4, Math.min(1.4, scale));
             return {
-              previewScale: clamped,
               resume: {
                 ...state.resume,
                 settings: {
@@ -153,7 +138,6 @@ export const useResumeStore = create<ResumeState>()(
           set((state) => {
             const clamped = Math.max(200, Math.min(1000, Math.round(width)));
             return {
-              rightPanelWidth: clamped,
               resume: {
                 ...state.resume,
                 settings: {
@@ -167,10 +151,9 @@ export const useResumeStore = create<ResumeState>()(
           set((state) => {
             const next =
               typeof collapsed === "function"
-                ? collapsed(state.isRightPanelCollapsed)
+                ? collapsed(state.resume.settings.isRightPanelCollapsed)
                 : collapsed;
             return {
-              isRightPanelCollapsed: next,
               resume: {
                 ...state.resume,
                 settings: {
@@ -196,17 +179,6 @@ export const useResumeStore = create<ResumeState>()(
             currentSlots[index] = color;
             const nextSlots = currentSlots.slice(0, 5);
 
-            if (typeof window !== "undefined") {
-              try {
-                localStorage.setItem(
-                  "yizhicv_custom_colors",
-                  JSON.stringify(nextSlots),
-                );
-              } catch {
-                // ignore local storage errors
-              }
-            }
-
             return {
               resume: {
                 ...state.resume,
@@ -218,30 +190,19 @@ export const useResumeStore = create<ResumeState>()(
             };
           }),
 
-        setImageSlot: (index, slot) =>
-          set((state) => {
-            const currentSlots = [
-              ...(state.resume.settings.imageSlots || [
-                null,
-                null,
-                null,
-                null,
-                null,
-              ]),
-            ];
-            while (currentSlots.length < 5) currentSlots.push(null);
-            currentSlots[index] = slot;
-            const nextSlots = currentSlots.slice(0, 5);
-            return {
-              resume: {
-                ...state.resume,
-                settings: {
-                  ...state.resume.settings,
-                  imageSlots: nextSlots,
+        setConfigCardOpen: (id, open) =>
+          set((state) => ({
+            resume: {
+              ...state.resume,
+              settings: {
+                ...state.resume.settings,
+                configCards: {
+                  ...state.resume.settings.configCards,
+                  [id]: open,
                 },
               },
-            };
-          }),
+            },
+          })),
 
         setTitle: (title) =>
           set((state) => ({
@@ -548,40 +509,24 @@ export const useResumeStore = create<ResumeState>()(
           set({
             resume: defaultResume,
             activeSectionId: defaultResume.sections[0]?.id || null,
-            rightPanelWidth: defaultResume.settings.rightPanelWidth,
-            isRightPanelCollapsed: defaultResume.settings.isRightPanelCollapsed,
-            isBlurMode: defaultResume.settings.isBlurMode,
-            isJsonEditorEnabled: defaultResume.settings.isJsonEditorEnabled,
-            previewScale: defaultResume.settings.previewScale,
           }),
 
         clearResume: () =>
           set({
             resume: createInitialResume(),
             activeSectionId: defaultResume.sections[0]?.id || null,
-            rightPanelWidth: defaultResume.settings.rightPanelWidth,
-            isRightPanelCollapsed: defaultResume.settings.isRightPanelCollapsed,
-            isBlurMode: false,
-            isJsonEditorEnabled: false,
-            previewScale: defaultResume.settings.previewScale,
           }),
 
         importResume: (newResume) =>
           set({
             resume: newResume,
             activeSectionId: newResume.sections[0]?.id || null,
-            rightPanelWidth: newResume.settings.rightPanelWidth,
-            isRightPanelCollapsed: newResume.settings.isRightPanelCollapsed,
-            isBlurMode: newResume.settings.isBlurMode,
-            isJsonEditorEnabled: newResume.settings.isJsonEditorEnabled,
-            previewScale: newResume.settings.previewScale,
           }),
 
         createNewResume: () =>
           set({
             resume: createInitialResume(),
             activeSectionId: defaultResume.sections[0]?.id || null,
-            isBlurMode: false,
           }),
       }),
       {
@@ -589,12 +534,10 @@ export const useResumeStore = create<ResumeState>()(
         storage: createJSONStorage(() => idbStorage),
         partialize: (state) => ({
           resume: state.resume,
-          isJsonEditorEnabled: state.isJsonEditorEnabled,
         }),
         merge: (persistedState: unknown, currentState: ResumeState) => {
           const persisted = (persistedState || {}) as {
             resume?: Partial<YizhiResume>;
-            isJsonEditorEnabled?: boolean;
           };
           const rawResume = persisted.resume || {};
           const rawSettings: Partial<YizhiResume["settings"]> =
@@ -611,25 +554,18 @@ export const useResumeStore = create<ResumeState>()(
             settings: {
               ...currentState.resume.settings,
               ...rawSettings,
-              isJsonEditorEnabled:
-                persisted.isJsonEditorEnabled ??
-                rawSettings.isJsonEditorEnabled ??
-                currentState.resume.settings.isJsonEditorEnabled,
             },
           };
 
-          // 彻底剔除历史遗留的无用字段 sidebarPosition
+          // 彻底剔除历史遗留的无用字段
           delete (mergedResume.layout as unknown as Record<string, unknown>)
             .sidebarPosition;
+          delete (mergedResume.settings as unknown as Record<string, unknown>)
+            .imageSlots;
 
           return {
             ...currentState,
             resume: mergedResume,
-            isBlurMode: mergedResume.settings.isBlurMode,
-            isJsonEditorEnabled: mergedResume.settings.isJsonEditorEnabled,
-            previewScale: mergedResume.settings.previewScale,
-            rightPanelWidth: mergedResume.settings.rightPanelWidth,
-            isRightPanelCollapsed: mergedResume.settings.isRightPanelCollapsed,
           };
         },
       },
@@ -639,9 +575,17 @@ export const useResumeStore = create<ResumeState>()(
       partialize: (state) => ({
         resume: state.resume,
       }),
-      equality: (pastState, currentState) =>
-        JSON.stringify(pastState?.resume) ===
-        JSON.stringify(currentState?.resume),
+      equality: (pastState, currentState) => {
+        const withoutCards = (resume?: YizhiResume) => {
+          if (!resume) return resume;
+          const { configCards: _configCards, ...settings } = resume.settings;
+          return { ...resume, settings };
+        };
+        return (
+          JSON.stringify(withoutCards(pastState?.resume)) ===
+          JSON.stringify(withoutCards(currentState?.resume))
+        );
+      },
     },
   ),
 );

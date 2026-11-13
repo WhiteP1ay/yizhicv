@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useResumeStore } from "@/store/resume";
+import { ConfigCard } from "./config-card";
 import { TextInspector } from "./text-inspector";
 
 const FONT_OPTIONS: Array<{
@@ -40,17 +41,13 @@ export const DesignTokenPanel: React.FC = () => {
       <TextInspector />
 
       {/* 2. 版面区块 (淡灰底圆角，统一样式规范) */}
-      <div
+      <ConfigCard
+        id="layout"
         data-testid="layout-inspector"
-        className="space-y-4 p-3 bg-slate-50/70 border border-slate-200/80 rounded-xl"
+        title="版面"
+        icon={<Sliders className="size-3.5 text-blue-600" />}
+        className="space-y-4"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-800">
-            <Sliders className="size-3.5 text-blue-600" />
-            <span>版面</span>
-          </div>
-        </div>
-
         {/* 字体族群 */}
         <section className="space-y-2">
           <div className="text-[11px] font-medium text-slate-600 flex items-center gap-1.5">
@@ -304,7 +301,7 @@ export const DesignTokenPanel: React.FC = () => {
             </div>
           </div>
         </section>
-      </div>
+      </ConfigCard>
 
       {/* 3. 底部重置操作 */}
       <div className="pt-1">

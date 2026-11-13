@@ -28,7 +28,8 @@ export function useSidebarResize(options: UseSidebarResizeOptions = {}) {
     defaultExpandWidth = 180,
   } = options;
 
-  const { resume, previewScale, setSidebarWidth } = useResumeStore();
+  const { resume, setSidebarWidth } = useResumeStore();
+  const { previewScale } = resume.settings;
   const [isResizing, setIsResizing] = useState(false);
 
   const activeMoveHandlerRef = useRef<((e: PointerEvent) => void) | null>(null);

@@ -28,32 +28,16 @@ export type ResumeLayout = z.infer<typeof resumeLayoutSchema>;
  * 工作台偏好设置 (Workspace Settings)
  * 记录右侧面板宽度、折叠状态、脱敏模式、预览比例及 JSON 源码编辑开关
  */
-export const imageSlotSchema = z.object({
-  /** base64 Data URL，含 MIME 前缀，如 data:image/jpeg;base64,... */
-  base64: z.string(),
-  /** 裁剪区域（百分比，0-100） */
-  cropX: z.number().default(0),
-  cropY: z.number().default(0),
-  cropWidth: z.number().default(100),
-  cropHeight: z.number().default(100),
-  /** 原始文件名（仅作展示用） */
-  fileName: z.string().default(""),
-});
-export type ImageSlot = z.infer<typeof imageSlotSchema>;
-
 export const resumeSettingsSchema = z.object({
   rightPanelWidth: z.number().min(200).max(1000).default(336),
   isRightPanelCollapsed: z.boolean().default(false),
   previewScale: z.number().min(0.4).max(1.4).default(0.88),
   isBlurMode: z.boolean().default(false),
   isJsonEditorEnabled: z.boolean().default(false),
+  /** 右侧配置卡是否展开，缺省为展开 */
+  configCards: z.record(z.string(), z.boolean()).default({}),
   customColors: z
     .array(z.string().nullable())
-    .max(5)
-    .default([null, null, null, null, null]),
-  /** 5 个图片插槽 */
-  imageSlots: z
-    .array(imageSlotSchema.nullable())
     .max(5)
     .default([null, null, null, null, null]),
 });
@@ -93,8 +77,8 @@ export const yizhiResumeSchema = z.object({
     previewScale: 0.88,
     isBlurMode: false,
     isJsonEditorEnabled: false,
+    configCards: {},
     customColors: [null, null, null, null, null],
-    imageSlots: [null, null, null, null, null],
   }),
   sections: z.array(resumeSectionSchema).default([]),
   design: resumeDesignSchema,
@@ -283,8 +267,8 @@ export const defaultResume: YizhiResume = {
     previewScale: 0.88,
     isBlurMode: false,
     isJsonEditorEnabled: false,
+    configCards: {},
     customColors: [null, null, null, null, null],
-    imageSlots: [null, null, null, null, null],
   },
   sections: [
     {
