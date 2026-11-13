@@ -352,7 +352,51 @@
 }
 
 /* 左右布局：一行两格，左格宽度是 --cv-side-left 的百分比 */
+.cv-side-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0.35em 0;
+}
+
+.cv-side-frame > .cv-side-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  gap: 2px;
+  transform: translateX(calc(-100% + 6px));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cv-side-frame:hover > .cv-side-handle {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cv-side-frame .cv-side-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  background: #fff;
+  color: #dc2626;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.cv-side-frame .cv-side-delete:hover {
+  background: #fef2f2;
+}
+
 #cv-print-target table.cv-side-layout {
+  position: relative;
   width: 100%;
   max-width: 100%;
   margin: 0.35em 0;
@@ -363,10 +407,15 @@
   page-break-inside: avoid;
 }
 
+.cv-side-frame > table.cv-side-layout {
+  margin: 0;
+}
+
 #cv-print-target table.cv-side-layout td {
   width: auto;
   border: none !important;
-  padding: 0.15rem 0.45rem;
+  padding: 0;
+  line-height: 0;
   vertical-align: top;
   min-width: 0;
   overflow-wrap: anywhere;
@@ -374,38 +423,33 @@
 
 #cv-print-target table.cv-side-layout td:first-child {
   width: calc(var(--cv-side-left, 50) * 1%);
-  padding-left: 0;
 }
 
 #cv-print-target table.cv-side-layout td:last-child {
   width: calc((100 - var(--cv-side-left, 50)) * 1%);
-  padding-right: 0;
+}
+
+#cv-print-target table.cv-side-layout td > :is(p, h1, h2, h3):only-child {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 @media screen {
-  #cv-print-target .ProseMirror-focused table.cv-side-layout.is-focused td {
-    outline: 1px dashed rgba(148, 163, 184, 0.7);
-    outline-offset: -1px;
+  #cv-print-target table.cv-side-layout td:first-child {
+    box-shadow: inset -1px 0 0 #e2e8f0;
   }
 
-  #cv-print-target
-    .ProseMirror-focused
-    table.cv-side-layout.is-focused
-    td:first-child {
-    box-shadow: inset -1.5px 0 0 #cbd5e1;
+  .cv-side-frame:hover > table.cv-side-layout {
+    outline: 1px solid #93c5fd;
+    outline-offset: 2px;
+    background: rgba(219, 234, 254, 0.45);
   }
 
-  #cv-print-target table.cv-side-layout.is-dragging td,
-  #cv-print-target .ProseMirror-focused table.cv-side-layout.is-dragging td {
-    outline: 1px dashed rgba(148, 163, 184, 0.7);
-    outline-offset: -1px;
+  .cv-side-frame:hover > table.cv-side-layout td:first-child {
+    box-shadow: inset -1px 0 0 #93c5fd;
   }
 
-  #cv-print-target table.cv-side-layout.is-dragging td:first-child,
-  #cv-print-target
-    .ProseMirror-focused
-    table.cv-side-layout.is-dragging
-    td:first-child {
+  .cv-side-frame.is-dragging > table.cv-side-layout td:first-child {
     box-shadow: inset -2px 0 0 #2563eb;
   }
 }
@@ -508,9 +552,16 @@
     background: transparent !important;
   }
 
+  .cv-side-frame,
+  #cv-print-target table.cv-side-layout,
   #cv-print-target table.cv-side-layout td {
     outline: none !important;
     box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  .cv-side-frame > .cv-side-handle {
+    display: none !important;
   }
 
   .cv-image-frame.is-selected {

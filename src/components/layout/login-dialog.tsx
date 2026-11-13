@@ -102,7 +102,7 @@ export function LoginDialog() {
       }}
     >
       <DialogContent className="sm:max-w-[440px] gap-5 p-5">
-        <DialogHeader className="gap-1.5 pr-6">
+        <DialogHeader className="gap-1.5">
           <DialogTitle className="text-base font-semibold text-slate-900">
             登录
           </DialogTitle>

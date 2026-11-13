@@ -3,7 +3,7 @@ import {
   CAPTCHA_COOKIE,
   CAPTCHA_TTL_SECONDS,
   issueCaptcha,
-} from "@/lib/captcha";
+} from "@/server/captcha";
 
 export async function GET(request: NextRequest) {
   await connection();

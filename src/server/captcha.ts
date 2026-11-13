@@ -1,7 +1,8 @@
+import "server-only";
 import { eq, lt } from "drizzle-orm";
 import svgCaptcha from "svg-captcha";
 import { captchas, db } from "@/db";
-import { hashToken, tokensMatch } from "@/lib/auth";
+import { hashToken, tokensMatch } from "@/server/auth";
 
 export const CAPTCHA_COOKIE = "yizhicv_captcha";
 export const CAPTCHA_TTL_SECONDS = 120;

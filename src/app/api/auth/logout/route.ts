@@ -3,7 +3,7 @@ import {
   clearSessionCookie,
   deleteSession,
   readSessionToken,
-} from "@/lib/auth";
+} from "@/server/auth";
 
 export async function POST(request: NextRequest) {
   const token = readSessionToken(request);

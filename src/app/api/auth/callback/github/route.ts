@@ -8,8 +8,8 @@ import {
   setSessionCookie,
   tokensMatch,
   upsertGithubUser,
-} from "@/lib/auth";
-import { fetchGithubProfile } from "@/lib/github";
+} from "@/server/auth";
+import { fetchGithubProfile } from "@/server/github";
 
 function failed(origin: string) {
   return NextResponse.redirect(new URL("/app?login=failed", origin));

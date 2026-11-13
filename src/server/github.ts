@@ -1,3 +1,5 @@
+import "server-only";
+
 export type GithubProfile = {
   providerUserId: string;
   name: string;

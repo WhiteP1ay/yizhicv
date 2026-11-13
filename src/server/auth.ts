@@ -1,3 +1,4 @@
+import "server-only";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { and, eq, gt } from "drizzle-orm";
 import type { NextRequest, NextResponse } from "next/server";

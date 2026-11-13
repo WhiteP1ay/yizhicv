@@ -1,0 +1,1 @@
+ALTER TABLE "user_images" ADD COLUMN "name" text DEFAULT '' NOT NULL;

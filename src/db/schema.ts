@@ -87,6 +87,7 @@ export const userImages = pgTable(
     objectKey: text("object_key").notNull().unique(),
     byteSize: integer("byte_size").notNull(),
     contentType: text("content_type").notNull(),
+    name: text("name").notNull().default(""),
     status: text("status", { enum: userImageStatuses }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

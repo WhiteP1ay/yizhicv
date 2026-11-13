@@ -4,7 +4,7 @@ import {
   randomToken,
   readGithubConfig,
   setOauthStateCookie,
-} from "@/lib/auth";
+} from "@/server/auth";
 
 export async function GET(request: NextRequest) {
   const config = readGithubConfig();

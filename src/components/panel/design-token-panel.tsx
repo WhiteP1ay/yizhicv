@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useResumeStore } from "@/store/resume";
+import { AlignInspector } from "./align-inspector";
 import { ConfigCard } from "./config-card";
 import { TextInspector } from "./text-inspector";
 
@@ -39,6 +40,8 @@ export const DesignTokenPanel: React.FC = () => {
     <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 text-xs text-slate-700 select-none">
       {/* 1. 文本区块 (淡灰底圆角，实时响应光标选区) */}
       <TextInspector />
+
+      <AlignInspector />
 
       {/* 2. 版面区块 (淡灰底圆角，统一样式规范) */}
       <ConfigCard

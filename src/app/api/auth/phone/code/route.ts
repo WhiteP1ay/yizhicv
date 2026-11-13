@@ -1,10 +1,10 @@
 import { connection, type NextRequest, NextResponse } from "next/server";
-import { CAPTCHA_COOKIE, verifyCaptcha } from "@/lib/captcha";
+import { CAPTCHA_COOKIE, verifyCaptcha } from "@/server/captcha";
 import {
   rememberSmsRequest,
   SMS_COOLDOWN_SECONDS,
   smsRetryAfter,
-} from "@/lib/phone-code";
+} from "@/server/phone-code";
 
 const phonePattern = /^1\d{10}$/;
 

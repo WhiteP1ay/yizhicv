@@ -40,6 +40,10 @@ export const resumeSettingsSchema = z.object({
   previewScale: z.number().min(0.4).max(1.4).default(0.88),
   isBlurMode: z.boolean().default(false),
   isJsonEditorEnabled: z.boolean().default(false),
+  /** 备选图片小窗是否打开 */
+  imageTrayOpen: z.boolean().default(false),
+  imageTrayX: z.number().default(24),
+  imageTrayY: z.number().default(88),
   /** 右侧配置卡是否展开，缺省为展开 */
   configCards: z.record(z.string(), z.boolean()).default({}),
   customColors: z
@@ -84,6 +88,9 @@ export const yizhiResumeSchema = z.object({
     previewScale: 0.88,
     isBlurMode: false,
     isJsonEditorEnabled: false,
+    imageTrayOpen: false,
+    imageTrayX: 24,
+    imageTrayY: 88,
     configCards: {},
     customColors: [null, null, null, null, null],
   }),
@@ -275,6 +282,9 @@ export const defaultResume: YizhiResume = {
     previewScale: 0.88,
     isBlurMode: false,
     isJsonEditorEnabled: false,
+    imageTrayOpen: false,
+    imageTrayX: 24,
+    imageTrayY: 88,
     configCards: {},
     customColors: [null, null, null, null, null],
   },

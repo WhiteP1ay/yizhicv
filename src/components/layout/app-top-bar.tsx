@@ -39,8 +39,9 @@ export const AppTopBar: React.FC = () => {
   const { canUndo, canRedo, undo, redo, undoShortcut, redoShortcut } =
     useResumeHistory();
 
-  const { toggleJsonEditor, toggleBlurMode, resume } = useResumeStore();
-  const { isJsonEditorEnabled, isBlurMode } = resume.settings;
+  const { toggleJsonEditor, toggleBlurMode, setImageTrayOpen, resume } =
+    useResumeStore();
+  const { isJsonEditorEnabled, isBlurMode, imageTrayOpen } = resume.settings;
 
   const {
     fileInputRef,
@@ -194,6 +195,13 @@ export const AppTopBar: React.FC = () => {
               窗口
             </MenubarTrigger>
             <MenubarContent className="min-w-44 text-xs">
+              <MenubarCheckboxItem
+                checked={imageTrayOpen}
+                onCheckedChange={(checked) => setImageTrayOpen(checked)}
+                className="text-xs cursor-pointer"
+              >
+                <span>备选</span>
+              </MenubarCheckboxItem>
               <MenubarSub>
                 <MenubarSubTrigger className="text-xs gap-2 cursor-pointer">
                   <Terminal className="size-3.5 text-slate-500" />

@@ -1,3 +1,4 @@
+import "server-only";
 import OSS from "ali-oss";
 
 function envValue(name: string) {

@@ -1,8 +1,12 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
 import { isImageUploadType, MAX_IMAGE_UPLOAD_BYTES } from "@/lib/image-upload";
-import { deleteUserImageByUrl, reserveUserImage } from "@/lib/user-images";
+import { currentUser } from "@/server/auth";
+import {
+  deleteUserImageByUrl,
+  listUserImages,
+  reserveUserImage,
+} from "@/server/user-images";
 
 export async function POST(request: NextRequest) {
   const user = await currentUser(request);
@@ -10,12 +14,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "请先登录" }, { status: 401 });
   }
 
-  const body: { contentType?: unknown; size?: unknown } = await request
-    .json()
-    .catch(() => ({}));
+  const body: { contentType?: unknown; size?: unknown; name?: unknown } =
+    await request.json().catch(() => ({}));
   const contentType =
     typeof body.contentType === "string" ? body.contentType : "";
   const size = typeof body.size === "number" ? body.size : 0;
+  const name = typeof body.name === "string" ? body.name : "";
 
   if (!isImageUploadType(contentType)) {
     return NextResponse.json(
@@ -30,7 +34,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const reserved = await reserveUserImage(user.id, contentType, size);
+  const reserved = await reserveUserImage(user.id, contentType, size, name);
   if (!reserved.ok) {
     return NextResponse.json(
       { message: reserved.message },
@@ -65,4 +69,14 @@ export async function DELETE(request: NextRequest) {
     );
   }
   return NextResponse.json({ ok: true });
+}
+
+export async function GET(request: NextRequest) {
+  const user = await currentUser(request);
+  if (!user) {
+    return NextResponse.json({ message: "请先登录" }, { status: 401 });
+  }
+  const query = request.nextUrl.searchParams.get("q") ?? "";
+  const images = await listUserImages(user.id, query);
+  return NextResponse.json({ images });
 }

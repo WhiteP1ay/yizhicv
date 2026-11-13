@@ -21,8 +21,9 @@ import {
   ResumeInlineImage,
 } from "@/components/editor/extensions/resume-image";
 import { ResumeTable } from "@/components/editor/extensions/side-layout";
-import { StoredImageDelete } from "@/components/editor/extensions/stored-image-delete";
+import { TextAlign } from "@/components/editor/extensions/text-align";
 import { Button } from "@/components/ui/button";
+import { IMAGE_TRAY_DRAG_TYPE, readImageTrayDrag } from "@/lib/image-tray-drag";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { useResumeStore } from "@/store/resume";
 import type { ResumeSection } from "@/types/resume";
@@ -76,6 +77,7 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
       }),
       CustomDivider,
       ResumeTable,
+      TextAlign,
       TableRow,
       TableHeader,
       TableCell,
@@ -89,12 +91,45 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
       BlurMark,
       ResumeBlockImage,
       ResumeInlineImage,
-      StoredImageDelete,
       BubbleMenuExtension,
     ],
     content: section.content,
     immediatelyRender: false,
     editorProps: {
+      handleDrop: (view, event) => {
+        const payload = readImageTrayDrag(event.dataTransfer);
+        if (!payload) return false;
+        const coords = view.posAtCoords({
+          left: event.clientX,
+          top: event.clientY,
+        });
+        if (!coords) return true;
+        event.preventDefault();
+        editor
+          ?.chain()
+          .focus()
+          .insertContentAt(coords.pos, {
+            type: "image",
+            attrs: {
+              src: payload.src,
+              alt: payload.name,
+              stored: payload.stored,
+              alignment: "center",
+            },
+          })
+          .run();
+        return true;
+      },
+      handleDOMEvents: {
+        dragover: (_view, event) => {
+          const types = event.dataTransfer?.types;
+          if (types && Array.from(types).includes(IMAGE_TRAY_DRAG_TYPE)) {
+            event.preventDefault();
+            if (event.dataTransfer) event.dataTransfer.dropEffect = "copy";
+          }
+          return false;
+        },
+      },
       attributes: {
         class:
           "cv-inline-editor focus:outline-none min-h-[30px] prose prose-slate max-w-none text-slate-800",

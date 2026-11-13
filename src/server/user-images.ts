@@ -1,4 +1,5 @@
-import { and, eq, lt, sql } from "drizzle-orm";
+import "server-only";
+import { and, desc, eq, ilike, lt, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { db, userImages, users } from "@/db";
 import { IMAGE_UPLOAD_TYPES, type ImageUploadType } from "@/lib/image-upload";
@@ -7,12 +8,17 @@ import {
   objectKeyFromPublicUrl,
   publicUrlFor,
   signStoredUpload,
-} from "@/lib/oss";
+} from "@/server/oss";
 
 export const USER_IMAGE_QUOTA_BYTES = 30 * 1024 * 1024;
 export const UPLOAD_URL_SECONDS = 300;
 
 const QUOTA_MESSAGE = "未付费用户一共只能上传 30MB";
+
+export function cleanImageName(name: string) {
+  const base = name.split(/[/\\]/).pop()?.replace(/\0/g, "").trim() ?? "";
+  return base.slice(0, 80) || "未命名";
+}
 
 async function deleteObjects(objectKeys: string[]) {
   await Promise.all(
@@ -24,6 +30,7 @@ export async function reserveUserImage(
   userId: string,
   contentType: ImageUploadType,
   byteSize: number,
+  name: string,
 ) {
   const expiredKeys: string[] = [];
   const reserved = await db.transaction(async (tx) => {
@@ -64,6 +71,7 @@ export async function reserveUserImage(
         objectKey,
         byteSize,
         contentType,
+        name: cleanImageName(name),
         status: "pending",
       })
       .returning({ id: userImages.id, objectKey: userImages.objectKey });
@@ -164,4 +172,65 @@ export async function deleteUserImageByUrl(userId: string, src: string) {
     .delete(userImages)
     .where(and(eq(userImages.id, row.id), eq(userImages.userId, userId)));
   return { ok: true as const };
+}
+
+export async function listUserImages(userId: string, query: string) {
+  const filters = [
+    eq(userImages.userId, userId),
+    eq(userImages.status, "ready"),
+  ];
+  const keyword = query.trim();
+  if (keyword) {
+    const escaped = keyword.replace(/[\\%_]/g, (char) => `\\${char}`);
+    filters.push(ilike(userImages.name, `%${escaped}%`));
+  }
+  const rows = await db
+    .select({
+      id: userImages.id,
+      name: userImages.name,
+      byteSize: userImages.byteSize,
+      objectKey: userImages.objectKey,
+    })
+    .from(userImages)
+    .where(and(...filters))
+    .orderBy(desc(userImages.createdAt))
+    .limit(200);
+
+  return rows.flatMap((row) => {
+    const publicUrl = publicUrlFor(row.objectKey);
+    if (!publicUrl) return [];
+    return [
+      {
+        id: row.id,
+        name: row.name || "未命名",
+        byteSize: row.byteSize,
+        publicUrl,
+      },
+    ];
+  });
+}
+
+export async function renameUserImage(
+  userId: string,
+  imageId: string,
+  name: string,
+) {
+  const nextName = cleanImageName(name);
+  if (nextName === "未命名" && !name.trim()) {
+    return { ok: false as const, status: 400, message: "名称不能为空" };
+  }
+  const [row] = await db
+    .update(userImages)
+    .set({ name: nextName })
+    .where(
+      and(
+        eq(userImages.id, imageId),
+        eq(userImages.userId, userId),
+        eq(userImages.status, "ready"),
+      ),
+    )
+    .returning({ name: userImages.name });
+  if (!row)
+    return { ok: false as const, status: 404, message: "找不到这张图片" };
+  return { ok: true as const, name: row.name };
 }

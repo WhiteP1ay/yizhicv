@@ -30,6 +30,8 @@ interface ResumeState {
   setRightPanelTab: (tab: RightPanelTab) => void;
   setCustomColorSlot: (index: number, color: string | null) => void;
   setConfigCardOpen: (id: string, open: boolean) => void;
+  setImageTrayOpen: (open: boolean) => void;
+  setImageTrayPosition: (x: number, y: number) => void;
   setTitle: (title: string) => void;
 
   // Layout & Design
@@ -216,6 +218,29 @@ export const useResumeStore = create<ResumeState>()(
                   ...state.resume.settings.configCards,
                   [id]: open,
                 },
+              },
+            },
+          })),
+
+        setImageTrayOpen: (open) =>
+          set((state) => ({
+            resume: {
+              ...state.resume,
+              settings: {
+                ...state.resume.settings,
+                imageTrayOpen: open,
+              },
+            },
+          })),
+
+        setImageTrayPosition: (x, y) =>
+          set((state) => ({
+            resume: {
+              ...state.resume,
+              settings: {
+                ...state.resume.settings,
+                imageTrayX: x,
+                imageTrayY: y,
               },
             },
           })),
@@ -597,6 +622,9 @@ export const useResumeStore = create<ResumeState>()(
           const {
             configCards: _configCards,
             rightPanelTab: _rightPanelTab,
+            imageTrayOpen: _imageTrayOpen,
+            imageTrayX: _imageTrayX,
+            imageTrayY: _imageTrayY,
             ...settings
           } = resume.settings;
           return { ...resume, settings };

@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { currentUser } from "@/lib/auth";
-import { completeUserImage } from "@/lib/user-images";
+import { currentUser } from "@/server/auth";
+import { completeUserImage } from "@/server/user-images";
 
 const imageIdPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
