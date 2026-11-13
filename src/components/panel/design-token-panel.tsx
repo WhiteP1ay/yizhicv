@@ -315,7 +315,7 @@ export const DesignTokenPanel: React.FC = () => {
           className="w-full h-8 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 gap-1.5 rounded-lg border-slate-200 cursor-pointer"
         >
           <RotateCcw className="size-3 text-slate-400" />
-          <span>恢复默认样式规范</span>
+          <span>恢复默认样式</span>
         </Button>
       </div>
     </div>

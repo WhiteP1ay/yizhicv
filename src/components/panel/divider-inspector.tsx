@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Info, Minus, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { Check, Info, Minus, Plus, Trash2 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -64,12 +64,6 @@ export const DividerInspector: React.FC = () => {
     }
   };
 
-  // 重置为默认浅灰 1px (若正选中分割线，同步重置其样式)
-  const handleReset = () => {
-    handleHeightChange(1);
-    handleColorChange("#e2e8f0");
-  };
-
   // 删除当前选中的分割线
   const handleDeleteSelected = () => {
     const currentEditor = getEffectiveEditor();
@@ -124,24 +118,6 @@ export const DividerInspector: React.FC = () => {
             <span>已选中</span>
           </span>
         ) : null
-      }
-      extra={
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-slate-400 font-mono">
-            {height}px · {color.toUpperCase()}
-          </span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-xs"
-            onPointerDown={(e) => e.preventDefault()}
-            onClick={handleReset}
-            className="size-5 rounded text-slate-400 hover:text-slate-700 cursor-pointer"
-            title="重置为默认浅灰 1px"
-          >
-            <RotateCcw className="size-2.5" />
-          </Button>
-        </div>
       }
       className="space-y-3.5"
     >
@@ -233,11 +209,6 @@ export const DividerInspector: React.FC = () => {
         label="分割线颜色"
         value={color}
         onChange={handleColorChange}
-        onReset={
-          color.toLowerCase() !== "#e2e8f0"
-            ? () => handleColorChange("#e2e8f0")
-            : undefined
-        }
         defaultLabel="浅灰 (默认)"
       />
 
@@ -276,20 +247,15 @@ export const DividerInspector: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-1.5">
-            <Button
-              type="button"
-              onPointerDown={(e) => e.preventDefault()}
-              onClick={handleInsert}
-              className="w-full h-8 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 gap-1.5 rounded-lg shadow-2xs transition-all cursor-pointer"
-            >
-              <Minus className="size-3.5 stroke-[2.5]" />
-              <span>插入分割线</span>
-            </Button>
-            <p className="text-[10px] text-slate-400 text-center">
-              在画布中单击已有分割线，即可直接在此二次编辑
-            </p>
-          </div>
+          <Button
+            type="button"
+            onPointerDown={(e) => e.preventDefault()}
+            onClick={handleInsert}
+            className="w-full h-8 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 gap-1.5 rounded-lg shadow-2xs transition-all cursor-pointer"
+          >
+            <Minus className="size-3.5 stroke-[2.5]" />
+            <span>插入分割线</span>
+          </Button>
         )}
       </div>
     </ConfigCard>

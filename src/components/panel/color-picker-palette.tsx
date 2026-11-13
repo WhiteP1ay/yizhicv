@@ -198,9 +198,8 @@ export const ColorPickerPalette: React.FC<ColorPickerPaletteProps> = ({
       {/* 3. 5 个自定义颜色槽位 (圈里一个加号，点击弹窗拾色器，自动保存) */}
       <Separator className="my-1.5 bg-slate-100" />
       <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-[11px]">
-          <span className="font-medium text-slate-600">自定义颜色槽</span>
-          <span className="text-[10px] text-slate-400 font-mono">5 个色槽</span>
+        <div className="text-[11px]">
+          <span className="font-medium text-slate-600">自定义颜色</span>
         </div>
 
         <div className="flex items-center gap-2 bg-white p-2 rounded-lg border border-slate-200 shadow-2xs">
@@ -219,7 +218,7 @@ export const ColorPickerPalette: React.FC<ColorPickerPaletteProps> = ({
                   onPointerDown={(e) => e.preventDefault()}
                   onClick={() => handleOpenSlotPicker(index)}
                   className="size-6 rounded-full border border-dashed border-slate-300 hover:border-blue-500 hover:bg-blue-50/50 hover:text-blue-600 text-slate-400 flex items-center justify-center transition-all cursor-pointer shadow-2xs group"
-                  title={`自定义颜色槽 ${index + 1}：点击打开拾色器`}
+                  title={`自定义颜色 ${index + 1}：点击打开拾色器`}
                 >
                   <Plus className="size-3 stroke-[2.5] transition-transform group-hover:scale-110" />
                 </button>
@@ -239,7 +238,7 @@ export const ColorPickerPalette: React.FC<ColorPickerPaletteProps> = ({
                       ? "ring-2 ring-blue-500 ring-offset-1 scale-105 border-transparent"
                       : "border-black/15 hover:scale-105"
                   }`}
-                  title={`自定义槽位 ${index + 1}：${slotColor} (单击应用 / 双击重选)`}
+                  title={`自定义颜色 ${index + 1}：${slotColor} (单击应用 / 双击重选)`}
                 >
                   {isSelected && (
                     <Check
@@ -261,7 +260,7 @@ export const ColorPickerPalette: React.FC<ColorPickerPaletteProps> = ({
                     handleClearSlot(index);
                   }}
                   className="absolute -top-1 -right-1 size-3.5 bg-slate-700 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover/slot:opacity-100 transition-opacity shadow-xs cursor-pointer z-10"
-                  title="清空此颜色槽"
+                  title="清空此颜色"
                 >
                   <X className="size-2 stroke-[3]" />
                 </button>

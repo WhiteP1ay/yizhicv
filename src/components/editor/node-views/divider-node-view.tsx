@@ -29,7 +29,7 @@ export const DividerNodeView: React.FC<NodeViewProps> = ({
       className="cv-divider-node-view relative select-none my-1.5 transition-all group print:my-2"
       data-selected={selected ? "true" : undefined}
     >
-      {/* 交互点击与悬停热区 (提供 12px 舒适高度，避免 1px 细线点不中) */}
+      {/* 点击选中分割线，线条本身不留内边距 */}
       <button
         type="button"
         onClick={handleSelect}
@@ -37,7 +37,7 @@ export const DividerNodeView: React.FC<NodeViewProps> = ({
           e.stopPropagation();
           handleSelect(e);
         }}
-        className={`w-full block py-1.5 px-1 rounded-sm cursor-pointer transition-all relative border-none bg-transparent outline-none focus:outline-none print:py-0 print:px-0 ${
+        className={`w-full block p-0 rounded-sm cursor-pointer transition-all relative border-none bg-transparent outline-none focus:outline-none ${
           selected
             ? "ring-2 ring-blue-500 bg-blue-50/25 shadow-2xs print:ring-0 print:bg-transparent"
             : "hover:bg-slate-200/50 print:hover:bg-transparent"

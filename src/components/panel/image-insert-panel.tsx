@@ -63,9 +63,6 @@ export const ImageInsertPanel: React.FC = () => {
         icon={<ImageIcon className="size-3.5 text-blue-600" />}
         className="space-y-2.5"
       >
-        <p className="text-[11px] leading-relaxed text-slate-500">
-          先放进备选，再拖进文档。
-        </p>
         <div className="grid grid-cols-2 overflow-hidden rounded-lg border border-slate-200 bg-white">
           <button
             type="button"

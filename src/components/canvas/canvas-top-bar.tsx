@@ -72,19 +72,19 @@ export const CanvasTopBar: React.FC<CanvasTopBarProps> = ({
       >
         <ToggleGroupItem
           value="single"
-          className="h-6 px-2.5 text-[11px] font-medium rounded-md gap-1 data-pressed:bg-white data-pressed:text-slate-900 data-pressed:shadow-xs text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 cursor-pointer"
+          aria-label="单列"
+          className="size-6 rounded-md p-0 data-pressed:bg-white data-pressed:text-slate-900 data-pressed:shadow-xs text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 cursor-pointer"
           title="单列文档流布局"
         >
           <RectangleVertical className="w-3 h-3" />
-          <span>单列</span>
         </ToggleGroupItem>
         <ToggleGroupItem
           value="double"
-          className="h-6 px-2.5 text-[11px] font-medium rounded-md gap-1 data-pressed:bg-white data-pressed:text-slate-900 data-pressed:shadow-xs text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 cursor-pointer"
+          aria-label="双列"
+          className="size-6 rounded-md p-0 data-pressed:bg-white data-pressed:text-slate-900 data-pressed:shadow-xs text-slate-500 hover:text-slate-800 hover:bg-slate-200/50 cursor-pointer"
           title="双栏侧边栏布局"
         >
           <Columns2 className="w-3 h-3" />
-          <span>双列</span>
         </ToggleGroupItem>
       </ToggleGroup>
     </div>

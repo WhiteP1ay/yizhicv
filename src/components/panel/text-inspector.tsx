@@ -9,7 +9,7 @@ import { ColorPickerPalette } from "./color-picker-palette";
 import { ConfigCard } from "./config-card";
 
 const FONT_SIZE_PRESETS = [
-  { label: "统一默认", value: "" },
+  { label: "默认", value: "" },
   { label: "12px", value: "12px" },
   { label: "14px", value: "14px" },
   { label: "16px", value: "16px" },
@@ -201,7 +201,7 @@ export const TextInspector: React.FC = () => {
         <div className="flex items-center justify-between text-[11px]">
           <span className="font-medium text-slate-600">字号大小</span>
           <span className="font-mono text-slate-400 text-[10px]">
-            {currentFontSize || "统一默认"}
+            {currentFontSize || "默认"}
           </span>
         </div>
 

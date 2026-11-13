@@ -346,6 +346,15 @@
   line-height: var(--cv-line-height, 1.45) !important;
 }
 
+/* 着色会把文字包进 span。标题行高比正文紧，span 若跟着正文行高，标题会被撑高 */
+#cv-print-target :is(h1, h2, h3) span {
+  line-height: inherit !important;
+}
+
+#cv-print-target :is(h1, h2, h3) span[style*="font-size"] {
+  line-height: var(--cv-line-height, 1.45) !important;
+}
+
 /* 模块间隙完全由父级 --cv-gap 驱动，消除模板内写死的 mb-4 外边距干扰，确保间隙可真正降至 0 */
 #cv-print-target .cv-section-block {
   margin-bottom: 0 !important;

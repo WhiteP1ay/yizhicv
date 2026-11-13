@@ -2,6 +2,12 @@
 
 import { useEffect } from "react";
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useLoginDialog } from "@/store/login-dialog";
 
@@ -56,28 +62,29 @@ export function AccountMenu() {
   }
 
   return (
-    <div className="flex items-center gap-1">
-      {user.avatarUrl ? (
-        // biome-ignore lint/performance/noImgElement: GitHub 头像地址固定尺寸
-        <img
-          src={user.avatarUrl}
-          alt=""
-          className="size-4 rounded-full"
-          referrerPolicy="no-referrer"
-        />
-      ) : null}
-      <span className="max-w-24 truncate text-xs text-slate-700">
-        {user.name || "已登录"}
-      </span>
-      <button
-        type="button"
-        onClick={() => {
-          void logout();
-        }}
-        className="h-7 px-2 text-xs font-medium rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100 cursor-pointer"
-      >
-        退出
-      </button>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger className="h-7 px-2 inline-flex items-center gap-1.5 rounded-md text-xs text-slate-700 outline-none hover:bg-slate-100 hover:text-slate-900 aria-expanded:bg-slate-100 cursor-pointer">
+        {user.avatarUrl ? (
+          // biome-ignore lint/performance/noImgElement: GitHub 头像地址固定尺寸
+          <img
+            src={user.avatarUrl}
+            alt=""
+            className="size-4 rounded-full"
+            referrerPolicy="no-referrer"
+          />
+        ) : null}
+        <span className="max-w-24 truncate">{user.name || "已登录"}</span>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-28 text-xs">
+        <DropdownMenuItem
+          className="text-xs cursor-pointer"
+          onClick={() => {
+            void logout();
+          }}
+        >
+          退出
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
