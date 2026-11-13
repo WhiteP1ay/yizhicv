@@ -75,6 +75,32 @@ export const phoneCodeCooldowns = pgTable("phone_code_cooldowns", {
   requestedAt: timestamp("requested_at", { withTimezone: true }).notNull(),
 });
 
+export const userImageStatuses = ["pending", "ready"] as const;
+
+export const userImages = pgTable(
+  "user_images",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    objectKey: text("object_key").notNull().unique(),
+    byteSize: integer("byte_size").notNull(),
+    contentType: text("content_type").notNull(),
+    status: text("status", { enum: userImageStatuses }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index().on(table.userId),
+    check(
+      "user_images_status_check",
+      sql`${table.status} in ('pending', 'ready')`,
+    ),
+  ],
+);
+
 export const usersRelations = relations(users, ({ many }) => ({
   identities: many(identities),
   sessions: many(sessions),
@@ -97,3 +123,4 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 export type User = typeof users.$inferSelect;
 export type Identity = typeof identities.$inferSelect;
 export type Session = typeof sessions.$inferSelect;
+export type UserImage = typeof userImages.$inferSelect;

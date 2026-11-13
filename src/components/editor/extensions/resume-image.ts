@@ -47,6 +47,11 @@ export const ResumeBlockImage = Image.extend({
           "data-alignment": attrs.alignment || "center",
         }),
       },
+      stored: {
+        default: false,
+        parseHTML: (element) => element.getAttribute("data-stored") === "true",
+        renderHTML: (attrs) => (attrs.stored ? { "data-stored": "true" } : {}),
+      },
       displayMode: {
         default: "block",
         parseHTML: (el) => el.getAttribute("data-display") || "block",
@@ -133,6 +138,11 @@ export const ResumeInlineImage = Image.extend({
         default: "inline",
         parseHTML: (el) => el.getAttribute("data-display") || "inline",
         renderHTML: () => ({ "data-display": "inline" }),
+      },
+      stored: {
+        default: false,
+        parseHTML: (element) => element.getAttribute("data-stored") === "true",
+        renderHTML: (attrs) => (attrs.stored ? { "data-stored": "true" } : {}),
       },
     };
   },

@@ -1,10 +1,10 @@
-import { connection, type NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { currentUser } from "@/lib/auth";
 import { isImageUploadType, MAX_IMAGE_UPLOAD_BYTES } from "@/lib/image-upload";
-import { signImageUpload } from "@/lib/oss";
+import { deleteUserImageByUrl, reserveUserImage } from "@/lib/user-images";
 
 export async function POST(request: NextRequest) {
-  await connection();
   const user = await currentUser(request);
   if (!user) {
     return NextResponse.json({ message: "请先登录" }, { status: 401 });
@@ -30,10 +30,39 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const signed = signImageUpload(user.id, contentType);
-  if (!signed) {
-    return NextResponse.json({ message: "对象存储还没配好" }, { status: 500 });
+  const reserved = await reserveUserImage(user.id, contentType, size);
+  if (!reserved.ok) {
+    return NextResponse.json(
+      { message: reserved.message },
+      { status: reserved.status },
+    );
   }
 
-  return NextResponse.json(signed);
+  return NextResponse.json({
+    imageId: reserved.id,
+    uploadUrl: reserved.uploadUrl,
+    publicUrl: reserved.publicUrl,
+  });
+}
+
+export async function DELETE(request: NextRequest) {
+  const user = await currentUser(request);
+  if (!user) {
+    return NextResponse.json({ message: "请先登录" }, { status: 401 });
+  }
+
+  const body: { src?: unknown } = await request.json().catch(() => ({}));
+  const src = typeof body.src === "string" ? body.src : "";
+  if (!src) {
+    return NextResponse.json({ message: "缺少图片地址" }, { status: 400 });
+  }
+
+  const removed = await deleteUserImageByUrl(user.id, src);
+  if (!removed.ok) {
+    return NextResponse.json(
+      { message: removed.message },
+      { status: removed.status },
+    );
+  }
+  return NextResponse.json({ ok: true });
 }

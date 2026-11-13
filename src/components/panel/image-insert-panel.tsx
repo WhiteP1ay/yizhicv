@@ -26,6 +26,7 @@ import {
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { isImageUploadType, MAX_IMAGE_UPLOAD_BYTES } from "@/lib/image-upload";
 import { fileNameFromImageUrl, isRemoteImageUrl } from "@/lib/image-url";
+import { releaseStoredImage } from "@/lib/release-stored-image";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { useLoginDialog } from "@/store/login-dialog";
 import { ConfigCard } from "./config-card";
@@ -47,16 +48,23 @@ export const ImageInsertPanel: React.FC = () => {
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadGeneration = useRef(0);
+  const ownedUrlRef = useRef<string | null>(null);
+  const insertedOwnedRef = useRef(false);
   const [uploading, setUploading] = useState(false);
 
   const resetForm = () => {
+    const src = ownedUrlRef.current;
+    const keep = insertedOwnedRef.current;
     uploadGeneration.current += 1;
+    ownedUrlRef.current = null;
+    insertedOwnedRef.current = false;
     setSource("choose");
     setUrlInput("");
     setPreviewFailed(false);
     setDisplayMode("block");
     setAlignment("center");
     setUploading(false);
+    if (src && !keep) void releaseStoredImage(src);
   };
 
   const handleConfirmInsert = () => {
@@ -73,6 +81,8 @@ export const ImageInsertPanel: React.FC = () => {
     }
 
     const fileName = fileNameFromImageUrl(src);
+    const stored = ownedUrlRef.current === src;
+    if (stored) insertedOwnedRef.current = true;
     if (displayMode === "inline") {
       editor
         .chain()
@@ -82,6 +92,7 @@ export const ImageInsertPanel: React.FC = () => {
           attrs: {
             src,
             alt: fileName,
+            stored,
           },
         })
         .run();
@@ -95,6 +106,7 @@ export const ImageInsertPanel: React.FC = () => {
             src,
             alt: fileName,
             alignment,
+            stored,
           },
         })
         .run();
@@ -126,11 +138,19 @@ export const ImageInsertPanel: React.FC = () => {
       });
       const permit: {
         message?: string;
+        imageId?: string;
         uploadUrl?: string;
         publicUrl?: string;
       } = await permitResponse.json().catch(() => ({}));
-      if (!permitResponse.ok || !permit.uploadUrl || !permit.publicUrl) {
-        toast.error(permit.message ?? "上传失败");
+      if (
+        !permitResponse.ok ||
+        !permit.imageId ||
+        !permit.uploadUrl ||
+        !permit.publicUrl
+      ) {
+        if (generation === uploadGeneration.current) {
+          toast.error(permit.message ?? "上传失败");
+        }
         return;
       }
 
@@ -139,13 +159,43 @@ export const ImageInsertPanel: React.FC = () => {
         headers: { "Content-Type": file.type },
         body: file,
       });
-      if (!uploadResponse.ok) {
-        toast.error("传到对象存储失败");
+      if (!uploadResponse.ok || generation !== uploadGeneration.current) {
+        await releaseStoredImage(permit.publicUrl);
+        if (generation === uploadGeneration.current) {
+          toast.error("传到对象存储失败");
+        }
         return;
       }
-      if (generation !== uploadGeneration.current) return;
 
-      setUrlInput(permit.publicUrl);
+      const completeResponse = await fetch(
+        `/api/uploads/${permit.imageId}/complete`,
+        { method: "POST" },
+      );
+      const completed: { message?: string; publicUrl?: string } =
+        await completeResponse.json().catch(() => ({}));
+      if (
+        !completeResponse.ok ||
+        !completed.publicUrl ||
+        generation !== uploadGeneration.current
+      ) {
+        await releaseStoredImage(permit.publicUrl);
+        if (generation === uploadGeneration.current) {
+          toast.error(completed.message ?? "上传没有完成");
+        }
+        return;
+      }
+
+      const previous = ownedUrlRef.current;
+      if (
+        previous &&
+        previous !== completed.publicUrl &&
+        !insertedOwnedRef.current
+      ) {
+        void releaseStoredImage(previous);
+      }
+      ownedUrlRef.current = completed.publicUrl;
+      insertedOwnedRef.current = false;
+      setUrlInput(completed.publicUrl);
       setPreviewFailed(false);
       setSource("url");
       toast.success("已上传，确认后插入到当前模块");

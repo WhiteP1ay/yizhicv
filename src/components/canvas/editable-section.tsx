@@ -21,6 +21,7 @@ import {
   ResumeInlineImage,
 } from "@/components/editor/extensions/resume-image";
 import { ResumeTable } from "@/components/editor/extensions/side-layout";
+import { StoredImageDelete } from "@/components/editor/extensions/stored-image-delete";
 import { Button } from "@/components/ui/button";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { useResumeStore } from "@/store/resume";
@@ -88,6 +89,7 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
       BlurMark,
       ResumeBlockImage,
       ResumeInlineImage,
+      StoredImageDelete,
       BubbleMenuExtension,
     ],
     content: section.content,
