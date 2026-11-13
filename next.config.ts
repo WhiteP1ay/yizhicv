@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
-  serverExternalPackages: ["svg-captcha"],
+  serverExternalPackages: ["svg-captcha", "ali-oss"],
   partialPrefetching: true,
   turbopack: {
     rules: {

@@ -6,7 +6,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { useLoginDialog } from "@/store/login-dialog";
 
 export function AccountMenu() {
-  const { status, user, reload } = useCurrentUser();
+  const { status, user } = useCurrentUser();
   const setLoginOpen = useLoginDialog((state) => state.setOpen);
 
   useEffect(() => {
@@ -32,8 +32,11 @@ export function AccountMenu() {
   }, []);
 
   const logout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    await reload();
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } finally {
+      window.location.reload();
+    }
   };
 
   if (status === "loading") {

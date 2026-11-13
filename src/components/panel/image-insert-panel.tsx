@@ -13,7 +13,7 @@ import {
   UploadCloud,
 } from "lucide-react";
 import type React from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { isImageUploadType, MAX_IMAGE_UPLOAD_BYTES } from "@/lib/image-upload";
 import { fileNameFromImageUrl, isRemoteImageUrl } from "@/lib/image-url";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { useLoginDialog } from "@/store/login-dialog";
@@ -44,13 +45,18 @@ export const ImageInsertPanel: React.FC = () => {
   const [alignment, setAlignment] = useState<"left" | "center" | "right">(
     "center",
   );
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadGeneration = useRef(0);
+  const [uploading, setUploading] = useState(false);
 
   const resetForm = () => {
+    uploadGeneration.current += 1;
     setSource("choose");
     setUrlInput("");
     setPreviewFailed(false);
     setDisplayMode("block");
     setAlignment("center");
+    setUploading(false);
   };
 
   const handleConfirmInsert = () => {
@@ -100,6 +106,56 @@ export const ImageInsertPanel: React.FC = () => {
     setModalOpen(false);
   };
 
+  const handleLocalFile = async (file: File) => {
+    if (!isImageUploadType(file.type)) {
+      toast.error("只支持 jpg、png、webp");
+      return;
+    }
+    if (file.size > MAX_IMAGE_UPLOAD_BYTES) {
+      toast.error("单张图片不能超过 5MB");
+      return;
+    }
+
+    const generation = uploadGeneration.current;
+    setUploading(true);
+    try {
+      const permitResponse = await fetch("/api/uploads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contentType: file.type, size: file.size }),
+      });
+      const permit: {
+        message?: string;
+        uploadUrl?: string;
+        publicUrl?: string;
+      } = await permitResponse.json().catch(() => ({}));
+      if (!permitResponse.ok || !permit.uploadUrl || !permit.publicUrl) {
+        toast.error(permit.message ?? "上传失败");
+        return;
+      }
+
+      const uploadResponse = await fetch(permit.uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      if (!uploadResponse.ok) {
+        toast.error("传到对象存储失败");
+        return;
+      }
+      if (generation !== uploadGeneration.current) return;
+
+      setUrlInput(permit.publicUrl);
+      setPreviewFailed(false);
+      setSource("url");
+      toast.success("已上传，确认后插入到当前模块");
+    } catch {
+      toast.error("上传失败");
+    } finally {
+      if (generation === uploadGeneration.current) setUploading(false);
+    }
+  };
+
   const urlReady = isRemoteImageUrl(urlInput.trim());
 
   return (
@@ -126,7 +182,7 @@ export const ImageInsertPanel: React.FC = () => {
         className="space-y-3"
       >
         <p className="text-[10px] text-slate-400 leading-normal">
-          外链直接写进正文。本地上传需要登录，图片以后放在服务端。
+          外链直接写进正文。本地图片会上传到对象存储，文档里只保存地址。
         </p>
       </ConfigCard>
 
@@ -162,7 +218,15 @@ export const ImageInsertPanel: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setSource("upload")}
+                onClick={() => {
+                  if (user) {
+                    setSource("upload");
+                    return;
+                  }
+                  if (authStatus === "loading") return;
+                  setModalOpen(false);
+                  setLoginOpen(true);
+                }}
                 className="p-3 rounded-lg border border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 text-left cursor-pointer transition-all"
               >
                 <UploadCloud className="size-4 text-blue-600" />
@@ -170,7 +234,7 @@ export const ImageInsertPanel: React.FC = () => {
                   本地上传
                 </span>
                 <p className="mt-1 text-[10px] leading-relaxed text-slate-400">
-                  需要登录。登录后可以裁剪，再上传
+                  需要登录。上传后文档里只保存地址
                 </p>
               </button>
             </div>
@@ -178,40 +242,36 @@ export const ImageInsertPanel: React.FC = () => {
 
           {source === "upload" && (
             <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  event.target.value = "";
+                  if (file) void handleLocalFile(file);
+                }}
+              />
               <p className="text-xs leading-relaxed text-slate-700">
-                本地上传需要登录。登录后图片会在浏览器里裁剪，再上传到服务端，不会写进本地草稿。
+                图片传到对象存储，文档里只保存地址。
               </p>
-              {user ? (
-                <p className="text-[11px] leading-relaxed text-slate-400">
-                  已登录。裁剪和上传还没接上，现在请改用图片链接。
-                </p>
-              ) : (
-                <p className="text-[11px] leading-relaxed text-slate-400">
-                  {authStatus === "loading"
-                    ? "正在确认登录状态。"
-                    : "登录后才能选择本地图片。"}
-                </p>
-              )}
               <div className="flex items-center gap-2">
-                {authStatus === "ready" && !user ? (
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={() => {
-                      setModalOpen(false);
-                      setLoginOpen(true);
-                    }}
-                  >
-                    登录
-                  </Button>
-                ) : null}
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={uploading}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {uploading ? "正在上传" : "选择图片"}
+                </Button>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setSource("url")}
+                  onClick={() => setSource("choose")}
                 >
-                  改用图片链接
+                  返回
                 </Button>
               </div>
             </div>
