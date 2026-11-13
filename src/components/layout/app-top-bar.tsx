@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
+import { AccountMenu } from "@/components/layout/account-menu";
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -217,8 +218,9 @@ export const AppTopBar: React.FC = () => {
       {/* 2. 中间：纯净留白 */}
       <div />
 
-      {/* 3. 右侧：GitHub */}
+      {/* 3. 右侧：账号与 GitHub */}
       <div className="flex items-center gap-1.5">
+        <AccountMenu />
         <a
           href="https://github.com/WhiteP1ay/yizhicv"
           target="_blank"

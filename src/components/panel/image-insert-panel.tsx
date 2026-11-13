@@ -23,14 +23,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { fileNameFromImageUrl, isRemoteImageUrl } from "@/lib/image-url";
 import { useActiveEditorStore } from "@/store/active-editor";
+import { useLoginDialog } from "@/store/login-dialog";
 import { ConfigCard } from "./config-card";
 
 type ImageSource = "choose" | "url" | "upload";
 
 export const ImageInsertPanel: React.FC = () => {
   const { getEffectiveEditor } = useActiveEditorStore();
+  const { status: authStatus, user } = useCurrentUser();
+  const setLoginOpen = useLoginDialog((state) => state.setOpen);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [source, setSource] = useState<ImageSource>("choose");
@@ -177,17 +181,39 @@ export const ImageInsertPanel: React.FC = () => {
               <p className="text-xs leading-relaxed text-slate-700">
                 本地上传需要登录。登录后图片会在浏览器里裁剪，再上传到服务端，不会写进本地草稿。
               </p>
-              <p className="text-[11px] leading-relaxed text-slate-400">
-                登录还没接上。现在请改用图片链接。
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setSource("url")}
-              >
-                改用图片链接
-              </Button>
+              {user ? (
+                <p className="text-[11px] leading-relaxed text-slate-400">
+                  已登录。裁剪和上传还没接上，现在请改用图片链接。
+                </p>
+              ) : (
+                <p className="text-[11px] leading-relaxed text-slate-400">
+                  {authStatus === "loading"
+                    ? "正在确认登录状态。"
+                    : "登录后才能选择本地图片。"}
+                </p>
+              )}
+              <div className="flex items-center gap-2">
+                {authStatus === "ready" && !user ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => {
+                      setModalOpen(false);
+                      setLoginOpen(true);
+                    }}
+                  >
+                    登录
+                  </Button>
+                ) : null}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSource("url")}
+                >
+                  改用图片链接
+                </Button>
+              </div>
             </div>
           )}
 

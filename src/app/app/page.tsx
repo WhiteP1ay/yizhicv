@@ -5,6 +5,7 @@ import type React from "react";
 import { useCallback, useEffect } from "react";
 import { Toaster } from "sonner";
 import { AppTopBar } from "@/components/layout/app-top-bar";
+import { LoginDialog } from "@/components/layout/login-dialog";
 import { RightPanel } from "@/components/panel/right-panel";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { useResumeStore } from "@/store/resume";
@@ -93,6 +94,8 @@ export default function AppPage() {
         {/* 右侧设计面板 */}
         <RightPanel />
       </div>
+
+      <LoginDialog />
 
       {/* 全局消息提示 */}
       <Toaster position="top-center" richColors />
