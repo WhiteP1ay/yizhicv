@@ -6,6 +6,7 @@ import { idbStorage } from "@/lib/idb-storage";
 import {
   defaultResume,
   type ResumeSection,
+  type RightPanelTab,
   SECTION_PRESETS,
   type YizhiResume,
 } from "@/types/resume";
@@ -26,6 +27,7 @@ interface ResumeState {
   setIsRightPanelCollapsed: (
     collapsed: boolean | ((prev: boolean) => boolean),
   ) => void;
+  setRightPanelTab: (tab: RightPanelTab) => void;
   setCustomColorSlot: (index: number, color: string | null) => void;
   setConfigCardOpen: (id: string, open: boolean) => void;
   setTitle: (title: string) => void;
@@ -159,6 +161,20 @@ export const useResumeStore = create<ResumeState>()(
                 settings: {
                   ...state.resume.settings,
                   isRightPanelCollapsed: next,
+                },
+              },
+            };
+          }),
+
+        setRightPanelTab: (tab) =>
+          set((state) => {
+            if (state.resume.settings.rightPanelTab === tab) return state;
+            return {
+              resume: {
+                ...state.resume,
+                settings: {
+                  ...state.resume.settings,
+                  rightPanelTab: tab,
                 },
               },
             };
@@ -578,7 +594,11 @@ export const useResumeStore = create<ResumeState>()(
       equality: (pastState, currentState) => {
         const withoutCards = (resume?: YizhiResume) => {
           if (!resume) return resume;
-          const { configCards: _configCards, ...settings } = resume.settings;
+          const {
+            configCards: _configCards,
+            rightPanelTab: _rightPanelTab,
+            ...settings
+          } = resume.settings;
           return { ...resume, settings };
         };
         return (

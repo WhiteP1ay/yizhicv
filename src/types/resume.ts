@@ -28,9 +28,15 @@ export type ResumeLayout = z.infer<typeof resumeLayoutSchema>;
  * 工作台偏好设置 (Workspace Settings)
  * 记录右侧面板宽度、折叠状态、脱敏模式、预览比例及 JSON 源码编辑开关
  */
+export const rightPanelTabSchema = z
+  .enum(["design", "insert", "sections", "json"])
+  .default("design");
+export type RightPanelTab = z.infer<typeof rightPanelTabSchema>;
+
 export const resumeSettingsSchema = z.object({
   rightPanelWidth: z.number().min(200).max(1000).default(336),
   isRightPanelCollapsed: z.boolean().default(false),
+  rightPanelTab: rightPanelTabSchema,
   previewScale: z.number().min(0.4).max(1.4).default(0.88),
   isBlurMode: z.boolean().default(false),
   isJsonEditorEnabled: z.boolean().default(false),
@@ -74,6 +80,7 @@ export const yizhiResumeSchema = z.object({
   settings: resumeSettingsSchema.default({
     rightPanelWidth: 336,
     isRightPanelCollapsed: false,
+    rightPanelTab: "design",
     previewScale: 0.88,
     isBlurMode: false,
     isJsonEditorEnabled: false,
@@ -264,6 +271,7 @@ export const defaultResume: YizhiResume = {
   settings: {
     rightPanelWidth: 336,
     isRightPanelCollapsed: false,
+    rightPanelTab: "design",
     previewScale: 0.88,
     isBlurMode: false,
     isJsonEditorEnabled: false,

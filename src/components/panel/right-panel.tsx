@@ -8,19 +8,18 @@ import {
   PlusCircle,
 } from "lucide-react";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useRightPanelResize } from "@/hooks/use-right-panel-resize";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { useResumeStore } from "@/store/resume";
+import type { RightPanelTab } from "@/types/resume";
 import { DesignTokenPanel } from "./design-token-panel";
 import { InsertPanel } from "./insert-panel";
 import { JsonEditorPanel } from "./json-editor-panel";
 
-type PanelTab = "design" | "insert" | "sections" | "json";
-
 interface TabItem {
-  id: PanelTab;
+  id: RightPanelTab;
   title: string;
   icon: React.ComponentType<{ className?: string }>;
 }
@@ -47,8 +46,12 @@ export const RightPanel: React.FC = () => {
   const isJsonEditorEnabled = useResumeStore(
     (state) => state.resume.settings.isJsonEditorEnabled,
   );
+  const activeTab = useResumeStore(
+    (state) => state.resume.settings.rightPanelTab,
+  );
+  const setActiveTab = useResumeStore((state) => state.setRightPanelTab);
+  const jsonWasEnabled = useRef(isJsonEditorEnabled);
   const { getEffectiveEditor, selectionTick } = useActiveEditorStore();
-  const [activeTab, setActiveTab] = useState<PanelTab | null>("design");
 
   const {
     width,
@@ -63,21 +66,28 @@ export const RightPanel: React.FC = () => {
   useEffect(() => {
     void selectionTick;
     const editor = getEffectiveEditor();
-    if (editor?.isActive("horizontalRule")) {
+    if (editor?.isActive("horizontalRule") && activeTab !== "insert") {
       setActiveTab("insert");
       setIsCollapsed(false);
     }
-  }, [selectionTick, getEffectiveEditor, setIsCollapsed]);
+  }, [
+    selectionTick,
+    getEffectiveEditor,
+    setIsCollapsed,
+    activeTab,
+    setActiveTab,
+  ]);
 
-  // 当开启 JSON 编辑器时，若当前收起则自动展开并切换到 json tab；关闭时回退到 design
+  // 刚打开 JSON 编辑时切到该标签；关掉后如果还停在 JSON，回到设计
   useEffect(() => {
-    if (isJsonEditorEnabled) {
+    if (isJsonEditorEnabled && !jsonWasEnabled.current) {
       setIsCollapsed(false);
       setActiveTab("json");
-    } else {
-      setActiveTab((prev) => (prev === "json" ? "design" : prev));
+    } else if (!isJsonEditorEnabled && activeTab === "json") {
+      setActiveTab("design");
     }
-  }, [isJsonEditorEnabled, setIsCollapsed]);
+    jsonWasEnabled.current = isJsonEditorEnabled;
+  }, [isJsonEditorEnabled, setIsCollapsed, activeTab, setActiveTab]);
 
   const availableTabs: TabItem[] = [
     ...BASE_TABS,
@@ -92,7 +102,7 @@ export const RightPanel: React.FC = () => {
       : []),
   ];
 
-  const handleTabClick = (tabId: PanelTab) => {
+  const handleTabClick = (tabId: RightPanelTab) => {
     if (isCollapsed) {
       setIsCollapsed(false);
       setActiveTab(tabId);
