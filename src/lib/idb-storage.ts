@@ -1,12 +1,6 @@
 import { clear, del, get, set } from "idb-keyval";
 import type { StateStorage } from "zustand/middleware";
 
-if (typeof window !== "undefined") {
-  void del("yizhicv_canvas_images").catch(() => {
-    // 旧图层库已删除，清不掉就留着
-  });
-}
-
 /**
  * 彻底清除所有客户端持久化数据（localStorage、sessionStorage 与 IndexedDB）
  */
