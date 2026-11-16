@@ -6,7 +6,7 @@ import BubbleMenuExtension from "@tiptap/extension-bubble-menu";
 import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
-import { TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
+import { TableHeader, TableRow } from "@tiptap/extension-table";
 import { FontSize, TextStyle } from "@tiptap/extension-text-style";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -15,6 +15,7 @@ import type React from "react";
 import { useEffect } from "react";
 import { CanvasBubbleMenu } from "@/components/editor/bubble-menu";
 import { BlurMark } from "@/components/editor/extensions/blur-mark";
+import { ResumeTableCell } from "@/components/editor/extensions/cell-vertical-align";
 import { CustomDivider } from "@/components/editor/extensions/custom-divider";
 import {
   ResumeBlockImage,
@@ -80,7 +81,7 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
       TextAlign,
       TableRow,
       TableHeader,
-      TableCell,
+      ResumeTableCell,
       TextStyle,
       Color,
       FontSize,

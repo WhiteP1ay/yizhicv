@@ -425,6 +425,7 @@
   border: none !important;
   padding: 0;
   line-height: 0;
+  /* 默认贴上边。格子写了 vertical-align: middle 或 bottom 时，以内联样式为准。 */
   vertical-align: top;
   min-width: 0;
   overflow-wrap: anywhere;

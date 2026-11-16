@@ -1,9 +1,17 @@
 "use client";
 
 import type { Editor } from "@tiptap/react";
-import { AlignCenter, AlignLeft, AlignRight } from "lucide-react";
+import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  AlignVerticalJustifyCenter,
+  AlignVerticalJustifyEnd,
+  AlignVerticalJustifyStart,
+} from "lucide-react";
 import type React from "react";
 import { toast } from "sonner";
+import type { CellVerticalAlign } from "@/components/editor/extensions/cell-vertical-align";
 import type { BlockTextAlign } from "@/components/editor/extensions/text-align";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useActiveEditorStore } from "@/store/active-editor";
@@ -19,6 +27,16 @@ const ALIGN_OPTIONS: Array<{
   { value: "right", label: "居右", icon: AlignRight },
 ];
 
+const VERTICAL_OPTIONS: Array<{
+  value: CellVerticalAlign;
+  label: string;
+  icon: typeof AlignVerticalJustifyStart;
+}> = [
+  { value: "top", label: "上对齐", icon: AlignVerticalJustifyStart },
+  { value: "middle", label: "居中", icon: AlignVerticalJustifyCenter },
+  { value: "bottom", label: "下对齐", icon: AlignVerticalJustifyEnd },
+];
+
 function currentAlign(editor: Editor | null): BlockTextAlign {
   if (!editor) return "left";
   const raw = editor.isActive("heading")
@@ -28,10 +46,18 @@ function currentAlign(editor: Editor | null): BlockTextAlign {
   return "left";
 }
 
+function currentVerticalAlign(editor: Editor | null): CellVerticalAlign | null {
+  if (!editor?.isActive("tableCell")) return null;
+  const raw = editor.getAttributes("tableCell").verticalAlign;
+  if (raw === "middle" || raw === "bottom") return raw;
+  return "top";
+}
+
 export const AlignInspector: React.FC = () => {
   const { editor, selectionTick, getEffectiveEditor } = useActiveEditorStore();
   void selectionTick;
   const align = currentAlign(editor);
+  const verticalAlign = currentVerticalAlign(editor);
 
   const apply = (next: BlockTextAlign) => {
     const current = editor ?? getEffectiveEditor();
@@ -40,6 +66,19 @@ export const AlignInspector: React.FC = () => {
       return;
     }
     current.chain().focus().setTextAlign(next).run();
+  };
+
+  const applyVertical = (next: CellVerticalAlign) => {
+    const current = editor ?? getEffectiveEditor();
+    if (!current) {
+      toast.error("请先在画布中点击一段文字");
+      return;
+    }
+    if (!current.isActive("tableCell")) {
+      toast.error("请先把光标放进左右布局的格子里");
+      return;
+    }
+    current.chain().focus().setCellVerticalAlign(next).run();
   };
 
   return (
@@ -61,6 +100,32 @@ export const AlignInspector: React.FC = () => {
         className="grid grid-cols-3 gap-1 p-1 bg-white rounded-lg border border-slate-200 shadow-2xs w-full"
       >
         {ALIGN_OPTIONS.map((option) => (
+          <ToggleGroupItem
+            key={option.value}
+            value={option.value}
+            onPointerDown={(event) => event.preventDefault()}
+            className="h-8 gap-1 rounded text-xs font-medium text-slate-600 transition-all cursor-pointer hover:bg-slate-100 hover:text-slate-900 data-pressed:bg-slate-900 data-pressed:text-white data-pressed:shadow-2xs"
+            title={option.label}
+          >
+            <option.icon className="size-3.5" />
+            <span>{option.label}</span>
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+      <p className="text-[11px] leading-relaxed text-slate-500">
+        左右两格高度不一样时，这一格的内容可以贴上边、居中或贴下边。
+      </p>
+      <ToggleGroup
+        value={verticalAlign ? [verticalAlign] : []}
+        onValueChange={(val) => {
+          const next = val[val.length - 1];
+          if (next === "top" || next === "middle" || next === "bottom") {
+            applyVertical(next);
+          }
+        }}
+        className="grid grid-cols-3 gap-1 p-1 bg-white rounded-lg border border-slate-200 shadow-2xs w-full"
+      >
+        {VERTICAL_OPTIONS.map((option) => (
           <ToggleGroupItem
             key={option.value}
             value={option.value}
