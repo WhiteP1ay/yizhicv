@@ -4,6 +4,7 @@ import { Check, Info, Minus, Plus, Trash2 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { ColorPickerPalette } from "./color-picker-palette";
 import { ConfigCard } from "./config-card";
@@ -152,27 +153,18 @@ export const DividerInspector: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-1">
-          {/* 预设高度 */}
-          {HEIGHT_PRESETS.map((h) => {
-            const isSelected = height === h;
-            return (
-              <Button
-                key={h}
-                type="button"
-                variant="outline"
-                size="xs"
-                onPointerDown={(e) => e.preventDefault()}
-                onClick={() => handleHeightChange(h)}
-                className={`h-6 flex-1 text-[11px] font-mono rounded-md transition-all cursor-pointer ${
-                  isSelected
-                    ? "bg-slate-900 text-white border-slate-900 hover:bg-slate-900 hover:text-white"
-                    : "bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border-slate-200"
-                }`}
-              >
-                {h}px
-              </Button>
-            );
-          })}
+          <SegmentedControl
+            columns={4}
+            size="xs"
+            className="min-w-0 flex-1"
+            itemClassName="font-mono"
+            value={HEIGHT_PRESETS.includes(height) ? String(height) : null}
+            options={HEIGHT_PRESETS.map((preset) => ({
+              value: String(preset),
+              label: `${preset}px`,
+            }))}
+            onValueChange={(next) => handleHeightChange(Number(next))}
+          />
 
           {/* 步进器 */}
           <div className="flex items-center gap-0.5 ml-1">

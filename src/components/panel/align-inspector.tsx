@@ -13,7 +13,7 @@ import type React from "react";
 import { toast } from "sonner";
 import type { CellVerticalAlign } from "@/components/editor/extensions/cell-vertical-align";
 import type { BlockTextAlign } from "@/components/editor/extensions/text-align";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { useActiveEditorStore } from "@/store/active-editor";
 import { ConfigCard } from "./config-card";
 
@@ -89,55 +89,21 @@ export const AlignInspector: React.FC = () => {
       icon={<AlignCenter className="size-3.5 text-blue-600" />}
       className="space-y-2.5"
     >
-      <ToggleGroup
-        value={[align]}
-        onValueChange={(val) => {
-          const next = val[val.length - 1];
-          if (next === "left" || next === "center" || next === "right") {
-            apply(next);
-          }
-        }}
-        className="grid grid-cols-3 gap-1 p-1 bg-white rounded-lg border border-slate-200 shadow-2xs w-full"
-      >
-        {ALIGN_OPTIONS.map((option) => (
-          <ToggleGroupItem
-            key={option.value}
-            value={option.value}
-            onPointerDown={(event) => event.preventDefault()}
-            className="h-8 gap-1 rounded text-xs font-medium text-slate-600 transition-all cursor-pointer hover:bg-slate-100 hover:text-slate-900 data-pressed:bg-slate-900 data-pressed:text-white data-pressed:shadow-2xs"
-            title={option.label}
-          >
-            <option.icon className="size-3.5" />
-            <span>{option.label}</span>
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+      <SegmentedControl
+        columns={3}
+        value={align}
+        options={ALIGN_OPTIONS}
+        onValueChange={apply}
+      />
       <p className="text-[11px] leading-relaxed text-slate-500">
         左右两格高度不一样时，这一格的内容可以贴上边、居中或贴下边。
       </p>
-      <ToggleGroup
-        value={verticalAlign ? [verticalAlign] : []}
-        onValueChange={(val) => {
-          const next = val[val.length - 1];
-          if (next === "top" || next === "middle" || next === "bottom") {
-            applyVertical(next);
-          }
-        }}
-        className="grid grid-cols-3 gap-1 p-1 bg-white rounded-lg border border-slate-200 shadow-2xs w-full"
-      >
-        {VERTICAL_OPTIONS.map((option) => (
-          <ToggleGroupItem
-            key={option.value}
-            value={option.value}
-            onPointerDown={(event) => event.preventDefault()}
-            className="h-8 gap-1 rounded text-xs font-medium text-slate-600 transition-all cursor-pointer hover:bg-slate-100 hover:text-slate-900 data-pressed:bg-slate-900 data-pressed:text-white data-pressed:shadow-2xs"
-            title={option.label}
-          >
-            <option.icon className="size-3.5" />
-            <span>{option.label}</span>
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+      <SegmentedControl
+        columns={3}
+        value={verticalAlign}
+        options={VERTICAL_OPTIONS}
+        onValueChange={applyVertical}
+      />
     </ConfigCard>
   );
 };

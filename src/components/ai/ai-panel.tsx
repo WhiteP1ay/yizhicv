@@ -1,22 +1,10 @@
 "use client";
 
-import { Check, MoreHorizontal, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AiChat } from "@/components/ai/ai-chat";
+import { AiChatMenu } from "@/components/ai/ai-chat-menu";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { type AiChatMode, readAiMode, writeAiMode } from "@/lib/ai-mode";
 import {
@@ -27,7 +15,6 @@ import {
 } from "@/lib/ai-thread-remote";
 import {
   AI_THREAD_LIMIT,
-  AI_THREAD_PAGE,
   type AiChatTurn,
   type AiThread,
   type AiThreadSummary,
@@ -56,7 +43,6 @@ export function AiPanel() {
   const [mode, setMode] = useState<AiChatMode | null>(null);
   const [ready, setReady] = useState(false);
   const [threads, setThreads] = useState<AiThreadSummary[]>([]);
-  const [visibleCount, setVisibleCount] = useState(AI_THREAD_PAGE);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [viewKey, setViewKey] = useState("draft");
   const [messages, setMessages] = useState<AiChatTurn[]>([]);
@@ -202,7 +188,6 @@ export function AiPanel() {
     });
   };
 
-  const visibleThreads = threads.slice(0, visibleCount);
   const currentTitle =
     threads.find((thread) => thread.id === threadId)?.title ?? "";
 
@@ -228,92 +213,17 @@ export function AiPanel() {
         >
           <Plus className="size-3.5" />
         </button>
-        <DropdownMenu
-          onOpenChange={(open) => {
-            if (open) setVisibleCount(AI_THREAD_PAGE);
-          }}
-        >
-          <DropdownMenuTrigger
-            aria-label="对话菜单"
-            title="对话菜单"
-            data-testid="ai-chat-menu"
-            className="inline-flex size-6 items-center justify-center rounded-md text-slate-500 outline-none hover:bg-slate-100 hover:text-slate-800 data-popup-open:bg-slate-100"
-          >
-            <MoreHorizontal className="size-3.5" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56! min-w-56 text-xs">
-            <DropdownMenuRadioGroup
-              value={mode ?? ""}
-              onValueChange={(value) => {
-                if (value !== "byok" && value !== "platform") return;
-                if (value === "platform") {
-                  if (status === "loading") return;
-                  if (!user) {
-                    setLoginOpen(true);
-                    return;
-                  }
-                }
-                choose(value);
-              }}
-            >
-              <DropdownMenuLabel>模式</DropdownMenuLabel>
-              <DropdownMenuRadioItem value="byok" className="text-xs">
-                BYOK
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="platform" className="text-xs">
-                账号额度
-              </DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger
-                className="text-xs"
-                data-testid="ai-thread-menu"
-              >
-                历史对话
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent
-                side="left"
-                className="w-56! min-w-56 text-xs"
-              >
-                {visibleThreads.length === 0 ? (
-                  <DropdownMenuItem disabled className="text-xs text-slate-400">
-                    暂无对话
-                  </DropdownMenuItem>
-                ) : (
-                  visibleThreads.map((thread) => (
-                    <DropdownMenuItem
-                      key={thread.id}
-                      className="text-xs"
-                      disabled={pending}
-                      data-testid="ai-thread"
-                      onClick={() => openThread(thread.id)}
-                    >
-                      <span className="min-w-0 flex-1 truncate">
-                        {thread.title}
-                      </span>
-                      {thread.id === threadId ? (
-                        <Check className="size-3.5 text-slate-500" />
-                      ) : null}
-                    </DropdownMenuItem>
-                  ))
-                )}
-                {threads.length > visibleCount ? (
-                  <DropdownMenuItem
-                    className="justify-center text-[11px] text-slate-500"
-                    closeOnClick={false}
-                    data-testid="ai-threads-more"
-                    onClick={() =>
-                      setVisibleCount((count) => count + AI_THREAD_PAGE)
-                    }
-                  >
-                    加载更多
-                  </DropdownMenuItem>
-                ) : null}
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <AiChatMenu
+          mode={mode}
+          authStatus={status}
+          signedIn={Boolean(user)}
+          pending={pending}
+          threads={threads}
+          activeId={threadId}
+          onMode={choose}
+          onLogin={() => setLoginOpen(true)}
+          onOpenThread={openThread}
+        />
       </div>
 
       {mode ? (
@@ -341,7 +251,6 @@ export function AiPanel() {
           </Button>
           <Button
             type="button"
-            variant="outline"
             className="w-full"
             data-testid="ai-direct"
             onClick={() => {
