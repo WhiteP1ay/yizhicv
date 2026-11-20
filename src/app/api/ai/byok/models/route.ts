@@ -1,10 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import {
-  isAiProviderId,
-  parseByokApiKey,
-  parseByokCustom,
-} from "@/lib/ai-providers";
-import { ByokEndpointError } from "@/server/ai-providers";
+import { isAiProviderId, parseByokApiKey } from "@/lib/ai-providers";
 import { currentUser } from "@/server/auth";
 import { ByokStoreError, readByokSecret } from "@/server/byok-store";
 import {
@@ -19,10 +14,7 @@ function failure(error: unknown) {
       { status: error.status },
     );
   }
-  if (
-    error instanceof ProviderModelsError ||
-    error instanceof ByokEndpointError
-  ) {
+  if (error instanceof ProviderModelsError) {
     return NextResponse.json(
       { message: error.message },
       { status: error.status },
@@ -35,15 +27,9 @@ export async function POST(request: NextRequest) {
   const body: {
     provider?: unknown;
     apiKey?: unknown;
-    baseUrl?: unknown;
-    wire?: unknown;
   } = await request.json().catch(() => ({}));
   if (!isAiProviderId(body.provider)) {
     return NextResponse.json({ message: "请选择服务商" }, { status: 400 });
-  }
-  const custom = parseByokCustom(body.provider, body.baseUrl, body.wire);
-  if (custom && "error" in custom) {
-    return NextResponse.json({ message: custom.error }, { status: 400 });
   }
   const submitted = parseByokApiKey(body.apiKey);
   if (submitted === null) {
@@ -69,11 +55,7 @@ export async function POST(request: NextRequest) {
       }
       apiKey = existing.apiKey;
     }
-    const models = await listProviderModels(
-      body.provider,
-      apiKey,
-      custom ?? undefined,
-    );
+    const models = await listProviderModels(body.provider, apiKey);
     return NextResponse.json({ models });
   } catch (error) {
     return failure(error);

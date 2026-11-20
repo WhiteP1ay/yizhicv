@@ -6,7 +6,6 @@ import {
   settleDirectUse,
 } from "@/server/ai-ledger";
 import { estimatePromptTokens, MAX_OUTPUT_TOKENS } from "@/server/ai-pricing";
-import { ByokEndpointError } from "@/server/ai-providers";
 import { currentUser } from "@/server/auth";
 import { ByokStoreError, readByokSecret } from "@/server/byok-store";
 import {
@@ -55,7 +54,7 @@ function failureMessage(error: unknown, mode: "platform" | "byok") {
   ) {
     return { status: 400, message: "API key 无效" };
   }
-  if (error instanceof ByokStoreError || error instanceof ByokEndpointError) {
+  if (error instanceof ByokStoreError) {
     return { status: error.status, message: error.message };
   }
   if (error instanceof Error && error.name === "TimeoutError") {
@@ -97,8 +96,6 @@ export async function POST(request: NextRequest) {
         provider: saved.provider,
         model: saved.model,
         apiKey: saved.apiKey,
-        baseUrl: saved.baseUrl,
-        wire: saved.wire,
         messages,
         maxTokens: MAX_OUTPUT_TOKENS,
       });

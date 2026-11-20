@@ -1,14 +1,7 @@
 import "server-only";
 
-import {
-  type AiProviderId,
-  type ByokWire,
-  parseByokModel,
-} from "@/lib/ai-providers";
-import {
-  ByokEndpointError,
-  resolveProviderEndpoint,
-} from "@/server/ai-providers";
+import { type AiProviderId, parseByokModel } from "@/lib/ai-providers";
+import { resolveProviderEndpoint } from "@/server/ai-providers";
 
 export class ProviderModelsError extends Error {
   status: number;
@@ -63,9 +56,8 @@ function upstreamFailure(status: number): never {
 export async function listProviderModels(
   provider: AiProviderId,
   apiKey: string,
-  custom?: { baseUrl?: string | null; wire?: ByokWire | null },
 ) {
-  const endpoint = await resolveProviderEndpoint(provider, custom);
+  const endpoint = resolveProviderEndpoint(provider);
   const headers: Record<string, string> = { Accept: "application/json" };
   if (endpoint.wire === "anthropic") {
     headers["x-api-key"] = apiKey;
@@ -95,12 +87,7 @@ export async function listProviderModels(
       url = nextPage(url, payload);
     }
   } catch (error) {
-    if (
-      error instanceof ProviderModelsError ||
-      error instanceof ByokEndpointError
-    ) {
-      throw error;
-    }
+    if (error instanceof ProviderModelsError) throw error;
     if (error instanceof Error && error.name === "TimeoutError") {
       throw new ProviderModelsError("获取模型超时", 504);
     }

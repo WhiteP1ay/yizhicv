@@ -1,0 +1,38 @@
+[
+  {
+    "available": true,
+    "groups": ["B"],
+    "highlight": false,
+    "indicator": "外观喜好度",
+    "mean": 7.16,
+    "pValueDescriptions": [
+      "785 / 475 校正后P=0.03097024644249439 显著=true",
+      "902 / 475 校正后P=0.050062031636905896 显著=false"
+    ],
+    "sample": "475"
+  },
+  {
+    "available": true,
+    "groups": ["A"],
+    "highlight": true,
+    "indicator": "外观喜好度",
+    "mean": 8.5,
+    "pValueDescriptions": [
+      "785 / 902 校正后P=0.050062031636905896 显著=false",
+      "785 / 475 校正后P=0.03097024644249439 显著=true"
+    ],
+    "sample": "785"
+  },
+  {
+    "available": true,
+    "groups": ["A", "B"],
+    "highlight": false,
+    "indicator": "外观喜好度",
+    "mean": 7.83,
+    "pValueDescriptions": [
+      "785 / 902 校正后P=0.050062031636905896 显著=false",
+      "902 / 475 校正后P=0.050062031636905896 显著=false"
+    ],
+    "sample": "902"
+  }
+]

@@ -1,10 +1,5 @@
 import { z } from "zod";
 
-/**
- * 极致纯粹的 Section 积木块
- * 彻底消除冗余字段（无 type、无 title、无 showHeader）。
- * 标题、正文、时间轴与联系方式全部内联于 Tiptap 富文本 HTML 中，所见即所得。
- */
 export const resumeSectionSchema = z.object({
   id: z.string(),
   slot: z.enum(["main", "sidebar"]).default("main"),
@@ -13,21 +8,11 @@ export const resumeSectionSchema = z.object({
 });
 export type ResumeSection = z.infer<typeof resumeSectionSchema>;
 
-/**
- * 双槽位自适应布局配置 (Unified Slot Grid)
- * 摒弃冗余的 mode 与 position 字段：
- * - sidebarWidth === 0: 纯单栏自然文档流
- * - sidebarWidth > 0: 开启侧边栏 (默认 260px，支持 180~360px 自由拖拽)
- */
 export const resumeLayoutSchema = z.object({
   sidebarWidth: z.number().min(0).max(400).default(260),
 });
 export type ResumeLayout = z.infer<typeof resumeLayoutSchema>;
 
-/**
- * 工作台偏好设置 (Workspace Settings)
- * 记录右侧面板宽度、折叠状态、脱敏模式、AI 标签、预览比例及 JSON 源码编辑开关
- */
 export const rightPanelTabSchema = z
   .enum(["design", "insert", "sections", "json", "ai"])
   .default("design");
@@ -225,24 +210,6 @@ export const SECTION_PRESETS: Record<string, SectionPreset> = {
 `.trim(),
   },
 };
-
-/**
- * 运行时动态提取 Section 概要显示名（用于图层列表或调试）
- */
-export function getSectionLabel(content: string): string {
-  if (!content) return "空白模块";
-  // 抓取第一个 <h2> 或 <h1>
-  const headingMatch = content.match(/<h[1-3][^>]*>([^<]+)<\/h[1-3]>/i);
-  if (headingMatch?.[1]) {
-    return headingMatch[1].trim();
-  }
-  // 抓取首行文本
-  const textMatch = content
-    .replace(/<[^>]+>/g, " ")
-    .trim()
-    .slice(0, 12);
-  return textMatch ? `${textMatch}...` : "内容模块";
-}
 
 /**
  * 提取简历智能导出文件名（优先级：用户自定义标题 > 网页内第一条姓名 > 保底时间戳）

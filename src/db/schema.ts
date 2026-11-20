@@ -113,8 +113,8 @@ export const aiByokProviders = [
   "deepseek",
   "groq",
   "bailian",
+  "siliconflow",
   "openrouter",
-  "custom",
 ] as const;
 
 /**
@@ -129,10 +129,6 @@ export const aiByok = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     provider: text("provider", { enum: aiByokProviders }).notNull(),
     model: text("model"),
-    /** 仅自定义服务商。OpenAI 兼容或 Anthropic 兼容的根地址，不含末尾斜杠。 */
-    baseUrl: text("base_url"),
-    /** 仅自定义服务商：openai 或 anthropic。 */
-    wire: text("wire"),
     keyCiphertext: text("key_ciphertext").notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
@@ -141,19 +137,7 @@ export const aiByok = pgTable(
   (table) => [
     check(
       "ai_byok_provider_check",
-      sql`${table.provider} in ('openai', 'anthropic', 'google', 'deepseek', 'groq', 'bailian', 'openrouter', 'custom')`,
-    ),
-    check(
-      "ai_byok_custom_check",
-      sql`(
-        ${table.provider} = 'custom'
-        and ${table.baseUrl} is not null
-        and ${table.wire} in ('openai', 'anthropic')
-      ) or (
-        ${table.provider} <> 'custom'
-        and ${table.baseUrl} is null
-        and ${table.wire} is null
-      )`,
+      sql`${table.provider} in ('openai', 'anthropic', 'google', 'deepseek', 'groq', 'bailian', 'siliconflow', 'openrouter')`,
     ),
   ],
 );

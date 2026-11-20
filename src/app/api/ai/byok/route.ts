@@ -2,13 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import {
   isAiProviderId,
   parseByokApiKey,
-  parseByokCustom,
   parseByokModel,
 } from "@/lib/ai-providers";
-import {
-  ByokEndpointError,
-  resolveProviderEndpoint,
-} from "@/server/ai-providers";
 import { currentUser } from "@/server/auth";
 import {
   ByokStoreError,
@@ -33,10 +28,7 @@ function storeFailure(error: unknown) {
 }
 
 function modelsFailure(error: unknown) {
-  if (
-    error instanceof ProviderModelsError ||
-    error instanceof ByokEndpointError
-  ) {
+  if (error instanceof ProviderModelsError) {
     return NextResponse.json(
       { message: error.message },
       { status: error.status },
@@ -71,22 +63,13 @@ export async function PUT(request: NextRequest) {
     provider?: unknown;
     apiKey?: unknown;
     model?: unknown;
-    baseUrl?: unknown;
-    wire?: unknown;
   } = await request.json().catch(() => ({}));
   if (!isAiProviderId(body.provider)) {
     return NextResponse.json({ message: "请选择服务商" }, { status: 400 });
   }
-  const custom = parseByokCustom(body.provider, body.baseUrl, body.wire);
-  if (custom && "error" in custom) {
-    return NextResponse.json({ message: custom.error }, { status: 400 });
-  }
   const model = parseByokModel(body.model);
   if (!model) {
-    return NextResponse.json(
-      { message: body.provider === "custom" ? "请填写模型" : "请选择模型" },
-      { status: 400 },
-    );
+    return NextResponse.json({ message: "请选择模型" }, { status: 400 });
   }
   const submitted = parseByokApiKey(body.apiKey);
   if (submitted === null) {
@@ -105,29 +88,21 @@ export async function PUT(request: NextRequest) {
       }
       apiKey = existing.apiKey;
     }
-    await resolveProviderEndpoint(body.provider, custom ?? undefined);
-    if (!custom) {
-      const models = await listProviderModels(body.provider, apiKey);
-      if (!models.includes(model)) {
-        return NextResponse.json(
-          { message: "这个模型当前不可用，请重新获取" },
-          { status: 400 },
-        );
-      }
+    const models = await listProviderModels(body.provider, apiKey);
+    if (!models.includes(model)) {
+      return NextResponse.json(
+        { message: "这个模型当前不可用，请重新获取" },
+        { status: 400 },
+      );
     }
-    await writeByokSecret(user.id, body.provider, apiKey, model, custom);
+    await writeByokSecret(user.id, body.provider, apiKey, model);
     return NextResponse.json({
       provider: body.provider,
       model,
-      baseUrl: custom?.baseUrl ?? null,
-      wire: custom?.wire ?? null,
       configured: true,
     });
   } catch (error) {
-    if (
-      error instanceof ProviderModelsError ||
-      error instanceof ByokEndpointError
-    ) {
+    if (error instanceof ProviderModelsError) {
       return modelsFailure(error);
     }
     return storeFailure(error);

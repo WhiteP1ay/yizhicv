@@ -1,8 +1,4 @@
-import {
-  type AiProviderId,
-  type ByokWire,
-  parseInlineByok,
-} from "@/lib/ai-providers";
+import { type AiProviderId, parseInlineByok } from "@/lib/ai-providers";
 
 const STORAGE_KEY = "yizhicv.ai-byok.v1";
 export const BYOK_SYNC_FLAG = "yizhicv.ai-byok-sync";
@@ -11,8 +7,6 @@ export type LocalByok = {
   provider: AiProviderId;
   model: string;
   apiKey: string;
-  baseUrl: string | null;
-  wire: ByokWire | null;
 };
 
 export function readLocalByok(): LocalByok | null {
@@ -49,9 +43,6 @@ export async function syncLocalByok() {
         provider: local.provider,
         model: local.model,
         apiKey: local.apiKey,
-        ...(local.baseUrl && local.wire
-          ? { baseUrl: local.baseUrl, wire: local.wire }
-          : {}),
       }),
     });
     const payload: { message?: string } = await response

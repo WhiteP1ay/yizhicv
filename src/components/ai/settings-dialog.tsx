@@ -21,11 +21,8 @@ import { WELCOME_GRANT_PICO_CNY } from "@/lib/ai-money";
 import {
   AI_PROVIDERS,
   type AiProviderId,
-  type ByokWire,
   isAiProviderId,
-  isByokWire,
   parseByokApiKey,
-  parseByokBaseUrl,
   parseByokModel,
 } from "@/lib/ai-providers";
 import { useSettingsDialog } from "@/store/api-key-dialog";
@@ -55,10 +52,6 @@ export function SettingsDialog() {
   const askedLogin = useRef(false);
   const [provider, setProvider] = useState<AiProviderId>("openai");
   const [savedProvider, setSavedProvider] = useState<AiProviderId | null>(null);
-  const [wire, setWire] = useState<ByokWire>("openai");
-  const [savedWire, setSavedWire] = useState<ByokWire | null>(null);
-  const [baseUrl, setBaseUrl] = useState("");
-  const [savedBaseUrl, setSavedBaseUrl] = useState<string | null>(null);
   const [model, setModel] = useState("");
   const [savedModel, setSavedModel] = useState<string | null>(null);
   const [models, setModels] = useState<string[]>([]);
@@ -109,22 +102,14 @@ export function SettingsDialog() {
       setModel(local.model);
       setSavedModel(local.model);
       setModels(local.model ? [local.model] : []);
-      setBaseUrl(local.baseUrl ?? "");
-      setSavedBaseUrl(local.baseUrl);
-      setWire(local.wire ?? "openai");
-      setSavedWire(local.wire);
       setConfigured(true);
       setKeySource("local");
     } else if (!user) {
       setModels([]);
       setModel("");
-      setBaseUrl("");
-      setWire("openai");
       setConfigured(false);
       setSavedProvider(null);
       setSavedModel(null);
-      setSavedBaseUrl(null);
-      setSavedWire(null);
       setKeySource(null);
     }
 
@@ -140,19 +125,13 @@ export function SettingsDialog() {
       setKeySource(null);
       setSavedProvider(null);
       setSavedModel(null);
-      setSavedBaseUrl(null);
-      setSavedWire(null);
       setModels([]);
       setModel("");
-      setBaseUrl("");
-      setWire("openai");
       void fetch("/api/ai/byok")
         .then(async (response) => {
           const payload: {
             provider?: string;
             model?: string | null;
-            baseUrl?: string | null;
-            wire?: string | null;
             configured?: boolean;
           } = await response.json().catch(() => ({}));
           if (cancelled || !response.ok || payload.configured !== true) return;
@@ -163,18 +142,11 @@ export function SettingsDialog() {
             typeof payload.model === "string" && payload.model
               ? payload.model
               : "";
-          const nextBase =
-            typeof payload.baseUrl === "string" ? payload.baseUrl : "";
-          const nextWire = isByokWire(payload.wire) ? payload.wire : "openai";
           setProvider(next);
           setSavedProvider(next);
           setSavedModel(nextModel || null);
-          setSavedBaseUrl(nextBase || null);
-          setSavedWire(isByokWire(payload.wire) ? payload.wire : null);
           setModel(nextModel);
           setModels(nextModel ? [nextModel] : []);
-          setBaseUrl(nextBase);
-          setWire(nextWire);
           setConfigured(true);
           setKeySource("account");
         })
@@ -226,8 +198,6 @@ export function SettingsDialog() {
       toast.error("请填写 API key");
       return;
     }
-    const custom = customFields();
-    if (custom === false) return;
     setFetching(true);
     try {
       const response = await fetch("/api/ai/byok/models", {
@@ -236,7 +206,6 @@ export function SettingsDialog() {
         body: JSON.stringify({
           provider,
           ...(nextKey ? { apiKey: nextKey } : {}),
-          ...(custom ?? {}),
         }),
       });
       const payload: { message?: string; models?: string[] } = await response
@@ -254,11 +223,7 @@ export function SettingsDialog() {
         (item) => typeof item === "string" && item,
       );
       setModels(nextModels);
-      setModel((current) =>
-        nextModels.includes(current) || (provider === "custom" && current)
-          ? current
-          : "",
-      );
+      setModel((current) => (nextModels.includes(current) ? current : ""));
       toast.success(`已获取 ${nextModels.length} 个模型`);
     } catch {
       toast.error("暂时拉不到模型列表");
@@ -276,28 +241,19 @@ export function SettingsDialog() {
     }
     const parsedModel = parseByokModel(model);
     if (!parsedModel) {
-      toast.error(provider === "custom" ? "请填写模型" : "请先获取并选择模型");
+      toast.error("请先获取并选择模型");
       return;
     }
-    const custom = customFields();
-    if (custom === false) return;
-    const base = custom?.baseUrl ?? null;
-    const nextWire = custom?.wire ?? null;
     writeLocalByok({
       provider,
       model: parsedModel,
       apiKey: parsedKey,
-      baseUrl: base,
-      wire: nextWire,
     });
     setConfigured(true);
     setKeySource("local");
     setSavedProvider(provider);
     setSavedModel(parsedModel);
-    setSavedBaseUrl(base);
-    setSavedWire(nextWire);
     setModel(parsedModel);
-    if (base) setBaseUrl(base);
     setApiKey("");
     toast.success("已保存在这台浏览器");
   };
@@ -337,12 +293,8 @@ export function SettingsDialog() {
     setKeySource(null);
     setSavedProvider(null);
     setSavedModel(null);
-    setSavedBaseUrl(null);
-    setSavedWire(null);
     setModel("");
     setModels([]);
-    setBaseUrl("");
-    setWire("openai");
     setApiKey("");
   };
 
@@ -359,20 +311,6 @@ export function SettingsDialog() {
       return;
     }
     toast.success("已清除");
-  };
-
-  const customFields = () => {
-    if (provider !== "custom") return null;
-    const parsed = parseByokBaseUrl(baseUrl);
-    if (parsed === "") {
-      toast.error("请填写 base URL");
-      return false;
-    }
-    if (!parsed) {
-      toast.error("base URL 格式不正确");
-      return false;
-    }
-    return { baseUrl: parsed, wire };
   };
 
   const fieldClass =
@@ -411,7 +349,8 @@ export function SettingsDialog() {
             <section className="mt-5">
               <h3 className="text-xs font-medium text-slate-800">BYOK 模式</h3>
               <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
-                使用你自己的 API key，不消耗账号额度。配置默认存在这台浏览器，登录并同步后可跨设备使用。
+                使用你自己的 API
+                key，不消耗账号额度。配置默认存在这台浏览器，登录并同步后可跨设备使用。
               </p>
               <form
                 className="mt-3 space-y-2.5"
@@ -431,8 +370,6 @@ export function SettingsDialog() {
                       const next = event.target.value;
                       setProvider(next);
                       if (next === savedProvider) {
-                        setBaseUrl(savedBaseUrl ?? "");
-                        setWire(savedWire ?? "openai");
                         if (savedModel) {
                           setModel(savedModel);
                           setModels([savedModel]);
@@ -442,8 +379,6 @@ export function SettingsDialog() {
                         }
                         return;
                       }
-                      setBaseUrl("");
-                      setWire("openai");
                       setModel("");
                       setModels([]);
                     }}
@@ -455,43 +390,6 @@ export function SettingsDialog() {
                     ))}
                   </select>
                 </label>
-                {provider === "custom" ? (
-                  <>
-                    <label className="block space-y-1.5">
-                      <span className="text-[11px] text-slate-500">
-                        接口格式
-                      </span>
-                      <select
-                        data-testid="api-key-wire"
-                        value={wire}
-                        className={fieldClass}
-                        onChange={(event) => {
-                          if (isByokWire(event.target.value)) {
-                            setWire(event.target.value);
-                          }
-                        }}
-                      >
-                        <option value="openai">OpenAI 兼容</option>
-                        <option value="anthropic">Anthropic 兼容</option>
-                      </select>
-                    </label>
-                    <label className="block space-y-1.5">
-                      <span className="text-[11px] text-slate-500">
-                        Base URL
-                      </span>
-                      <input
-                        data-testid="api-key-base-url"
-                        type="url"
-                        autoComplete="off"
-                        spellCheck={false}
-                        value={baseUrl}
-                        placeholder="https://example.com/v1"
-                        className={fieldClass}
-                        onChange={(event) => setBaseUrl(event.target.value)}
-                      />
-                    </label>
-                  </>
-                ) : null}
                 <label className="block space-y-1.5">
                   <span className="text-[11px] text-slate-500">API key</span>
                   <input
@@ -525,45 +423,25 @@ export function SettingsDialog() {
                     {fetching ? "获取中" : "获取模型"}
                   </Button>
                 </div>
-                {provider === "custom" ? (
-                  <label className="block space-y-1.5">
-                    <span className="text-[11px] text-slate-500">模型</span>
-                    <input
-                      data-testid="api-key-model"
-                      list="byok-model-options"
-                      value={model}
-                      placeholder="获取列表，或直接填写模型 id"
-                      spellCheck={false}
-                      className={fieldClass}
-                      onChange={(event) => setModel(event.target.value)}
-                    />
-                    <datalist id="byok-model-options">
-                      {models.map((item) => (
-                        <option key={item} value={item} />
-                      ))}
-                    </datalist>
-                  </label>
-                ) : (
-                  <label className="block space-y-1.5">
-                    <span className="text-[11px] text-slate-500">模型</span>
-                    <select
-                      data-testid="api-key-model"
-                      value={model}
-                      disabled={models.length === 0}
-                      className={`${fieldClass} disabled:bg-slate-50 disabled:text-slate-400`}
-                      onChange={(event) => setModel(event.target.value)}
-                    >
-                      <option value="">
-                        {models.length === 0 ? "先获取模型" : "选择模型"}
+                <label className="block space-y-1.5">
+                  <span className="text-[11px] text-slate-500">模型</span>
+                  <select
+                    data-testid="api-key-model"
+                    value={model}
+                    disabled={models.length === 0}
+                    className={`${fieldClass} disabled:bg-slate-50 disabled:text-slate-400`}
+                    onChange={(event) => setModel(event.target.value)}
+                  >
+                    <option value="">
+                      {models.length === 0 ? "先获取模型" : "选择模型"}
+                    </option>
+                    {models.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
                       </option>
-                      {models.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                )}
+                    ))}
+                  </select>
+                </label>
                 <div className="flex gap-2 pt-1">
                   <Button
                     type="submit"
@@ -603,9 +481,7 @@ export function SettingsDialog() {
 
             <section className="mt-6 border-t border-slate-100 pt-5">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-xs font-medium text-slate-800">
-                  账号额度
-                </h3>
+                <h3 className="text-xs font-medium text-slate-800">账号额度</h3>
                 {user && allowance !== null ? (
                   <span className="text-[11px] text-slate-400">
                     剩余 {percent}%

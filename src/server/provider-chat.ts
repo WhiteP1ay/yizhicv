@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { AiProviderId, ByokWire } from "@/lib/ai-providers";
+import type { AiProviderId } from "@/lib/ai-providers";
 import { resolveProviderEndpoint } from "@/server/ai-providers";
 
 type ChatTurn = { role: "user" | "assistant"; content: string };
@@ -38,15 +38,10 @@ export async function completeByokChat(options: {
   provider: AiProviderId;
   model: string;
   apiKey: string;
-  baseUrl?: string | null;
-  wire?: ByokWire | null;
   messages: ChatTurn[];
   maxTokens: number;
 }) {
-  const endpoint = await resolveProviderEndpoint(options.provider, {
-    baseUrl: options.baseUrl,
-    wire: options.wire,
-  });
+  const endpoint = resolveProviderEndpoint(options.provider);
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
