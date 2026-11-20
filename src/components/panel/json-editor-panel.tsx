@@ -36,7 +36,7 @@ export const JsonEditorPanel: React.FC = () => {
         setLastSyncedJson(currentInStore);
         setError(null);
       } catch {
-        // ignore
+        // 忽略
       }
     }
   }, [resume, hasUnsyncedChanges]);
@@ -221,7 +221,7 @@ export const JsonEditorPanel: React.FC = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      // ignore
+      // 忽略
     }
   };
 

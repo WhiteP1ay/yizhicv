@@ -7,6 +7,7 @@ import {
   EyeOff,
   FileCode,
   FilePlus,
+  Files,
   Images,
   Printer,
   Redo2,
@@ -17,7 +18,7 @@ import {
   Undo2,
   Upload,
 } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { AccountMenu } from "@/components/layout/account-menu";
@@ -41,6 +42,7 @@ import { useSettingsDialog } from "@/store/api-key-dialog";
 import { useResumeStore } from "@/store/resume";
 
 export const AppTopBar: React.FC = () => {
+  const router = useRouter();
   const openSettings = useSettingsDialog((state) => state.openDialog);
   const [settingsShortcut, setSettingsShortcut] = useState("Ctrl+,");
   const { canUndo, canRedo, undo, redo, undoShortcut, redoShortcut } =
@@ -85,25 +87,41 @@ export const AppTopBar: React.FC = () => {
 
       {/* 1. 左侧：品牌与菜单栏 */}
       <div className="flex items-center gap-1">
-        <Link
-          href="/"
-          title="返回官网首页"
-          className="h-7 px-2 flex items-center text-xs font-bold text-slate-900 tracking-tight hover:opacity-75 transition-opacity select-none"
-        >
-          一纸简历
-        </Link>
-
-        {/* 品牌与菜单分隔线 */}
-        <Separator
-          orientation="vertical"
-          className="h-3.5 mx-0.5 bg-slate-200"
-        />
-
-        {/* 桌面级菜单栏 (shadcn Menubar 原生提供点击展开、悬停切换、键盘导航与子菜单能力) */}
         <Menubar
           data-testid="top-menu-bar"
           className="h-auto border-none bg-transparent p-0 gap-0.5 shadow-none"
         >
+          <MenubarMenu>
+            <MenubarTrigger className="h-7 px-2 text-xs font-bold rounded-md text-slate-900 tracking-tight hover:bg-slate-100 data-[state=open]:bg-slate-200 data-[state=open]:text-slate-900 cursor-pointer">
+              一纸简历
+            </MenubarTrigger>
+            <MenubarContent className="min-w-44 text-xs">
+              <MenubarItem
+                onClick={() => router.push("/list")}
+                className="text-xs gap-2 cursor-pointer"
+              >
+                <Files className="size-3.5 text-slate-500" />
+                <span>我的简历</span>
+              </MenubarItem>
+              <MenubarItem
+                onClick={() => openSettings()}
+                className="text-xs gap-2 cursor-pointer"
+                data-testid="api-key-menu"
+              >
+                <Settings className="size-3.5 text-slate-500" />
+                <span>设置</span>
+                <MenubarShortcut className="tracking-normal">
+                  {settingsShortcut}
+                </MenubarShortcut>
+              </MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
+
+          <Separator
+            orientation="vertical"
+            className="h-3.5 mx-0.5 bg-slate-200"
+          />
+
           {/* 文件菜单 */}
           <MenubarMenu>
             <MenubarTrigger className="h-7 px-2.5 text-xs font-medium rounded-md text-slate-700 hover:text-slate-900 hover:bg-slate-100 data-[state=open]:bg-slate-200 data-[state=open]:text-slate-900 cursor-pointer">
@@ -160,20 +178,6 @@ export const AppTopBar: React.FC = () => {
                   </MenubarItem>
                 </MenubarSubContent>
               </MenubarSub>
-
-              <MenubarSeparator />
-
-              <MenubarItem
-                onClick={() => openSettings()}
-                className="text-xs gap-2 cursor-pointer"
-                data-testid="api-key-menu"
-              >
-                <Settings className="size-3.5 text-slate-500" />
-                <span>设置</span>
-                <MenubarShortcut className="tracking-normal">
-                  {settingsShortcut}
-                </MenubarShortcut>
-              </MenubarItem>
             </MenubarContent>
           </MenubarMenu>
 

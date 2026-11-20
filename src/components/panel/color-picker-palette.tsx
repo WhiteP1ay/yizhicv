@@ -113,7 +113,7 @@ export const ColorPickerPalette: React.FC<ColorPickerPaletteProps> = ({
             input.showPicker();
             return;
           } catch {
-            // fallback to click
+            // 退回点击
           }
         }
         input.click();

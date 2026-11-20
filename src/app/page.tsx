@@ -36,10 +36,10 @@ export default function HomePage() {
             <SiGithub className="w-4 h-4" />
           </a>
           <Link
-            href="/app"
+            href="/list"
             className="h-8 px-3.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium rounded-lg inline-flex items-center gap-1.5 transition-all shadow-xs hover:shadow-md"
           >
-            <span>打开编辑器</span>
+            <span>我的简历</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -71,10 +71,10 @@ export default function HomePage() {
         {/* 行动号召按钮组 */}
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mb-16">
           <Link
-            href="/app"
+            href="/list"
             className="w-full sm:w-auto h-11 px-7 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl inline-flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
           >
-            <span>立即进入编辑器</span>
+            <span>进入我的简历</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
 
@@ -108,10 +108,11 @@ export default function HomePage() {
               <ShieldCheck className="w-4 h-4" />
             </div>
             <h3 className="text-sm font-semibold text-slate-900 mb-1">
-              本地优先与隐私脱敏
+              登录同步与隐私脱敏
             </h3>
             <p className="text-xs text-slate-500 leading-relaxed">
-              数据 100% 留存在浏览器本地与 JSON 文件，支持敏感信息高斯模糊遮盖。
+              未登录时简历留在这台浏览器，登录后同步到账号。支持导出
+              JSON，也能把敏感信息模糊掉。
             </p>
           </div>
 

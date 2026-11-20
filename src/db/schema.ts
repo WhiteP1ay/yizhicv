@@ -306,6 +306,29 @@ export const aiThreadsRelations = relations(aiThreads, ({ one }) => ({
   }),
 }));
 
+/** 登录用户的简历。未登录的简历只留在这台浏览器。 */
+export const resumes = pgTable(
+  "resumes",
+  {
+    id: uuid("id").primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    document: jsonb("document").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull(),
+  },
+  (table) => [index().on(table.userId, table.updatedAt)],
+);
+
+export const resumesRelations = relations(resumes, ({ one }) => ({
+  user: one(users, {
+    fields: [resumes.userId],
+    references: [users.id],
+  }),
+}));
+
 export const aiHoldsRelations = relations(aiHolds, ({ one }) => ({
   user: one(users, {
     fields: [aiHolds.userId],

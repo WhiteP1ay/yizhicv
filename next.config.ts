@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  /* 配置写在这里 */
   cacheComponents: true,
   serverExternalPackages: ["svg-captcha", "ali-oss"],
   partialPrefetching: true,

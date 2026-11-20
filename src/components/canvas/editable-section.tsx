@@ -26,6 +26,7 @@ import { TextAlign } from "@/components/editor/extensions/text-align";
 import { Button } from "@/components/ui/button";
 import { IMAGE_TRAY_DRAG_TYPE, readImageTrayDrag } from "@/lib/image-tray-drag";
 import { useActiveEditorStore } from "@/store/active-editor";
+import { confirmDialog } from "@/store/confirm-dialog";
 import { useResumeStore } from "@/store/resume";
 import type { ResumeSection } from "@/types/resume";
 
@@ -220,9 +221,15 @@ export const EditableSection: React.FC<EditableSectionProps> = ({
             variant="ghost"
             size="icon-xs"
             onClick={() => {
-              if (window.confirm("确定要删除当前模块吗？")) {
-                removeSection(section.id);
-              }
+              void (async () => {
+                const ok = await confirmDialog({
+                  title: "删除模块",
+                  description: "确定要删除当前模块吗？",
+                  confirmLabel: "删除",
+                  destructive: true,
+                });
+                if (ok) removeSection(section.id);
+              })();
             }}
             className="h-7 w-7 p-0 hover:bg-rose-600/80 text-rose-300 hover:text-white rounded transition-colors"
             title="删除此模块"

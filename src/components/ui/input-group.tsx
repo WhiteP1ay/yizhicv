@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    // biome-ignore lint/a11y/useSemanticElements: shadcn input-group is a flex row, not a fieldset
+    // biome-ignore lint/a11y/useSemanticElements: shadcn 的输入组是横排，不是 fieldset
     <div
       data-slot="input-group"
       role="group"
@@ -55,7 +55,7 @@ function InputGroupAddon({
   };
 
   return (
-    // biome-ignore lint/a11y/useSemanticElements: shadcn input-group addon is a flex row, not a fieldset
+    // biome-ignore lint/a11y/useSemanticElements: shadcn 的输入组附件是横排，不是 fieldset
     <div
       role="group"
       data-slot="input-group-addon"

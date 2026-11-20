@@ -1,8 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import type React from "react";
 import { useCallback, useRef } from "react";
-import { clearAllClientStorage } from "@/lib/idb-storage";
+import { toast } from "sonner";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { parseResumeDocument } from "@/lib/resume-document";
+import { createResume } from "@/lib/resume-library";
+import { confirmDialog } from "@/store/confirm-dialog";
 import { useResumeStore } from "@/store/resume";
 import { getResumeExportName, yizhiResumeSchema } from "@/types/resume";
 
@@ -14,8 +19,8 @@ interface UseResumeFileActionsOptions {
  * 简历文档生命周期与文件流管理 Hook
  *
  * 核心功能：
- * 1. 新建简历：二次确认后先调用底层清空函数清除 localStorage 与 IndexedDB，随后初始化崭新文档；
- * 2. 清空数据：二次确认防误触，彻底清空客户端所有持久化缓存并将文档恢复至纯净初始状态；
+ * 1. 新建简历：另建一份并打开，原来的简历留在列表里；
+ * 2. 清空数据：二次确认后清空当前这份简历的内容，不删除其他简历；
  * 3. 导入 JSON：读取本地文件，执行 zod 规范校验，兼顾向后兼容修复；
  * 4. 导出 PDF：调用 window.print() 原生打印管线，结合 @media print 渲染纯净矢量 A4；
  * 5. 导出 JSON：序列化文档结构，利用 Blob 与动态链接下载标准 .json 文件。
@@ -24,34 +29,32 @@ export function useResumeFileActions(
   options: UseResumeFileActionsOptions = {},
 ) {
   const { onActionComplete } = options;
-  const { resume, createNewResume, clearResume, importResume } =
-    useResumeStore();
+  const router = useRouter();
+  const { status, user } = useCurrentUser();
+  const { resume, clearResume, importResume } = useResumeStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 1. 新建简历（二次确认后先调用底层清空函数清空所有缓存，再创建新文档）
-  const handleNew = useCallback(async () => {
+  const handleNew = useCallback(() => {
     onActionComplete?.();
-    if (
-      window.confirm(
-        "确定要新建一份简历吗？当前所有未导出的修改及本地缓存都将被彻底清空。",
-      )
-    ) {
-      await clearAllClientStorage();
-      createNewResume();
-    }
-  }, [createNewResume, onActionComplete]);
+    if (status !== "ready") return;
+    void (async () => {
+      const next = await createResume(Boolean(user));
+      router.push(`/app/${next.metadata.id}`);
+    })();
+  }, [onActionComplete, router, status, user]);
 
-  // 2. 清空所有数据与缓存
-  const handleClear = useCallback(async () => {
+  const handleClear = useCallback(() => {
     onActionComplete?.();
-    if (
-      window.confirm(
-        "确定要清空所有内容与本地缓存吗？包括草稿与历史自定义配置，此操作不可撤销。",
-      )
-    ) {
-      await clearAllClientStorage();
+    void (async () => {
+      const ok = await confirmDialog({
+        title: "清空内容",
+        description: "这份简历的内容会被清空，此操作不可撤销。",
+        confirmLabel: "清空",
+        destructive: true,
+      });
+      if (!ok) return;
       clearResume();
-    }
+    })();
   }, [clearResume, onActionComplete]);
 
   // 3. 触发导入文件选择器
@@ -73,8 +76,21 @@ export function useResumeFileActions(
           const parsed = yizhiResumeSchema.safeParse(raw);
 
           if (parsed.success) {
-            importResume(parsed.data);
-            alert("简历导入成功！");
+            const imported = parseResumeDocument({
+              ...parsed.data,
+              metadata: {
+                ...parsed.data.metadata,
+                id: resume.metadata.id,
+                createdAt: resume.metadata.createdAt,
+                updatedAt: new Date().toISOString(),
+              },
+            });
+            if (!imported) {
+              toast.error("导入失败：文件格式不符合一纸简历规范");
+              return;
+            }
+            importResume(imported);
+            toast.success("简历导入成功");
           } else {
             // 尝试宽松兼容历史或第三方结构
             if (raw && Array.isArray(raw.sections)) {
@@ -84,17 +100,24 @@ export function useResumeFileActions(
                 metadata: {
                   ...resume.metadata,
                   ...(raw.metadata || {}),
+                  id: resume.metadata.id,
+                  createdAt: resume.metadata.createdAt,
                   updatedAt: new Date().toISOString(),
                 },
               };
-              importResume(normalized);
-              alert("简历已兼容导入！");
+              const compatible = parseResumeDocument(normalized);
+              if (!compatible) {
+                toast.error("导入失败：文件格式不符合一纸简历规范");
+                return;
+              }
+              importResume(compatible);
+              toast.success("简历已兼容导入");
             } else {
-              alert("导入失败：文件格式不符合一纸简历规范。");
+              toast.error("导入失败：文件格式不符合一纸简历规范");
             }
           }
         } catch {
-          alert("导入失败：无效的 JSON 文件。");
+          toast.error("导入失败：无效的 JSON 文件");
         }
       };
       reader.readAsText(file);

@@ -43,7 +43,7 @@ function Slider({
         {Array.from({ length: _values.length }, (_, index) => (
           <SliderPrimitive.Thumb
             data-slot="slider-thumb"
-            // biome-ignore lint/suspicious/noArrayIndexKey: slider thumb count is stable
+            // biome-ignore lint/suspicious/noArrayIndexKey: 滑块拇指数量固定
             key={index}
             className="relative block size-3.5 shrink-0 rounded-full border border-slate-900 bg-white ring-ring/50 transition-[color,box-shadow] select-none after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:ring-3 disabled:pointer-events-none disabled:opacity-50 cursor-pointer shadow-xs"
           />

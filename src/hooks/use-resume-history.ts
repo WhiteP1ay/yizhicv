@@ -75,13 +75,13 @@ export function useResumeHistory() {
           navigator.platform || navigator.userAgent,
         );
 
-      // Mac: ⌘Z, Win: Ctrl+Z
+      // Mac 用 ⌘Z，Windows 用 Ctrl+Z
       const isUndo =
         (macPlatform ? e.metaKey : e.ctrlKey) &&
         !e.shiftKey &&
         e.key.toLowerCase() === "z";
 
-      // Mac: ⇧⌘Z, Win: Ctrl+Shift+Z 或 Ctrl+Y
+      // Mac 用 ⇧⌘Z，Windows 用 Ctrl+Shift+Z 或 Ctrl+Y
       const isRedo =
         (macPlatform &&
           e.metaKey &&

@@ -13,19 +13,19 @@ export async function clearAllClientStorage(): Promise<void> {
   try {
     localStorage.clear();
   } catch {
-    // ignore
+    // 忽略
   }
   try {
     sessionStorage.clear();
   } catch {
-    // ignore
+    // 忽略
   }
 
   // 2. 清空 idb-keyval 默认数据库键值对
   try {
     await clear();
   } catch {
-    // ignore
+    // 忽略
   }
 
   // 3. 递归删除所有 IndexedDB 数据库
@@ -41,7 +41,7 @@ export async function clearAllClientStorage(): Promise<void> {
         }
       }
     } catch {
-      // ignore
+      // 忽略
     }
   }
 }
@@ -71,7 +71,7 @@ export const idbStorage: StateStorage = {
           return localFallback;
         }
       } catch {
-        // ignore
+        // 忽略
       }
 
       return null;
@@ -98,7 +98,7 @@ export const idbStorage: StateStorage = {
     try {
       await del(name);
     } catch {
-      // ignore
+      // 忽略
     }
   },
 };

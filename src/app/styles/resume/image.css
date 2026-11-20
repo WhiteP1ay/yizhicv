@@ -70,17 +70,17 @@
   pointer-events: none;
 }
 
-#cv-print-target img {
+:is(#cv-print-target, .cv-sheet) img {
   max-width: 100%;
   object-fit: cover;
 }
 
-#cv-print-target img.cv-image-block {
+:is(#cv-print-target, .cv-sheet) img.cv-image-block {
   display: block;
   clear: both;
 }
 
-#cv-print-target img.cv-image-inline {
+:is(#cv-print-target, .cv-sheet) img.cv-image-inline {
   display: inline-block;
   vertical-align: middle;
 }

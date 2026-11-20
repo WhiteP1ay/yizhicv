@@ -1,7 +1,7 @@
-/** 1 CNY = 1e12 pico-CNY. Integer money so a debit cannot drift. */
+/** 1 元 = 1e12 pico-CNY。用整数记账，扣费不会出现小数漂移。 */
 export const PICO_PER_CNY = BigInt(1000000000000);
 
-/** One-time welcome balance. Not monthly, and not a "free tier used" flag. */
+/** 一次性的新用户额度。不是按月发放，也不是「免费额度已用完」的标记。 */
 export const WELCOME_GRANT_PICO_CNY = PICO_PER_CNY / BigInt(2);
 
 export function formatCnyFromPico(value: bigint | string): string {

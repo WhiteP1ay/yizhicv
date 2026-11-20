@@ -18,10 +18,9 @@ const HOLD_TTL_MS = 2 * 60 * 1000;
 const WELCOME_KEY = "welcome";
 
 /**
- * Spendable balance is the account row. Open holds are already subtracted.
- * Ledger rows are the durable history: one welcome grant, usage debits,
- * and later top-ups. Sum of grant + topup + debit equals
- * spendable balance plus any open holds.
+ * 可用余额记在账户行上，未结束的预扣已经减掉。
+ * 流水是留下来的账：一次新用户赠送、使用扣费，以及以后的充值。
+ * 赠送 + 充值 + 扣费 = 可用余额 + 尚未结束的预扣。
  */
 async function lockAccount(tx: Tx, userId: string, releaseStale: boolean) {
   await tx
@@ -201,8 +200,8 @@ export async function releaseDirectUse(userId: string, requestId: string) {
 }
 
 /**
- * Later paid top-ups insert a ledger row and add the same amount.
- * There is no public route for this yet.
+ * 以后的付费充值写入一条流水，并加上同样的金额。
+ * 目前还没有对外的充值接口。
  */
 export async function creditAiBalance(
   userId: string,

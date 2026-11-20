@@ -13,7 +13,7 @@ import {
 import { fetchGithubProfile } from "@/server/github";
 
 function failed(origin: string) {
-  return NextResponse.redirect(new URL("/app?login=failed", origin));
+  return NextResponse.redirect(new URL("/list?login=failed", origin));
 }
 
 export async function GET(request: NextRequest) {
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     // 账本稍后在对话时补开，不阻断登录
   }
   const token = await createSession(userId);
-  const response = NextResponse.redirect(new URL("/app", origin));
+  const response = NextResponse.redirect(new URL("/list", origin));
   clearOauthStateCookie(response);
   setSessionCookie(response, token);
   return response;

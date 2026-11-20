@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const config = readGithubConfig();
   if (!config) {
     return NextResponse.redirect(
-      new URL("/app?login=config", request.nextUrl.origin),
+      new URL("/list?login=config", request.nextUrl.origin),
     );
   }
 

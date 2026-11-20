@@ -20,7 +20,7 @@ function freePort(port) {
         try {
           process.kill(Number(pid), "SIGKILL");
         } catch {
-          // ignore
+          // 忽略
         }
       }
     }
@@ -126,7 +126,7 @@ async function start() {
       try {
         sshProcess.kill("SIGTERM");
       } catch {
-        // ignore
+        // 忽略
       }
     }
   };

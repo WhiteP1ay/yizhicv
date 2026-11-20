@@ -43,7 +43,7 @@
   background: #fef2f2;
 }
 
-#cv-print-target table.cv-side-layout {
+:is(#cv-print-target, .cv-sheet) table.cv-side-layout {
   position: relative;
   width: 100%;
   max-width: 100%;
@@ -59,7 +59,7 @@
   margin: 0;
 }
 
-#cv-print-target table.cv-side-layout td {
+:is(#cv-print-target, .cv-sheet) table.cv-side-layout td {
   width: auto;
   border: none !important;
   padding: 0;
@@ -70,21 +70,21 @@
   overflow-wrap: anywhere;
 }
 
-#cv-print-target table.cv-side-layout td:first-child {
+:is(#cv-print-target, .cv-sheet) table.cv-side-layout td:first-child {
   width: calc(var(--cv-side-left, 50) * 1%);
 }
 
-#cv-print-target table.cv-side-layout td:last-child {
+:is(#cv-print-target, .cv-sheet) table.cv-side-layout td:last-child {
   width: calc((100 - var(--cv-side-left, 50)) * 1%);
 }
 
-#cv-print-target table.cv-side-layout td > :is(p, h1, h2, h3):only-child {
+:is(#cv-print-target, .cv-sheet) table.cv-side-layout td > :is(p, h1, h2, h3):only-child {
   margin-top: 0;
   margin-bottom: 0;
 }
 
 @media screen {
-  #cv-print-target table.cv-side-layout td:first-child {
+  :is(#cv-print-target, .cv-sheet) table.cv-side-layout td:first-child {
     box-shadow: inset -1px 0 0 #e2e8f0;
   }
 

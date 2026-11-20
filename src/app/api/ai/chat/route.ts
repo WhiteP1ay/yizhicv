@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
       try {
         await releaseDirectUse(user.id, requestId);
       } catch {
-        // The hold expires and returns to the balance on a later request.
+        // 预扣过期后，由之后的请求退回余额。
       }
       const failure = failureMessage(error, mode);
       return NextResponse.json(

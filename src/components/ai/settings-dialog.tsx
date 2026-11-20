@@ -391,7 +391,7 @@ export function SettingsDialog() {
       >
         <DialogTitle className="sr-only">设置</DialogTitle>
         <DialogDescription className="sr-only">
-          AI 的 API key 和直接使用额度
+          AI 的 API key 和账号额度
         </DialogDescription>
         <div className="flex h-[520px] min-h-0">
           <aside className="flex w-40 shrink-0 flex-col border-r border-slate-200 bg-slate-50 p-2">
@@ -409,11 +409,9 @@ export function SettingsDialog() {
             <h2 className="text-sm font-medium text-slate-900">AI</h2>
 
             <section className="mt-5">
-              <h3 className="text-xs font-medium text-slate-800">API key</h3>
+              <h3 className="text-xs font-medium text-slate-800">BYOK 模式</h3>
               <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
-                选择服务商并填写 API key，再获取该 key
-                当前可用的模型。配置保存在这台浏览器，不登录也能用。登录后可以同步到账号。BYOK
-                使用你的 key，不占用直接使用额度。
+                使用你自己的 API key，不消耗账号额度。配置默认存在这台浏览器，登录并同步后可跨设备使用。
               </p>
               <form
                 className="mt-3 space-y-2.5"
@@ -606,7 +604,7 @@ export function SettingsDialog() {
             <section className="mt-6 border-t border-slate-100 pt-5">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-xs font-medium text-slate-800">
-                  直接使用额度
+                  账号额度
                 </h3>
                 {user && allowance !== null ? (
                   <span className="text-[11px] text-slate-400">
@@ -623,7 +621,7 @@ export function SettingsDialog() {
                   <div
                     className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-200"
                     role="progressbar"
-                    aria-label="直接使用剩余额度"
+                    aria-label="账号剩余额度"
                     aria-valuemin={0}
                     aria-valuemax={100}
                     aria-valuenow={percent}
@@ -635,9 +633,19 @@ export function SettingsDialog() {
                   </div>
                 )
               ) : (
-                <p className="mt-3 text-[11px] text-slate-400">
-                  登录后可查看剩余额度
-                </p>
+                <div className="mt-3 flex items-center gap-2">
+                  <p className="text-[11px] text-slate-400">
+                    新用户可领取免费 AI 额度
+                  </p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setLoginOpen(true)}
+                  >
+                    登录
+                  </Button>
+                </div>
               )}
             </section>
           </div>

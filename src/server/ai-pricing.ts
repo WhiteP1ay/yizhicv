@@ -18,7 +18,7 @@
 const FX_CNY_NUMERATOR = BigInt(67131);
 const FX_CNY_DENOMINATOR = BigInt(10000);
 
-/** USD per 1M tokens, in micro-USD (1 USD = 1_000_000). */
+/** 每百万 token 的美元价，单位是微美元（1 美元 = 1_000_000）。 */
 const OFF_PEAK_MICRO_USD_PER_MILLION = {
   hit: BigInt(3000),
   miss: BigInt(150000),
@@ -62,7 +62,7 @@ function pricesFrom(table: TokenPrices): TokenPrices {
   };
 }
 
-/** Peak hours are 01:00–04:00 and 06:00–10:00 UTC, Monday through Friday. */
+/** 高峰是周一到周五的 UTC 01:00–04:00 和 06:00–10:00。 */
 export function isDeepSeekPeak(at: Date): boolean {
   const day = at.getUTCDay();
   if (day === 0 || day === 6) return false;
@@ -88,8 +88,7 @@ function wholeTokens(value: number | undefined): bigint {
 }
 
 /**
- * Bill cache hit and cache miss separately. If the API omits the split,
- * treat the whole prompt as a cache miss so the debit is not too small.
+ * 缓存命中和未命中分开计费。接口没拆开时，整段输入按未命中计，避免少扣。
  */
 export function usageCostPico(usage: TokenUsage, prices: TokenPrices): bigint {
   const completion = wholeTokens(usage.completion_tokens);
@@ -108,7 +107,7 @@ export function usageCostPico(usage: TokenUsage, prices: TokenPrices): bigint {
   return hit * prices.hit + miss * prices.miss + completion * prices.output;
 }
 
-/** Conservative prompt size so max_tokens is set before the real usage arrives. */
+/** 真实用量回来之前，用偏保守的输入长度先算出 max_tokens。 */
 export function estimatePromptTokens(messages: { content: string }[]): number {
   let tokens = 16;
   for (const message of messages) {
@@ -129,9 +128,8 @@ export type TurnPlan =
   | { ok: true; maxTokens: number; reservePicoCny: bigint };
 
 /**
- * Refuse when the balance cannot pay this prompt at cache-miss rates plus
- * a 16-token reply. Otherwise cap max_tokens so the reserved completion
- * fits in what is left, and never above 1024.
+ * 余额不够按未命中价支付这段输入，再加 16 个 token 的回复时，拒绝这次对话。
+ * 否则把 max_tokens 限制在剩余余额能覆盖的长度内，并且不超过 1024。
  */
 export function planTurn(
   balancePicoCny: bigint,
