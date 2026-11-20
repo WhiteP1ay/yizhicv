@@ -75,7 +75,7 @@ export function AccountMenu() {
         ) : null}
         <span className="max-w-24 truncate">{user.name || "已登录"}</span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-28 text-xs">
+      <DropdownMenuContent align="end" className="min-w-40 text-xs">
         <DropdownMenuItem
           className="text-xs cursor-pointer"
           onClick={() => {

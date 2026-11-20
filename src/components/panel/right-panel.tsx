@@ -6,9 +6,11 @@ import {
   Layers,
   Palette,
   PlusCircle,
+  Sparkles,
 } from "lucide-react";
 import type React from "react";
 import { useEffect, useRef } from "react";
+import { AiPanel } from "@/components/ai/ai-panel";
 import { Button } from "@/components/ui/button";
 import { useRightPanelResize } from "@/hooks/use-right-panel-resize";
 import { useActiveEditorStore } from "@/store/active-editor";
@@ -46,11 +48,15 @@ export const RightPanel: React.FC = () => {
   const isJsonEditorEnabled = useResumeStore(
     (state) => state.resume.settings.isJsonEditorEnabled,
   );
+  const showAiContent = useResumeStore(
+    (state) => state.resume.settings.showAiContent !== false,
+  );
   const activeTab = useResumeStore(
     (state) => state.resume.settings.rightPanelTab,
   );
   const setActiveTab = useResumeStore((state) => state.setRightPanelTab);
   const jsonWasEnabled = useRef(isJsonEditorEnabled);
+  const aiWasShown = useRef(showAiContent);
   const { getEffectiveEditor, selectionTick } = useActiveEditorStore();
 
   const {
@@ -89,8 +95,28 @@ export const RightPanel: React.FC = () => {
     jsonWasEnabled.current = isJsonEditorEnabled;
   }, [isJsonEditorEnabled, setIsCollapsed, activeTab, setActiveTab]);
 
+  // 打开「显示AI内容」时切到该标签；关掉后如果还停在 AI，回到设计
+  useEffect(() => {
+    if (showAiContent && !aiWasShown.current) {
+      setIsCollapsed(false);
+      setActiveTab("ai");
+    } else if (!showAiContent && activeTab === "ai") {
+      setActiveTab("design");
+    }
+    aiWasShown.current = showAiContent;
+  }, [showAiContent, setIsCollapsed, activeTab, setActiveTab]);
+
   const availableTabs: TabItem[] = [
     ...BASE_TABS,
+    ...(showAiContent
+      ? [
+          {
+            id: "ai" as const,
+            title: "AI",
+            icon: Sparkles,
+          },
+        ]
+      : []),
     ...(isJsonEditorEnabled
       ? [
           {
@@ -159,6 +185,7 @@ export const RightPanel: React.FC = () => {
                   type="button"
                   variant="ghost"
                   size="icon"
+                  data-testid={tab.id === "ai" ? "ai-tab" : undefined}
                   onClick={() => handleTabClick(tab.id)}
                   className={`size-8 rounded-full transition-all duration-150 relative cursor-pointer ${
                     isActive
@@ -204,6 +231,7 @@ export const RightPanel: React.FC = () => {
                 type="button"
                 variant="ghost"
                 size="icon"
+                data-testid={tab.id === "ai" ? "ai-tab" : undefined}
                 onClick={() => handleTabClick(tab.id)}
                 className={`size-8 rounded-full transition-all duration-150 cursor-pointer ${
                   isActive
@@ -231,6 +259,15 @@ export const RightPanel: React.FC = () => {
               <p className="text-[11px] text-slate-400 mt-1">
                 支持拖拽重排、显隐控制与跨栏调配
               </p>
+            </div>
+          )}
+          {showAiContent && (
+            <div
+              className={`flex-1 flex-col min-h-0 overflow-hidden ${
+                activeTab === "ai" ? "flex" : "hidden"
+              }`}
+            >
+              <AiPanel />
             </div>
           )}
           {isJsonEditorEnabled && (

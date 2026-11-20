@@ -1,0 +1,107 @@
+/* 简历文字层级：标题、正文、行高、模块间距。标题不自带分割线。 */
+
+#cv-print-target h1,
+#cv-print-target .cv-inline-editor h1 {
+  font-size: 1.75em;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-top: 0.35em;
+  margin-bottom: 0.25em;
+  border: none !important;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+#cv-print-target h2,
+#cv-print-target .cv-inline-editor h2 {
+  font-size: 1.25em;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin-top: 0.45em;
+  margin-bottom: 0.3em;
+  border: none !important;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+#cv-print-target h3,
+#cv-print-target .cv-inline-editor h3 {
+  font-size: 1.1em;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 0.35em;
+  margin-bottom: 0.2em;
+  border: none !important;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+/* 消除条目内横向 flex 容器中标题的外边距，确保与日期等元数据基线完美对齐 */
+#cv-print-target .cv-entry .flex h1,
+#cv-print-target .cv-entry .flex h2,
+#cv-print-target .cv-entry .flex h3,
+#cv-print-target .justify-between h1,
+#cv-print-target .justify-between h2,
+#cv-print-target .justify-between h3 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  border: none !important;
+  border-bottom: none !important;
+}
+
+/* 水平分割线规则：允许内联样式自定义高度与颜色 */
+#cv-print-target hr {
+  border: none;
+  border-top-style: solid;
+  margin: 0.6em 0;
+}
+
+/* 正文段落与列表基准 */
+#cv-print-target p,
+#cv-print-target .cv-inline-editor p {
+  font-size: 1em;
+  margin-top: 0;
+  margin-bottom: 0.35em;
+}
+
+/* 行高变量穿透与强制继承：击碎 prose 默认行高与硬编码 leading */
+#cv-print-target {
+  line-height: var(--cv-line-height, 1.45);
+}
+
+#cv-print-target .cv-inline-editor,
+#cv-print-target .cv-inline-editor p,
+#cv-print-target .cv-inline-editor li,
+#cv-print-target .cv-inline-editor ul,
+#cv-print-target .cv-inline-editor ol,
+#cv-print-target .cv-inline-editor div,
+#cv-print-target .cv-inline-editor span,
+#cv-print-target .prose,
+#cv-print-target .prose p,
+#cv-print-target .prose li,
+#cv-print-target .prose ul,
+#cv-print-target .prose ol,
+#cv-print-target .prose div,
+#cv-print-target .prose span,
+#cv-print-target p,
+#cv-print-target li,
+#cv-print-target div,
+#cv-print-target span {
+  line-height: var(--cv-line-height, 1.45) !important;
+}
+
+/* 着色会把文字包进 span。标题行高比正文紧，span 若跟着正文行高，标题会被撑高 */
+#cv-print-target :is(h1, h2, h3) span {
+  line-height: inherit !important;
+}
+
+#cv-print-target :is(h1, h2, h3) span[style*="font-size"] {
+  line-height: var(--cv-line-height, 1.45) !important;
+}
+
+/* 模块间隙完全由父级 --cv-gap 驱动，消除模板内写死的 mb-4 外边距干扰，确保间隙可真正降至 0 */
+#cv-print-target .cv-section-block {
+  margin-bottom: 0 !important;
+}

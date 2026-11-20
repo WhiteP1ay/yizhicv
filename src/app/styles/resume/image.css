@@ -1,0 +1,86 @@
+/* 简历图片：选中、缩放，以及在排版流里的块级 / 行内显示。 */
+
+.cv-image-frame {
+  position: relative;
+  max-width: 100%;
+  line-height: 0;
+}
+
+.cv-image-frame.is-block {
+  display: block;
+  width: fit-content;
+}
+
+.cv-image-frame.is-block[data-align="left"] {
+  margin: 0.5rem auto 0.5rem 0;
+}
+
+.cv-image-frame.is-block[data-align="center"] {
+  margin: 0.5rem auto;
+}
+
+.cv-image-frame.is-block[data-align="right"] {
+  margin: 0.5rem 0 0.5rem auto;
+}
+
+.cv-image-frame.is-inline {
+  display: inline-block;
+  vertical-align: middle;
+  width: fit-content;
+  margin: 0 2px;
+}
+
+.cv-image-frame.is-selected {
+  outline: 1px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+.cv-image-el {
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+.cv-image-resize-handle {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  z-index: 2;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid #2563eb;
+  border-radius: 2px;
+  background: white;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.cv-image-resize-label {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 4px;
+  border-radius: 4px;
+  background: #1e293b;
+  color: white;
+  font-size: 10px;
+  line-height: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+#cv-print-target img {
+  max-width: 100%;
+  object-fit: cover;
+}
+
+#cv-print-target img.cv-image-block {
+  display: block;
+  clear: both;
+}
+
+#cv-print-target img.cv-image-inline {
+  display: inline-block;
+  vertical-align: middle;
+}

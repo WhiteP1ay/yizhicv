@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import type React from "react";
 import { useCallback, useEffect } from "react";
 import { Toaster } from "sonner";
+import { SettingsDialog } from "@/components/ai/settings-dialog";
 import { ImageTray } from "@/components/canvas/image-tray";
 import { AppTopBar } from "@/components/layout/app-top-bar";
 import { LoginDialog } from "@/components/layout/login-dialog";
@@ -99,6 +100,7 @@ export default function AppPage() {
       <ImageTray />
 
       <LoginDialog />
+      <SettingsDialog />
 
       {/* 全局消息提示 */}
       <Toaster position="top-center" richColors />

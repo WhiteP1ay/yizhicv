@@ -1,0 +1,63 @@
+/* 画布内编辑：占位符、脱敏标记、内联编辑器。 */
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: #94a3b8;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* 脱敏标记：编辑器内的视觉提示 */
+.cv-blur-mark {
+  background-color: #f3e8ff;
+  color: #6b21a8;
+  border-radius: 4px;
+  padding: 1px 4px;
+  border-bottom: 1.5px dashed #a855f7;
+  transition: all 0.25s ease;
+}
+
+/* 画布预览脱敏：开启「隐藏敏感内容」时的五彩马赛克遮盖效果（透出模糊暗色字迹，不可辨认细节） */
+.cv-preview-blur .cv-blur-mark {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 2px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  /* 足够强度的模糊，透出暗色墨迹轮廓但坚决无法看清字符细节 */
+  color: #0f172a !important;
+  filter: blur(4px);
+  user-select: none;
+  pointer-events: none;
+  border: none !important;
+  text-shadow: none !important;
+  /* 五彩马卡龙静态渐变底色 */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 182, 193, 0.75) 0%,
+    rgba(255, 209, 164, 0.75) 18%,
+    rgba(255, 242, 168, 0.75) 36%,
+    rgba(168, 240, 213, 0.75) 54%,
+    rgba(163, 216, 244, 0.75) 72%,
+    rgba(216, 187, 244, 0.75) 90%,
+    rgba(255, 182, 193, 0.75) 100%
+  );
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.cv-preview-blur .cv-blur-mark::selection {
+  background: transparent !important;
+  color: transparent !important;
+}
+
+/* 画布内联直接编辑微调 */
+.cv-inline-editor {
+  outline: none !important;
+}
+.cv-inline-editor > *:first-child {
+  margin-top: 0 !important;
+}
+.cv-inline-editor > *:last-child {
+  margin-bottom: 0 !important;
+}

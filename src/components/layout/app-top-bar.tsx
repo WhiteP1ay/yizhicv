@@ -7,8 +7,11 @@ import {
   EyeOff,
   FileCode,
   FilePlus,
+  Images,
   Printer,
   Redo2,
+  Settings,
+  Sparkles,
   Terminal,
   Trash2,
   Undo2,
@@ -16,6 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
+import { useEffect, useState } from "react";
 import { AccountMenu } from "@/components/layout/account-menu";
 import {
   Menubar,
@@ -33,15 +37,30 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useResumeFileActions } from "@/hooks/use-resume-file-actions";
 import { useResumeHistory } from "@/hooks/use-resume-history";
+import { useSettingsDialog } from "@/store/api-key-dialog";
 import { useResumeStore } from "@/store/resume";
 
 export const AppTopBar: React.FC = () => {
+  const openSettings = useSettingsDialog((state) => state.openDialog);
+  const [settingsShortcut, setSettingsShortcut] = useState("Ctrl+,");
   const { canUndo, canRedo, undo, redo, undoShortcut, redoShortcut } =
     useResumeHistory();
 
-  const { toggleJsonEditor, toggleBlurMode, setImageTrayOpen, resume } =
-    useResumeStore();
-  const { isJsonEditorEnabled, isBlurMode, imageTrayOpen } = resume.settings;
+  useEffect(() => {
+    if (/Mac|iPhone|iPad/.test(navigator.userAgent)) {
+      setSettingsShortcut("⌘,");
+    }
+  }, []);
+
+  const {
+    toggleJsonEditor,
+    toggleBlurMode,
+    setShowAiContent,
+    setImageTrayOpen,
+    resume,
+  } = useResumeStore();
+  const { isJsonEditorEnabled, isBlurMode, showAiContent, imageTrayOpen } =
+    resume.settings;
 
   const {
     fileInputRef,
@@ -141,6 +160,20 @@ export const AppTopBar: React.FC = () => {
                   </MenubarItem>
                 </MenubarSubContent>
               </MenubarSub>
+
+              <MenubarSeparator />
+
+              <MenubarItem
+                onClick={() => openSettings()}
+                className="text-xs gap-2 cursor-pointer"
+                data-testid="api-key-menu"
+              >
+                <Settings className="size-3.5 text-slate-500" />
+                <span>设置</span>
+                <MenubarShortcut className="tracking-normal">
+                  {settingsShortcut}
+                </MenubarShortcut>
+              </MenubarItem>
             </MenubarContent>
           </MenubarMenu>
 
@@ -186,25 +219,27 @@ export const AppTopBar: React.FC = () => {
                 <EyeOff className="size-3.5 text-slate-500 mr-1" />
                 <span>隐藏敏感内容</span>
               </MenubarCheckboxItem>
-            </MenubarContent>
-          </MenubarMenu>
-
-          {/* 窗口菜单 */}
-          <MenubarMenu>
-            <MenubarTrigger className="h-7 px-2.5 text-xs font-medium rounded-md text-slate-700 hover:text-slate-900 hover:bg-slate-100 data-[state=open]:bg-slate-200 data-[state=open]:text-slate-900 cursor-pointer">
-              窗口
-            </MenubarTrigger>
-            <MenubarContent className="min-w-44 text-xs">
+              <MenubarCheckboxItem
+                checked={showAiContent !== false}
+                onCheckedChange={(checked) => setShowAiContent(checked)}
+                className="text-xs cursor-pointer"
+                data-testid="show-ai-content"
+              >
+                <Sparkles className="size-3.5 text-slate-500 mr-1" />
+                <span>显示AI内容</span>
+              </MenubarCheckboxItem>
               <MenubarCheckboxItem
                 checked={imageTrayOpen}
                 onCheckedChange={(checked) => setImageTrayOpen(checked)}
                 className="text-xs cursor-pointer"
               >
+                <Images className="size-3.5 text-slate-500 mr-1" />
                 <span>备选</span>
               </MenubarCheckboxItem>
               <MenubarSub>
-                <MenubarSubTrigger className="text-xs gap-2 cursor-pointer">
-                  <Terminal className="size-3.5 text-slate-500" />
+                <MenubarSubTrigger className="text-xs cursor-pointer">
+                  {/* 复选项内容从 pl-7 起排，子菜单触发器只有 px-1.5，补上差值后图标与「隐藏敏感内容」左缘、行高中线一致 */}
+                  <Terminal className="ml-[1.375rem] size-3.5 self-center text-slate-500 mr-1" />
                   <span>开发者</span>
                 </MenubarSubTrigger>
                 <MenubarSubContent className="min-w-40 text-xs">

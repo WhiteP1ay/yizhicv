@@ -114,6 +114,10 @@ export const JsonEditorPanel: React.FC = () => {
             typeof rawSettings.isBlurMode === "boolean"
               ? rawSettings.isBlurMode
               : defaultResume.settings.isBlurMode,
+          showAiContent:
+            typeof rawSettings.showAiContent === "boolean"
+              ? rawSettings.showAiContent
+              : defaultResume.settings.showAiContent,
           isJsonEditorEnabled:
             typeof rawSettings.isJsonEditorEnabled === "boolean"
               ? rawSettings.isJsonEditorEnabled

@@ -1,0 +1,7 @@
+/* 简历画布：编辑器、标题正文、左右栏、图片、打印。 */
+
+@import "./resume/editor.css";
+@import "./resume/type.css";
+@import "./resume/side.css";
+@import "./resume/image.css";
+@import "./resume/print.css";

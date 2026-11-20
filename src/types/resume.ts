@@ -26,10 +26,10 @@ export type ResumeLayout = z.infer<typeof resumeLayoutSchema>;
 
 /**
  * 工作台偏好设置 (Workspace Settings)
- * 记录右侧面板宽度、折叠状态、脱敏模式、预览比例及 JSON 源码编辑开关
+ * 记录右侧面板宽度、折叠状态、脱敏模式、AI 标签、预览比例及 JSON 源码编辑开关
  */
 export const rightPanelTabSchema = z
-  .enum(["design", "insert", "sections", "json"])
+  .enum(["design", "insert", "sections", "json", "ai"])
   .default("design");
 export type RightPanelTab = z.infer<typeof rightPanelTabSchema>;
 
@@ -39,6 +39,8 @@ export const resumeSettingsSchema = z.object({
   rightPanelTab: rightPanelTabSchema,
   previewScale: z.number().min(0.4).max(1.4).default(0.88),
   isBlurMode: z.boolean().default(false),
+  /** 右侧面板里的 AI 标签，默认显示 */
+  showAiContent: z.boolean().default(true),
   isJsonEditorEnabled: z.boolean().default(false),
   /** 备选图片小窗是否打开 */
   imageTrayOpen: z.boolean().default(false),
@@ -87,6 +89,7 @@ export const yizhiResumeSchema = z.object({
     rightPanelTab: "design",
     previewScale: 0.88,
     isBlurMode: false,
+    showAiContent: true,
     isJsonEditorEnabled: false,
     imageTrayOpen: false,
     imageTrayX: 24,
@@ -281,6 +284,7 @@ export const defaultResume: YizhiResume = {
     rightPanelTab: "design",
     previewScale: 0.88,
     isBlurMode: false,
+    showAiContent: true,
     isJsonEditorEnabled: false,
     imageTrayOpen: false,
     imageTrayX: 24,

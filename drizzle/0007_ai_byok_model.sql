@@ -1,0 +1,1 @@
+ALTER TABLE "ai_byok" ADD COLUMN "model" text;

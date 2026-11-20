@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { ensureAiAccount } from "@/server/ai-ledger";
 import {
   callbackUrl,
   clearOauthStateCookie,
@@ -48,6 +49,11 @@ export async function GET(request: NextRequest) {
   }
 
   const userId = await upsertGithubUser(profile);
+  try {
+    await ensureAiAccount(userId);
+  } catch {
+    // 账本稍后在对话时补开，不阻断登录
+  }
   const token = await createSession(userId);
   const response = NextResponse.redirect(new URL("/app", origin));
   clearOauthStateCookie(response);

@@ -1,0 +1,70 @@
+/* 打印与导出 PDF。屏幕上的选中框、拖拽手柄在这里关掉。 */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .cv-preview-blur .cv-blur-mark {
+    filter: blur(4px) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  header,
+  nav,
+  .md\:hidden,
+  .SectionEditorPane,
+  aside:not(.cv-slot-sidebar),
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  #cv-print-target {
+    transform: none !important;
+    box-shadow: none !important;
+    margin: 0 auto !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    padding: var(--cv-page-padding, 16mm) !important;
+    page-break-after: always;
+  }
+
+  /* 打印时避免断行截断 */
+  .cv-section-block,
+  .cv-entry {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .cv-section-container {
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  .cv-side-frame,
+  #cv-print-target table.cv-side-layout,
+  #cv-print-target table.cv-side-layout td {
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  .cv-side-frame > .cv-side-handle {
+    display: none !important;
+  }
+
+  .cv-image-frame.is-selected {
+    outline: none !important;
+  }
+}

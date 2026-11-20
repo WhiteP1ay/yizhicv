@@ -19,6 +19,7 @@ interface ResumeState {
   // Actions
   setActiveSectionId: (id: string | null) => void;
   toggleBlurMode: () => void;
+  setShowAiContent: (show: boolean) => void;
   toggleJsonEditor: () => void;
   setJsonEditorEnabled: (enabled: boolean) => void;
   setIsPaddingHighlight: (highlight: boolean) => void;
@@ -100,6 +101,16 @@ export const useResumeStore = create<ResumeState>()(
               },
             };
           }),
+        setShowAiContent: (showAiContent) =>
+          set((state) => ({
+            resume: {
+              ...state.resume,
+              settings: {
+                ...state.resume.settings,
+                showAiContent,
+              },
+            },
+          })),
         toggleJsonEditor: () =>
           set((state) => {
             const next = !state.resume.settings.isJsonEditorEnabled;

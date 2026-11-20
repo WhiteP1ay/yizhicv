@@ -1,0 +1,109 @@
+/* 左右布局：一行两格，左格宽度是 --cv-side-left 的百分比。 */
+
+.cv-side-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0.35em 0;
+}
+
+.cv-side-frame > .cv-side-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  gap: 2px;
+  transform: translateX(calc(-100% + 6px));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cv-side-frame:hover > .cv-side-handle {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cv-side-frame .cv-side-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  background: #fff;
+  color: #dc2626;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.cv-side-frame .cv-side-delete:hover {
+  background: #fef2f2;
+}
+
+#cv-print-target table.cv-side-layout {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 0.35em 0;
+  border: none;
+  border-collapse: collapse;
+  table-layout: fixed;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.cv-side-frame > table.cv-side-layout {
+  margin: 0;
+}
+
+#cv-print-target table.cv-side-layout td {
+  width: auto;
+  border: none !important;
+  padding: 0;
+  line-height: 0;
+  /* 默认贴上边。格子写了 vertical-align: middle 或 bottom 时，以内联样式为准。 */
+  vertical-align: top;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+#cv-print-target table.cv-side-layout td:first-child {
+  width: calc(var(--cv-side-left, 50) * 1%);
+}
+
+#cv-print-target table.cv-side-layout td:last-child {
+  width: calc((100 - var(--cv-side-left, 50)) * 1%);
+}
+
+#cv-print-target table.cv-side-layout td > :is(p, h1, h2, h3):only-child {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+@media screen {
+  #cv-print-target table.cv-side-layout td:first-child {
+    box-shadow: inset -1px 0 0 #e2e8f0;
+  }
+
+  .cv-side-frame:hover > table.cv-side-layout {
+    outline: 1px solid #93c5fd;
+    outline-offset: 2px;
+    background: rgba(219, 234, 254, 0.45);
+  }
+
+  .cv-side-frame:hover > table.cv-side-layout td:first-child {
+    box-shadow: inset -1px 0 0 #93c5fd;
+  }
+
+  .cv-side-frame.is-dragging > table.cv-side-layout td:first-child {
+    box-shadow: inset -2px 0 0 #2563eb;
+  }
+}
+
+.cv-side-resize,
+.cv-side-resize * {
+  cursor: col-resize !important;
+}
